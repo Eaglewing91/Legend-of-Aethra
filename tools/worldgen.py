@@ -138,6 +138,8 @@ PLACES = {
     'wreck_isle': (120, 182, 'wreck_isle', 0, 0, 'wreck', 'Shipwreck Cove'),
     'hermit': (12, 170, 'hermit', 0, 0, 'hut', 'Hermit\'s Hut'),
     'chapel': (150, 88, 'chapel', 0, 0, 'temple', 'Isle Chapel'),
+    'mideel': (73, 144, 'mideel', 0, 0, 'village', 'Mideel Shallows'),
+    'academy': (91, 104, 'academy', 0, 0, 'tower', 'Vanguard Academy'),
 }
 # encounter regions: a coarse grid (16 x 16 tiles per cell) of encounter groups by area
 REG = {}

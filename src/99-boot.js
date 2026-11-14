@@ -1,6 +1,14 @@
 /* ================= Boot: unpack the data, decode the art, start ================= */
-AE.boot = function (host, data, opts) {
+// gzip + base64 -> object (maps and the world are shipped compressed)
+AE.unz = async function (b64) {
+  const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const txt = await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  return JSON.parse(txt);
+};
+AE.boot = async function (host, data, opts) {
   opts = opts || {};
+  if (data.mapsz) { data.maps = await AE.unz(data.mapsz); delete data.mapsz; }
+  if (data.worldz) { data.world = await AE.unz(data.worldz); delete data.worldz; }
   AE.VERSION = data.version; AE.SHEETS = data.sheets; AE.FILL_ORDER = data.fills; AE.FXMETA = data.fx; AE.MS = data.ms || null; AE.BOSSFW = data.bossfw || {};
   AE.MAPS = data.maps; AE.WORLD = data.world; AE.SFX = data.sfx || {}; AE.MUSIC = Object.assign(AE.MUSIC || {}, data.music || {});
   const canvas = document.createElement('canvas'); canvas.className = 'ae-canvas'; host.appendChild(canvas);

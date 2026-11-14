@@ -97,9 +97,9 @@ AE.World.prototype.onTile = function () {
   }
 };
 AE.worldBg = function (t) { return { 2: 'beach', 3: 'grass', 4: 'forest', 5: 'plains', 7: 'desert', 8: 'snow', 10: 'swamp', 11: 'slums', 13: 'plains', 15: 'forest', 19: 'plains', 21: 'ice', 0: 'sea', 1: 'sea' }[t] || 'grass'; };
-AE.World.prototype.enterPlace = function (k) {
+AE.World.prototype.enterPlace = function (k, force) {
   const p = AE.WORLD.places[k], self = this, S = AE.S_;
-  if (AE.EV['place:' + k]) { this.busy = true; Promise.resolve(AE.EV['place:' + k](this)).then(function (r) { self.busy = false; }); return; }
+  if (!force && AE.EV['place:' + k]) { this.busy = true; Promise.resolve(AE.EV['place:' + k](this)).then(function (r) { self.busy = false; }); return; }
   const M = AE.MAPS[p[2]]; if (!M) { this.notice = { text: p[6] + ' (not built yet)', t: 90 }; return; }
   this.busy = true;
   AE.game.fadeOut(0.1).then(function () {

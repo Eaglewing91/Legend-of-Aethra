@@ -124,7 +124,7 @@ def dunewreck():
     house(t, 22, 3, 'hall')
     for (x, y, w, h) in ((6, 12, 4, 2), (31, 13, 5, 2), (12, 29, 4, 3), (40, 23, 3, 3), (18, 15, 2, 2)): t.ground('lava', x, y, x + w - 1, y + h - 1)
     t.entry = [24, 36]; t.event(22, 34, 'a3_dive1', 6, 1, unless='dive1'); t.event(21, 23, 'a3_dive2', 8, 1, unless='dive2'); t.event(22, 9, 'a3_dive3', 6, 1, unless='dive3')
-    t.enc = 'dive'
+    t.enc = 'dive'; t.extra['tint'] = 'rgba(120,20,0,.28)'
     return [m, t]
 
 def cinder():

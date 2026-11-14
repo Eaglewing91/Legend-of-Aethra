@@ -95,7 +95,8 @@ bossfw = {}
 for f in glob.glob('art/na/boss/*_Idle*.png'):
     im = Image.open(f); n = os.path.basename(f)[:-4].split('_')[0]; bossfw[n] = im.size[1] if im.size[0] % im.size[1] == 0 else im.size[0] // max(1, round(im.size[0] / im.size[1]))
 world = json.load(open('build/world.json'))
-data = {'version': VERSION, 'world': world, 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'maps': maps, 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw}
+gz = lambda o: base64.b64encode(gzip.compress(json.dumps(o, separators=(',', ':')).encode(), 9)).decode()
+data = {'version': VERSION, 'worldz': gz(world), 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'mapsz': gz(maps), 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw}
 src = '\n'.join(open(f).read() for f in sorted(glob.glob('src/*.js')) + sorted(glob.glob('src/content/*.js')))
 blob = json.dumps(data)
 open('build/data.js', 'w').write('window.AE_DATA = ' + blob + ';')

@@ -18,7 +18,7 @@ THEMES = {
     'lava': dict(wall='lava', floor='cave', accent='darkcobble', props=['rock', 'stal'], music='dungeon', dark=0, water='lava'),
     'ruins': dict(wall='sand', floor='cobble', accent='brick', props=['pillar', 'statue', 'urn', 'rock'], music='ruins', dark=0),
     'ship': dict(wall='wood', floor='planks', accent='metal', props=['crate', 'barrel', 'console', 'pipe_h'], music='dungeon', dark=0),
-    'crystal': dict(wall='crystal', floor='marble', accent='crystal', props=['crystal_s', 'pillar', 'statue'], music='final', dark=0),
+    'crystal': dict(wall='dark', floor='crystal', accent='marble', props=['crystal_s', 'pillar', 'statue'], music='final', dark=0),
     'forest': dict(wall='hedge', floor='grass', accent='dirt', props=['bush', 'rock', 'flowers', 'stump'], music='forest', dark=0, water='water'),
     'factory': dict(wall='metal', floor='metal', accent='darkmetal', props=['crate', 'console', 'pipe_h', 'pipe_v', 'barrel'], music='factory', dark=0),
 }

@@ -177,6 +177,7 @@ AE.Field.prototype.draw = function (ctx) {
   all.forEach(function (a) { a.draw(ctx, cx, cy); });
   m.drawLayer(ctx, 'over', cx, cy);
   if (m.d.dark) { ctx.fillStyle = 'rgba(0,0,20,' + (m.d.dark * 0.15) + ')'; ctx.fillRect(0, 0, AE.W, AE.H); }
+  if (m.d.tint) { ctx.fillStyle = m.d.tint; ctx.fillRect(0, 0, AE.W, AE.H); }
   if (this.title > 0) {
     this.title--; const a = Math.min(1, this.title / 30);
     ctx.globalAlpha = a; const w = AE.textWidth(m.name) + 24; AE.window(ctx, (AE.W - w) / 2, 12, w, 20); AE.text(ctx, m.name, AE.W / 2, 18, '#fff', { align: 'center' }); ctx.globalAlpha = 1;

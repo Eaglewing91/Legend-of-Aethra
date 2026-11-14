@@ -116,8 +116,11 @@ AE.Battle.prototype.draw = function (ctx) {
     const fr = Math.min(M2.n - 1, Math.floor(e.t / 4)), k = 2;
     AE.blit(ctx, im, fr * M2.fw, 0, M2.fw, im.height, e.x - M2.fw * k / 2, e.y - im.height * k / 2, M2.fw * k, im.height * k, { filter: e.tint || undefined });
   });
-  this.pops.forEach(function (p) {
-    const y = p.y - Math.min(14, p.t) + (p.t < 14 ? 0 : 0), a = p.t > 45 ? (60 - p.t) / 15 : 1;
+  if (this.drawParts) this.drawParts(ctx);
+  this.pops.forEach(function (p, i) {
+    // numbers leap up, drop and bounce twice, then fade
+    const t = p.t, b = t < 10 ? Math.sin(t / 10 * Math.PI) * 14 : t < 18 ? Math.sin((t - 10) / 8 * Math.PI) * 5 : t < 24 ? Math.sin((t - 18) / 6 * Math.PI) * 2 : 0;
+    const y = p.y - 6 - b, a = t > 45 ? (60 - t) / 15 : 1;
     ctx.globalAlpha = a; AE.text(ctx, p.text, p.x, y, p.col, { align: 'center' }); ctx.globalAlpha = 1;
   });
   if (this.banner) { const w = AE.textWidth(this.banner.text) + 20; AE.window(ctx, (AE.W - w) / 2, 4, w, 18); AE.text(ctx, this.banner.text, AE.W / 2, 9, '#fff', { align: 'center' }); }
@@ -130,7 +133,6 @@ AE.Battle.prototype.draw = function (ctx) {
     const a = Math.min(1, this.endT / 90); ctx.globalAlpha = a; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, AE.W, AE.H); ctx.globalAlpha = 1;
     if (this.endT > 60) AE.text(ctx, 'The party has fallen...', AE.W / 2, 100, '#e0d0d0', { align: 'center' });
   }
-  if (this.phase === 'intro') { ctx.fillStyle = '#000'; const k = 1 - this.t / 30; ctx.fillRect(0, 0, AE.W, AE.H * k / 2); ctx.fillRect(0, AE.H - AE.H * k / 2, AE.W, AE.H * k / 2); }
   if (this.runHold > 10) AE.text(ctx, 'Running...', 200, 50, '#fff', { align: 'center' });
 };
 AE.Battle.prototype.drawEcho = function (ctx) {

@@ -77,6 +77,11 @@ def sumps():
     # the road east to the Market Ward
     for y in (26, 27, 28): m.warp(W - 3, y, 'market', 2, y - 4, 1)
     m.ground('cobble', W - 3, 26, W - 2, 28); m.wall[m.i(W - 2, 26)] = None
+    # west along Lantern Row: Ash Lane, where the plate came down
+    for y in (26, 27, 28):
+        for x in (0, 1): m.wall[m.i(x, y)] = None; m.ground('cobble', x, y, x, y)
+        m.warp(0, y, 'ash_lane', 42, y - 11, 3)
+    m.sign(3, 25, 'ASH LANE. Closed. Rescue workers only.')
     shanty(m)
     m.entry = [10, 10]
     people(m)

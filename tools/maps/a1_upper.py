@@ -125,7 +125,7 @@ def drains():
 
 def spire():
     maps = []; infos = []
-    loot = [['potion', 'grenade', ('gold', 200)], ['phoenix_down', 'prism:ice', 'hi_potion'], ['rifle_lance', ('potion', 3), 'antidote'],
+    loot = [['potion', 'grenade', ('gold', 200)], ['phoenix_down', 'prism:ice', 'hi_potion', 'clerk_pass'], ['rifle_lance', ('potion', 3), 'antidote'],
             ['copper_staff', 'ether', ('gold', 400)], ['titan_band', 'prism:cover', 'hi_potion'], ['prism:steal', 'stiletto', ('gold', 500)]]
     names = ['Base Scaffold', 'Girder Run', 'Crane Deck', 'Wind Gallery', 'Rivet Heights', 'Top Spar']
     for k in range(6):
@@ -191,6 +191,8 @@ def plate_plaza(spire_top):
     # the tower doors: the top of the plaza
     m.ground('marble', 18, 1, 21, 1); m.warp(18, 1, 'tower_1', 15, 21, 0, 4)
     m.warp(19, 27, 'spire_6', spire_top[0], spire_top[1], 2, 2)
+    # west: the road into Lantern Heights, the plate's residential sector
+    for y in (11, 12, 13): m.wall[m.i(0, y)] = None; m.ground('tile', 0, y, 0, y); m.warp(0, y, 'plate_heights', 0, 0, 3)
     m.entry = [19, 25]
     m.event(14, 4, 'a1_plaza', 12, 1, unless='a1_plaza')
     m.sign(17, 6, 'AUREX DYNAMICS - HEADQUARTERS. "Power for a brighter Aethra."')

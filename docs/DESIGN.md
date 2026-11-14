@@ -44,14 +44,14 @@ make herself its god.
 ## Cast (party of 3 in battle; swap at save points / on the world map)
 | Name | Role in story | Weapon | Surge Arts (4 levels) |
 |---|---|---|---|
-| **Kael Ardent** | Ex-Aurex security trooper turned courier-mercenary. Lead. | Blades | Gale Rush, Skysplitter, Tempest Arc, Aether Edge |
-| **Lyra Vale** | Spire reactor technician who learned what the drain does; rebel healer. | Staves | Mending Light, Ward Bloom, Sanctuary, Rebirth |
-| **Bram Hollis** | Disgraced Aurex knight-captain leading the rebel cell *Undercurrent*. | Rifle-lances | Breach Shot, Overload, Siege Line, Last Stand |
-| **Sable** | Thief and spy from the Halcyon undercity. | Daggers | Pickpocket Flurry, Shadowstep, Thousand Cuts, Vanish |
-| **Orin Thale** | Old scholar of the Crystals, in his tower in the desert. | Rods | Arcane Surge, Starfall, Gravity Well, Genesis |
+| **Kael Ardent** | A newly sworn Warden of the Vanguard Academy; not who he thinks he is. Lead. | Blades | Gale Rush, Skysplitter, Tempest Arc, Aether Edge |
+| **Lyra Vale** | Reactor technician, secretly one of the last Chorus who hear the Aetherflow. | Staves | Mending Light, Ward Bloom, Sanctuary, Rebirth |
+| **Bram Hollis** | Ex-Aurex knight-captain who leads the rebel cell *Undercurrent*; burned Thornbrook on orders. | Rifle-lances | Breach Shot, Overload, Siege Line, Last Stand |
+| **Sable** | Undercity thief and spy, raised at the Lantern House orphanage. | Daggers | Pickpocket Flurry, Shadowstep, Thousand Cuts, Vanish |
+| **Orin Thale** | Crystal scholar who taught Vesper, hiding in his desert tower. | Rods | Arcane Surge, Starfall, Gravity Well, Genesis |
 | **Ember** | Young summoner from Lumen, last of her line. | Bells | Echo Call, Twin Echo, Echo Chorus, Grand Echo |
-| **Rook** *(optional)* | An ancient automaton found in Dunewreck. | Fists | Piston Barrage, Core Burst, Overclock, Self-Repair |
-| **Vesna** *(optional)* | A mercenary sharpshooter hunting Vesper. | Guns | Deadeye, Spread Shot, Rain of Lead, Final Mark |
+| **Rook** *(optional)* | A Chorus-era automaton holding the real Kael's last memories. | Fists | Piston Barrage, Core Burst, Overclock, Self-Repair |
+| **Vesna** *(optional)* | Sharpshooter, Vesper's former partner in Project Cradle. | Guns | Deadeye, Spread Shot, Rain of Lead, Final Mark |
 
 ## Systems
 - **ATB** (Active or Wait, battle speed 1–5). Commands: Attack, (Prism commands), Magic, Echo, Item, Surge when
@@ -78,28 +78,123 @@ make herself its god.
 - **Side content**: 40+ side quests, 9 Echoes, ultimate weapons for each character, 3 super-bosses,
   the post-game Abyssal Spire (50 floors).
 
-## Story (five acts)
-**Act I — Halcyon.** Kael, hired by the rebel cell Undercurrent (Bram, Sable), raids a Spire reactor and
-meets Lyra, a technician who helps them escape. The raid is framed as a massacre. Through the four districts,
-the undercity and a corporate tower, they learn of Vesper's Crystal project and escape Halcyon by train.
-*Dungeons: Reactor 4 (4 floors), Undercity sewers, Aurex Tower (8 floors), the Rail Yards.*
+## Story
 
-**Act II — Meridia.** Thornbrook, Mistwood, Kestrel Ranch (Talonbirds), the Gilded Spire, and Windhaven,
-where Aurex attacks the Wind Crystal. It shatters; Lyra holds a shard, and Echo Sylphine is born.
-*Dungeons: Mistwood (3 areas), Old Mine, Windhaven Catacombs, Wind Shrine (5 floors).*
+### What we take from FF7 and FF8 (in spirit only)
+| | FF7 | FF8 | What Aethra does with the idea |
+|---|---|---|---|
+| Opening | Eco-terrorists bomb a corporate reactor draining the planet's life | Cadets graduate from a mercenary academy on their first contract | Kael, a newly sworn **Warden** of the Vanguard Academy, takes his first contract: escort the rebel cell **Undercurrent** into Aurex's **Reactor 4** |
+| The world's lifeblood | The Lifestream, mako | Sorceress power passed between people | The **Aetherflow**, the planet's living memory, welling up as crystal; four Crystals hold the sky up |
+| The heroine | Aerith, last of an ancient people who hear the planet | Rinoa, a rebel who falls for the aloof lead | **Lyra**, a reactor technician secretly one of the last **Chorus**, people who can hear the Aetherflow |
+| The lead's secret | Cloud's memories aren't his own | Squall shuts everyone out | Kael's memories of Thornbrook belong to someone who **died seven years ago** |
+| The face of the enemy | Sephiroth, made by the company, wants to become a god | Edea, possessed by a sorceress from the future | **Dr. Vesper Lune**, Aurex's chief engineer, raised in the same orphanage as the party, guided by a voice from the Crater |
+| The thing behind it | Jenova, an alien calamity | Ultimecia's time compression | **Nyxar, the Hollow Echo**: the memory of the world's first calamity, sealed in the Crater, wanting to be the only memory left |
+| Mid-game shock | Aerith's death; Cloud hands over the Black Materia | The orphanage reveal | Kael hands Vesper the last shard; Lyra falls into the Aetherflow to save him |
+| The world breaks | Meteor; the Weapons wake | The Lunar Cry | **The Sundering**: the sky cracks, the **Sky Wardens** wake and lay waste to cities |
+| Flashbacks | Kalm, Nibelheim | Laguna's dreams | Playable **Memory Dives** as the real Kael Ardent, seven years ago |
+| Mobile base | The Highwind | Garden flies | The Vanguard Academy lifts off as a flying fortress, then the airship **Skylark** |
+| Side fun | Gold Saucer, chocobos | Triple Triad | The **Gilded Spire**, **Talonbirds**, the **Arcana** card game |
 
-**Act III — Solmara.** Saltmere, the sea journey, the Coral Sanctum (Water Crystal) by submersible, Sunscar,
-Orin's Tower (Orin joins), Dunewreck (Rook, the Skylark's engine), and Mount Cinder (Fire Crystal).
-*Dungeons: Smugglers' Grotto, Coral Sanctum (5 floors), Sunscar Ruins, Orin's Tower (6 floors),
-Dunewreck (4 decks), Mount Cinder (6 areas).*
+Everything in the right-hand column is ours: names, people, places, twists and how they play out.
 
-**Act IV — Nordheim.** Frostgate, Lumen (Ember joins), the Deeproot Caverns (Earth Crystal). Vesper takes the
-last shard, kills Corvin Aurex and raises the Sky Citadel; the sky cracks and the world changes
-(new monsters, towns in trouble, new areas open).
-*Dungeons: Frostgate Mines, Lumen Trial, Deeproot Caverns (6 floors), the Crater.*
+### Premise
+Aethra's four Crystals (Wind, Water, Fire, Earth) are where the Aetherflow, the planet's living memory, rises to the
+surface. They also anchor the sky-currents that hold up the islands of the upper sky. **Aurex Dynamics** powers the
+world by drinking the Aetherflow through reactors. Its president, **Corvin Aurex**, thinks it's simply business.
+Its chief engineer, **Dr. Vesper Lune**, is running **Project Cradle**: draining all four Crystals to raise the lost
+**Sky Citadel**, the throne the Chorus once used to sing the world into being. She believes she'll use it to make a
+better world. The voice that taught her how is **Nyxar**.
 
-**Act V — The Broken Sky.** Gather allies, recover the Skylark, optional content everywhere, then the
-Sky Citadel (8 floors with branching paths) and Vesper in three forms. Ending and credits.
+### Cast and their arcs
+- **Kael Ardent**, 19: a newly sworn Warden of the Vanguard Academy, a mercenary school with a long code of honour.
+  Cool, guarded, very good with a blade. He remembers growing up in Thornbrook and remembers the fire that burned it.
+  *Truth:* the real Kael Ardent, a Warden, died in that fire seven years ago. "Our" Kael is a **Vessel**: a body grown
+  by Project Cradle and given the dead man's memories so it could carry the Crystal shards. Vesper can call to him.
+  *Arc:* from "I'm somebody else's leftovers" to choosing who he is.
+- **Lyra Vale**, 18: a technician at Reactor 4 who hears the Aetherflow screaming and secretly helps Undercurrent.
+  One of the last of the Chorus. Warm, stubborn, funny. *Arc:* she steps into the Aetherflow to pull Kael back. She
+  survives, changed. At the end, her song (with every Chorus voice in the flow) holds the sky up.
+- **Bram Hollis**, 38: an ex-Aurex knight-captain who leads Undercurrent. Loud, big-hearted, a father to his men.
+  *Arc:* he was the officer who followed the order to burn Thornbrook. He confesses at the Lantern House.
+- **Sable**, 17: an undercity thief and Undercurrent's spy. Quick, cheeky, steals from the party twice.
+  *Arc:* she grew up at the Lantern House with Kael's original and Vesper's little sister. She knew all along.
+- **Orin Thale**, 71: a Crystal scholar who taught Vesper. He hides in his desert tower, ashamed of what he taught
+  her. *Arc:* he faces his student.
+- **Ember**, 12: the last summoner of Lumen. Echoes answer her bell. *Arc:* the voice in the Crater sounds like
+  her mother. Ember is the one who names Nyxar for what it is.
+- **Rook** *(optional)*: a Chorus-era automaton in the buried airship Dunewreck. It carries the real Kael Ardent's
+  last memories (and through them, the Memory Dives).
+- **Vesna Korr** *(optional)*: a mercenary sharpshooter and Vesper's former partner in Project Cradle. She walked out
+  when the first Vessels died. She hunts Vesper to end what they started.
+- **Dr. Vesper Lune**: brilliant, gentle-voiced, utterly sure. An orphan of the Lantern House. Thornbrook burned
+  because her first Cradle test there failed. She tells herself she's saving the world from Aurex.
+- **Corvin Aurex**: the company's president. Vesper kills him at the end of Act IV.
+- **Mother Ilse**: runs the Lantern House orphanage in Thornbrook, where Vesper, Sable and the real Kael grew up.
+- **Captain Drago Venn**: Aurex's security chief and the party's recurring rival (five fights), who finally sides
+  with the party at the Sky Citadel.
+
+### Act I: Halcyon (about 6 hours)
+1. **Reactor 4.** Kael's first Warden contract: get Bram, Sable and two Undercurrent rebels into Reactor 4 and out
+   again. Lyra opens a door for them from inside. **Boss: Warden-class security mech "Bulwark".**
+2. The reactor goes up larger than planned. Vesper triggered the overload herself. Aurex's broadcasts blame
+   Undercurrent and call it a massacre. Kael and Lyra fall through the plates into **the Sumps** (undercity).
+3. **The Sumps and the Market Ward**: Undercurrent's hideout in the bar "The Spillway", side quests, the arena, and
+   Kael's first Warden bounty.
+4. Aurex seals the Sumps to "contain the terrorists". The party climbs the **Spire Stair** (outer scaffold, 6
+   floors) to **Aurex Tower** (8 floors: lobby, records, labs, Cradle vault).
+5. In the Cradle vault: glass tanks of Vessels with Kael's face. Kael doesn't understand. Vesper meets him and
+   calls him "my bright boy". Corvin Aurex announces Project Cradle to the board.
+6. **Boss: Captain Drago Venn** on the tower roof. Escape by stolen freight train through the **Rail Yards** into
+   the Ashfields. *Act I ends:* Halcyon behind them, the open world ahead.
+
+### Act II: Meridia (about 8 hours)
+1. **Thornbrook**, the village Kael remembers, rebuilt. Nobody remembers him. Mother Ilse does. She calls him by
+   the dead boy's name and cries.
+2. **Mistwood** (3 areas) to **Kestrel Ranch**: tame the first Talonbird. Optional: race and breed them.
+3. **The Gilded Spire**: the arcade city on a mesa. Minigames, the Arcana card game, a frame-up for murder, and
+   **Spire Prison**, a desert pit (Bram's past comes out).
+4. **The Old Mine** (4 floors), then **Windhaven**, temple-town of the Wind Crystal. Aurex arrives to drain it.
+   **Windhaven Catacombs** and the **Wind Shrine** (5 floors). **Boss: "Tempest Engine".**
+5. Kael's head fills with Vesper's voice. He walks to her and hands her the **Wind Shard**. Lyra stops him from
+   going with her. The Shrine collapses. *Act II ends* on the Wind Crystal's death and Sylphine's birth from it.
+
+### Act III: Solmara (about 9 hours)
+1. **Port Lark** by ferry to **Saltmere**. **Smugglers' Grotto**: Sable's old crew. The submersible.
+2. **The Coral Sanctum** (5 floors) under the sea: the Water Crystal is already drained. **Boss: the Drowned
+   Warden**, a Sky Warden still asleep. A first hint of what is coming.
+3. **Sunscar**, a desert town, and its buried **Sunscar Ruins** (Chorus history). **Orin's Tower** (6 floors of
+   puzzles): Orin joins and tells them about the Chorus, the Sky Citadel and Nyxar.
+4. **Dunewreck**, a Chorus-era airship buried in sand. Rook wakes up. **The first Memory Dive**: play as the real
+   Kael Ardent, the night Thornbrook burned. The party gets the Aether Engine Core for the **Skylark**.
+5. **Mount Cinder** (6 areas) and the Fire Crystal: Drago Venn again, then **Boss: "Ignis Colossus"**. Vesper
+   takes the Fire Shard. Optional: Vesna's quest begins.
+
+### Act IV: Nordheim (about 8 hours)
+1. The Skylark flies. **Frostgate**, a mining town. **Frostgate Mines** (5 floors).
+2. **Lumen**, the hidden summoners' village: Ember's trial and Ember joins. The Lantern House revelation, told at
+   last: everyone has a piece of it. Bram confesses.
+3. **The Deeproot Caverns** (6 floors) to the Earth Crystal. Vesper is waiting. She calls Kael and he goes to her.
+   She has all four shards. **The Sundering**: the Sky Citadel rises over the Crater, the sky cracks, Corvin Aurex
+   dies, and Lyra throws herself into the Aetherflow after Kael.
+4. **The Vanguard Academy lifts off** and takes in the party as a flying fortress. It becomes the party's base.
+
+### Act V: The Broken Sky (open; 10+ hours with side content)
+1. The world has changed: red sky, new monsters, towns in trouble. The **Sky Wardens** are loose (five huge
+   bosses that roam the world map; one attacks Halcyon).
+2. **Find Kael**: at **Mideel Shallows**, a clinic where the Aetherflow surfaces, Kael lies broken. **Memory Dive
+   inside his mind** with Lyra: he and Lyra rebuild who he is. Kael rejoins as himself.
+3. **Open world.** The Skylark is yours. Echo trials, ultimate weapons, Vesna's quest, Rook's last memory, the
+   Abyssal Spire, Arcana championship, Talonbird racing to the gold Talonbird, three hidden super-bosses.
+4. **Halcyon's last stand**: the Sky Warden attack, the Academy's guns, and Drago Venn's change of side.
+5. **The Sky Citadel** (8 floors, branching): the party splits into teams to open the gates.
+   **The Aetherflow** beneath the Citadel (final area). **Vesper Lune** (3 forms); then **Nyxar, the Hollow Echo**
+   (2 forms). Lyra and every Chorus voice in the flow sing the sky back together.
+6. **Ending**: the Crystals don't come back, so Aurex's reactors fall silent and the world has to learn to live
+   without them. Kael, his own name now, at Thornbrook. Credits.
+
+### Themes
+Who are you if your memories are borrowed? What is a world's memory worth? Taking the power that feeds a city has a
+price, and so does giving it up.
 
 ## Technical
 - Userscript in the Legends folder. Separate scripts: game, art (Mana Seed atlases + monsters), soundtrack.

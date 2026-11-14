@@ -2,8 +2,13 @@
    Aurex skimmer-bikes chase the train out of Halcyon. Kael rides the coal tender's side rail on a stolen skimmer:
    left/right/up/down to move, OK to swing. Bikes that reach the train scrape its armour. Keep the train going for
    the whole run. Retry if the train is stopped (no game over). */
+AE.CHASETHEME = {
+  road: { bg: '#4a4038', road: '#2e2c30', line: '#c8b060', escort: 'FREIGHT NINE', foe: 'trooper', heavy: 'officer', hint: 'Keep the bikes off the train!', win: 'Freight Nine breaks free!', lose: 'The train is stopped...' },
+  sea: { bg: '#0e2a48', road: '#123a60', line: '#2a6a9a', escort: 'SUBMERSIBLE', foe: 'gunner', heavy: 'officer', hint: 'Fend off the Aurex divers!', win: 'The way to the Sanctum is clear!', lose: 'The hull is breached...' },
+  sky: { bg: '#6a90c8', road: '#8ab0e0', line: '#ffffff', escort: 'THE SKYLARK', foe: 'gunner', heavy: 'drago', hint: 'Knock the gunship raiders off the deck!', win: 'The Skylark climbs free!', lose: 'The Skylark is going down...' }
+};
 AE.chase = function (o) {
-  o = o || {};
+  o = o || {}; const TH = AE.CHASETHEME[o.theme || 'road'];
   return AE.miniScene({
     dur: (o.secs || 70) * 60 * (AE.S_ && AE.S_.flags.chase_easy ? 0.75 : 1), hp: 100, x: 176, y: 150, bikes: [], spawn: 60, score: 0, swing: 0, hitT: 0, scroll: 0, done2: false,
     update: function (g) {
@@ -41,20 +46,28 @@ AE.chase = function (o) {
     },
     draw: function (ctx) {
       const sx = this.shake ? AE.rand(3) - 1 : 0;
-      ctx.fillStyle = '#4a4038'; ctx.fillRect(0, 0, AE.W, AE.H);                       // ash plain
+      ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, AE.W, AE.H);                       // ash plain
       ctx.fillStyle = '#5a5048'; for (let y = -32 + this.scroll; y < AE.H; y += 32) ctx.fillRect(0, y, 12, 6);
-      ctx.fillStyle = '#2e2c30'; ctx.fillRect(100, 0, 140, AE.H);                       // the service road beside the rails
-      ctx.fillStyle = '#c8b060'; for (let y = -32 + this.scroll * 2 % 32; y < AE.H; y += 32) { ctx.fillRect(146, y, 2, 14); ctx.fillRect(180, y, 2, 14); ctx.fillRect(214, y, 2, 14); }
-      // the train: rails and Freight Nine
-      ctx.fillStyle = '#3a3634'; ctx.fillRect(30 + sx, 0, 56, AE.H); ctx.fillStyle = '#6a625c'; for (let y = -16 + this.scroll; y < AE.H; y += 16) ctx.fillRect(30 + sx, y, 56, 3);
-      for (let k = 0; k < 4; k++) { const y = 10 + k * 54; ctx.fillStyle = k === 0 ? '#5a2a20' : '#3a4a5a'; ctx.fillRect(38 + sx, y, 40, 48); ctx.fillStyle = '#222'; ctx.fillRect(42 + sx, y + 6, 32, 6); }
-      ctx.fillStyle = 'rgba(200,200,210,.35)'; for (let i = 0; i < 5; i++) { const r = (this.t * 2 + i * 23) % 60; ctx.beginPath(); ctx.arc(58 + sx + Math.sin(i + this.t / 20) * 6, 8 - r * 0.3, 4 + r / 8, 0, 7); ctx.fill(); }
+      ctx.fillStyle = TH.road; ctx.fillRect(100, 0, 140, AE.H);                       // the service road beside the rails
+      ctx.fillStyle = TH.line; for (let y = -32 + this.scroll * 2 % 32; y < AE.H; y += 32) { ctx.fillRect(146, y, 2, 14); ctx.fillRect(180, y, 2, 14); ctx.fillRect(214, y, 2, 14); }
+      // the escort: Freight Nine on its rails, the submersible, or the Skylark's deck
+      if (!o.theme || o.theme === 'road') {
+        ctx.fillStyle = '#3a3634'; ctx.fillRect(30 + sx, 0, 56, AE.H); ctx.fillStyle = '#6a625c'; for (let y = -16 + this.scroll; y < AE.H; y += 16) ctx.fillRect(30 + sx, y, 56, 3);
+        for (let k = 0; k < 4; k++) { const y = 10 + k * 54; ctx.fillStyle = k === 0 ? '#5a2a20' : '#3a4a5a'; ctx.fillRect(38 + sx, y, 40, 48); ctx.fillStyle = '#222'; ctx.fillRect(42 + sx, y + 6, 32, 6); }
+        ctx.fillStyle = 'rgba(200,200,210,.35)'; for (let i = 0; i < 5; i++) { const r = (this.t * 2 + i * 23) % 60; ctx.beginPath(); ctx.arc(58 + sx + Math.sin(i + this.t / 20) * 6, 8 - r * 0.3, 4 + r / 8, 0, 7); ctx.fill(); }
+      } else {
+        const hull = o.theme === 'sea' ? '#c8a030' : '#7a5a3a', trim = o.theme === 'sea' ? '#6a5010' : '#c0a060';
+        ctx.fillStyle = hull; ctx.fillRect(34 + sx, 6, 48, AE.H - 12); ctx.fillStyle = trim; for (let y = 12; y < AE.H - 12; y += 24) ctx.fillRect(38 + sx, y, 40, 4);
+        ctx.fillStyle = o.theme === 'sea' ? '#80d0ff' : '#e8e0c8'; for (let y = 20; y < AE.H - 20; y += 40) ctx.fillRect(52 + sx, y, 12, 8);
+        if (o.theme === 'sea') { ctx.fillStyle = 'rgba(200,230,255,.35)'; for (let i = 0; i < 8; i++) { const y = (this.t * 1.5 + i * 31) % AE.H; ctx.fillRect(110 + (i * 37) % 120, AE.H - y, 2, 2); } }
+        else { ctx.fillStyle = 'rgba(255,255,255,.5)'; for (let i = 0; i < 6; i++) { const y = (this.t * 3 + i * 47) % (AE.H + 40) - 20; ctx.fillRect(104 + (i * 53) % 130, y, 26, 6); } }
+      }
       // bikes
       const im = AE.IMG.mon_Eye2;
       this.bikes.forEach(function (b) {
         ctx.globalAlpha = b.dead ? b.dead / 40 : 1;
         ctx.fillStyle = b.heavy ? '#8a3a2a' : '#5a6a7a'; ctx.fillRect(b.x - 9, b.y - 4, 18, 12); ctx.fillStyle = '#ffd060'; ctx.fillRect(b.x - 2, b.y - 6, 4, 3);
-        AE.actor(ctx, b.heavy ? 'officer' : 'trooper', 'idle', 0, 0, b.x, b.y + 2, 0.6);
+        AE.actor(ctx, b.heavy ? TH.heavy : TH.foe, 'idle', 0, 0, b.x, b.y + 2, 0.6);
         ctx.globalAlpha = 1;
       });
       // Kael on the skimmer
@@ -62,12 +75,12 @@ AE.chase = function (o) {
       if (!(this.hitT > 0 && this.hitT % 6 < 3)) AE.actor(ctx, 'kael', this.swing > 8 ? 'run' : 'idle', 0, Math.floor(this.t / 6), this.x, this.y + 2, 0.6);
       if (this.swing > 8) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(this.x, this.y - 6, 18, Math.PI * (1 + (16 - this.swing) / 8), Math.PI * (1.5 + (16 - this.swing) / 8)); ctx.stroke(); ctx.lineWidth = 1; }
       // HUD
-      AE.window(ctx, 4, 4, 92, 30); AE.text(ctx, 'FREIGHT NINE', 10, 8, '#ffe080');
+      AE.window(ctx, 4, 4, 92, 30); AE.text(ctx, TH.escort, 10, 8, '#ffe080');
       ctx.fillStyle = '#300'; ctx.fillRect(10, 22, 78, 6); ctx.fillStyle = this.hp > 30 ? '#4c4' : '#e44'; ctx.fillRect(10, 22, Math.max(0, 78 * this.hp / 100), 6);
       const left = Math.max(0, Math.ceil((this.dur - this.t) / 60)); AE.window(ctx, AE.W - 70, 4, 66, 30);
       AE.text(ctx, left + 's', AE.W - 37, 8, '#fff', { align: 'center' }); AE.text(ctx, 'KO ' + this.score, AE.W - 37, 20, '#8cf', { align: 'center' });
-      if (this.t < 120) { AE.window(ctx, 44, 92, 168, 40); AE.text(ctx, 'Keep the bikes off the train!', AE.W / 2, 98, '#fff', { align: 'center' }); AE.text(ctx, 'Arrows move · Z/OK to swing', AE.W / 2, 114, '#cde', { align: 'center' }); }
-      if (this.done2) { AE.window(ctx, 40, 96, 176, 28); AE.text(ctx, this.result === 'win' ? 'Freight Nine breaks free!' : 'The train is stopped...', AE.W / 2, 104, '#fff', { align: 'center' }); }
+      if (this.t < 120) { AE.window(ctx, 44, 92, 168, 40); AE.text(ctx, TH.hint, AE.W / 2, 98, '#fff', { align: 'center' }); AE.text(ctx, 'Arrows move · Z/OK to swing', AE.W / 2, 114, '#cde', { align: 'center' }); }
+      if (this.done2) { AE.window(ctx, 40, 96, 176, 28); AE.text(ctx, this.result === 'win' ? TH.win : TH.lose, AE.W / 2, 104, '#fff', { align: 'center' }); }
     }
   });
 };

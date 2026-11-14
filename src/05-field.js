@@ -9,7 +9,7 @@ AE.Actor.prototype.draw = function (ctx, cx, cy) {
   if (this.hidden) return;
   const X = this.px + 8 - cx, Y = this.py + 14 - cy + (this.hop || 0);
   if (X < -32 || Y < -48 || X > AE.W + 32 || Y > AE.H + 48) return;
-  ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(Math.round(X - 5), Math.round(Y - 1), 10, 3);
+  ctx.fillStyle = 'rgba(0,0,0,.26)'; ctx.beginPath(); ctx.ellipse(X, Y, 6, 2.2, 0, 0, 7); ctx.fill();
   const f = this.moving ? Math.floor(this.anim) : -1, run = this.speed > 1;
   if (this.cast !== false && AE.actorOn(this.who)) {
     AE.actor(ctx, this.who, this.pose || (this.moving ? (run ? 'run' : 'walk') : 'idle'), this.dir, this.pose ? Math.floor(this.anim) : f < 0 ? 0 : f, X, Y, 0.75);
@@ -176,7 +176,8 @@ AE.Field.prototype.draw = function (ctx) {
   const all = this.npcs.concat([this.player]).sort(function (a, b) { return a.py - b.py; });
   all.forEach(function (a) { a.draw(ctx, cx, cy); });
   m.drawLayer(ctx, 'over', cx, cy);
-  if (m.d.dark) { ctx.fillStyle = 'rgba(0,0,20,' + (m.d.dark * 0.15) + ')'; ctx.fillRect(0, 0, AE.W, AE.H); }
+  if (AE.fieldAmbient) AE.fieldAmbient(ctx, this, cx, cy);
+  if (AE.fieldLight) AE.fieldLight(ctx, this, cx, cy);
   if (m.d.tint) { ctx.fillStyle = m.d.tint; ctx.fillRect(0, 0, AE.W, AE.H); }
   if (this.title > 0) {
     this.title--; const a = Math.min(1, this.title / 30);

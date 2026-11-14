@@ -1,0 +1,7 @@
+art/private/
+build/.png/
+build/.snd/
+build/data.js
+build/dev.html
+build/maps.json
+node_modules/

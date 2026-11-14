@@ -18,6 +18,23 @@ def main():
     # modules may add to other modules' maps (more people, more events) before the tiles are made
     for mod in mods:
         if hasattr(mod, 'patch'): mod.patch(maps)
+    # shaped rooms: make sure every spot something stands on or arrives at is floor
+    import re, _gen
+    arr = {}
+    for m in maps.values():
+        for w in m.warps:
+            if w['to'] in maps: arr.setdefault(w['to'], []).append((w['tx'], w['ty']))
+    for f in glob.glob(os.path.join(os.path.dirname(__file__), '..', 'src', '**', '*.js'), recursive=True):
+        for mid, x, y in re.findall(r"warp\('(\w+)',\s*(\d+),\s*(\d+)", open(f).read()): arr.setdefault(mid, []).append((int(x), int(y)))
+    for m in maps.values():
+        if not getattr(m, '_genrooms', None): continue
+        pts = arr.get(m.id, []) + [tuple(m.entry)] if m.entry else arr.get(m.id, [])
+        for L in (m.events, m.npcs, m.warps):
+            for e in L:
+                for k in range(e.get('w', 1)):
+                    for j in range(e.get('h', 1)): pts.append((e['x'] + k, e['y'] + j))
+        pts += [tuple(map(int, k.split(','))) if isinstance(k, str) else k for k in m.chests]
+        _gen.open_spots(m, pts)
     # no half trees: a tree cut by a map edge, a doorway or an exit is removed (a bush goes where it stood)
     import check_cuts as CC
     for m in maps.values(): CC.prune(m)

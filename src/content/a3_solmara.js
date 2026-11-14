@@ -100,8 +100,8 @@
     await sayAs('KESTRA', 'Grotto law. Beat me, take what you want. Lose, and you scrub barnacles for a year.');
     await cs.battle(['pirate', 'kestra', 'pirate'], { bg: 'cave', boss: 1, noRun: 1 });
     await sayAs('KESTRA', 'Ha! Still fast. Fine. The sub\'s in the west cove. Don\'t scratch her. And Sable... the Owner of the Spire was asking after you. Sweetly.');
-    cs.flag('a3_grotto'); const q = AE.landNear(156, 124); AE.S_.vehicles.sub = { x: q[0], y: q[1], have: 1 };
-    const b = AE.landNear(134, 112); AE.S_.vehicles.boat = { x: b[0], y: b[1], have: 1 };
+    cs.flag('a3_grotto'); const q = (AE.WORLD.vehicles && AE.WORLD.vehicles.sub) || AE.landNear(156, 124); AE.S_.vehicles.sub = { x: q[0], y: q[1], have: 1 };
+    const b = (AE.WORLD.vehicles && AE.WORLD.vehicles.boat) || AE.landNear(134, 112); AE.S_.vehicles.boat = { x: b[0], y: b[1], have: 1 };
     await AE.notice('The submersible and a sailing boat are yours.');
     await AE.say('Sail the boat across shallow seas; dive the submersible over deep water and press OK above the reef to enter the Coral Sanctum (far south).', { name: 'TIP' });
   };
@@ -216,7 +216,7 @@
     await cs.narrate(['At the foot of Mount Cinder, in an abandoned Aurex hangar, the party found the Skylark.', 'Rook fitted the Engine Core into her heart. She shook, coughed smoke, and flew.']);
     await cs.title('END OF ACT III', 'SOLMARA', 180);
     cs.flag('a3_done'); cs.chapter(4);
-    const q = AE.landNear(212, 146); AE.S_.vehicles.airship = { x: q[0], y: q[1], have: 1 };
+    const q = (AE.WORLD.vehicles && AE.WORLD.vehicles.airship) || AE.landNear(212, 146); AE.S_.vehicles.airship = { x: q[0], y: q[1], have: 1 };
     AE.toWorld(q[0], q[1] + 1);
     await AE.say('The Skylark is yours: board it on the world map and fly anywhere. The Earth Crystal lies north, in Nordheim. Frostgate is the gateway.', { name: 'TIP' });
   };

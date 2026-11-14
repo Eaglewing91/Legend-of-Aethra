@@ -25,10 +25,11 @@ g = [[T['sea']] * W for _ in range(H)]
 def put(x, y, t):
     if 0 <= x < W and 0 <= y < H: g[y][x] = t
 def at(x, y): return g[y][x] if 0 <= x < W and 0 <= y < H else T['sea']
-def blob(cx, cy, rx, ry, t, rough=0.35, only=None, scale=0.08, seed=0):
+def blob(cx, cy, rx, ry, t, rough=0.5, only=None, scale=0.08, seed=0):
     for y in range(int(cy - ry * 1.5), int(cy + ry * 1.5) + 1):
         for x in range(int(cx - rx * 1.5), int(cx + rx * 1.5) + 1):
-            d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
+            wx = x + (fbm(x * 0.07 + seed * 3.3, y * 0.07) - 0.5) * rx * 1.1; wy = y + (fbm(x * 0.07, y * 0.07 + seed * 5.1) - 0.5) * ry * 1.1
+            d = ((wx - cx) / rx) ** 2 + ((wy - cy) / ry) ** 2
             n = fbm(x * scale + seed * 13.1, y * scale + seed * 7.7)
             if d < 1 + (n - 0.5) * 2 * rough * 2:
                 if only is None or at(x, y) in only: put(x, y, t)
@@ -45,14 +46,59 @@ LAND = None
 def land(): return {v for k, v in T.items() if k not in ('sea', 'shallow', 'deep')}
 
 # ---------- continents ----------
-# Meridia (centre-west)
-for (cx, cy, rx, ry) in [(75, 100, 52, 44), (40, 128, 26, 22), (112, 72, 24, 24), (120, 108, 18, 26), (60, 60, 26, 16)]: blob(cx, cy, rx, ry, T['grass'], seed=1)
-# Solmara (south-east)
-for (cx, cy, rx, ry) in [(195, 152, 46, 30), (165, 128, 18, 16), (228, 128, 16, 18), (175, 178, 28, 12)]: blob(cx, cy, rx, ry, T['grass'], seed=2)
-# Nordheim (north)
-for (cx, cy, rx, ry) in [(135, 24, 72, 20), (80, 30, 26, 16), (200, 20, 26, 16)]: blob(cx, cy, rx, ry, T['grass'], seed=3)
-# islands
-for (cx, cy, r, s) in [(242, 52, 8, 4), (20, 40, 7, 5), (150, 88, 6, 6), (238, 92, 5, 7), (12, 170, 6, 9), (120, 182, 7, 10), (205, 82, 5, 11), (30, 82, 5, 12)]: blob(cx, cy, r, r * 0.8, T['grass'], seed=s)
+# Each continent is a set of cores (ellipses) and arms (tapering strokes: peninsulas, capes, hooks) with bays cut out of
+# it; the edge is pushed about by two layers of noise and a domain warp, so coastlines are jagged at every scale.
+def seg_d(px, py, ax, ay, bx, by):
+    dx, dy = bx - ax, by - ay; L = dx * dx + dy * dy or 1
+    t = max(0, min(1, ((px - ax) * dx + (py - ay) * dy) / L)); qx, qy = ax + t * dx, ay + t * dy
+    return math.hypot(px - qx, py - qy), t
+CONT = [
+    # Meridia: a broad heartland, the mesa country in the south-west, a curling western arm, the Port Lark cape
+    dict(cores=[(76, 98, 40, 34, 0.3), (104, 80, 22, 18, -0.4), (118, 106, 14, 22, 0.2), (40, 130, 22, 16, 0.5), (62, 62, 20, 12, -0.2)],
+         arms=[[(44, 84, 9), (24, 96, 7), (16, 116, 6), (22, 138, 4)], [(118, 112, 8), (134, 112, 6), (140, 122, 3)], [(62, 60, 7), (54, 46, 4)],
+               [(100, 118, 7), (96, 140, 5), (104, 154, 3)], [(30, 140, 6), (20, 152, 4), (28, 160, 2)]],
+         bays=[(86, 126, 9, 6), (54, 82, 6, 5), (126, 90, 6, 7), (66, 132, 7, 5)]),
+    # Solmara: desert heart, Mount Cinder's horn in the east, a southern hook, a western lobe for Saltmere
+    dict(cores=[(196, 154, 40, 22, 0.15), (164, 126, 14, 12, 0), (226, 130, 12, 16, 0.4), (176, 178, 24, 9, -0.1)],
+         arms=[[(226, 120, 8), (236, 104, 5), (232, 92, 3)], [(160, 182, 7), (142, 186, 4)], [(214, 172, 8), (234, 178, 5), (246, 168, 3)], [(158, 132, 6), (146, 140, 3)]],
+         bays=[(212, 140, 8, 5), (184, 132, 6, 4)]),
+    # Nordheim: a long frozen shelf with the Crater in the west, fingers reaching south (Frostgate, Lumen)
+    dict(cores=[(140, 22, 66, 15, 0), (82, 28, 22, 12, 0.2), (204, 20, 22, 12, -0.1)],
+         arms=[[(110, 30, 7), (108, 42, 5), (104, 52, 3)], [(152, 30, 6), (160, 42, 4), (156, 52, 2)], [(186, 26, 7), (190, 38, 4)], [(64, 26, 6), (48, 36, 4), (40, 48, 2)]],
+         bays=[(130, 36, 7, 5), (176, 36, 5, 4)]),
+]
+ISLANDS = [(242, 52, 6, 4), (236, 44, 3, 2), (248, 60, 3, 3), (20, 40, 6, 5), (12, 48, 3, 2), (150, 88, 5, 5), (156, 82, 2, 2), (238, 92, 4, 6),
+           (12, 170, 5, 8), (22, 180, 3, 2), (120, 182, 6, 8), (132, 186, 3, 2), (108, 186, 2, 2), (205, 82, 4, 9), (30, 82, 4, 9), (64, 176, 3, 2), (240, 140, 2, 3)]
+def landness(x, y):
+    wx = x + (fbm(x * 0.045 + 31, y * 0.045) - 0.5) * 16; wy = y + (fbm(x * 0.045, y * 0.045 + 57) - 0.5) * 16   # domain warp
+    best = -9
+    for C in CONT:
+        v = -9
+        for (cx, cy, rx, ry, rot) in C['cores']:
+            c, s_ = math.cos(rot), math.sin(rot); dx, dy = wx - cx, wy - cy
+            u, w_ = (dx * c + dy * s_) / rx, (-dx * s_ + dy * c) / ry
+            v = max(v, 1 - math.sqrt(u * u + w_ * w_))
+        for arm in C['arms']:
+            for (ax, ay, ar), (bx, by, br) in zip(arm, arm[1:]):
+                d, t = seg_d(wx, wy, ax, ay, bx, by); r_ = ar + (br - ar) * t
+                v = max(v, 1 - d / r_)
+        for (bx, by, brx, bry) in C['bays']:
+            v = min(v, ((wx - bx) / brx) ** 2 + ((wy - by) / bry) ** 2 - 1)
+        best = max(best, v)
+    for (cx, cy, rx, ry) in ISLANDS:
+        best = max(best, 1 - math.sqrt(((wx - cx) / rx) ** 2 + ((wy - cy) / ry) ** 2))
+    return best + (fbm(x * 0.09, y * 0.09) - 0.5) * 0.7 + (fbm(x * 0.25 + 5, y * 0.25) - 0.5) * 0.35
+for y in range(H):
+    for x in range(W):
+        if landness(x, y) > 0.08: g[y][x] = T['grass']
+# every place stands on land, with a little ground round it
+PLACE_XY = [(70, 100), (104, 84), (116, 70), (98, 120), (89, 76), (120, 54), (36, 132), (132, 110), (157, 120), (150, 132), (195, 155), (178, 146), (225, 168), (212, 142),
+            (222, 128), (110, 36), (150, 22), (186, 22), (96, 14), (242, 52), (30, 82), (20, 40), (205, 82), (238, 92), (120, 182), (12, 170), (150, 88), (73, 144), (91, 104),
+            (83, 91), (200, 165), (130, 30), (60, 30)]
+for (px, py) in PLACE_XY:
+    for yy in range(py - 2, py + 3):
+        for xx in range(px - 2, px + 3):
+            if 0 <= xx < W and 0 <= yy < H and g[yy][xx] == T['sea']: g[yy][xx] = T['grass']
 LAND = land()
 # ---------- biomes ----------
 blob(135, 20, 70, 18, T['snow'], only=LAND, seed=4)                       # the whole north is snow
@@ -67,20 +113,28 @@ blob(36, 132, 4, 4, T['mesa'], only={T['desert']}, seed=12)
 blob(108, 128, 10, 7, T['swamp'], only=LAND, seed=13)
 blob(100, 86, 10, 7, T['farm'], only=LAND, seed=14)                       # Thornbrook fields
 blob(176, 186, 20, 6, T['jungle'], only=LAND, seed=15)
-blob(185, 22, 10, 7, T['forest'], only={T['snow']}, seed=16)              # Lumen's hidden wood
 # mountains: ranges as noisy lines
-line([(88, 58), (90, 78), (86, 96), (90, 116)], T['mount'], 3.2, only=LAND, seed=1)
 line([(56, 58), (40, 66), (28, 76)], T['mount'], 2.6, only=LAND, seed=2)
 line([(122, 50), (132, 58)], T['mount'], 2.2, only=LAND, seed=3)
 line([(214, 112), (226, 122), (232, 136)], T['mount'], 3.0, only=LAND, seed=4)
-line([(160, 140), (176, 136), (186, 130)], T['hills'], 2.5, only=LAND, seed=5)
 line([(70, 22), (100, 12), (140, 8), (170, 12), (205, 6)], T['snowmount'], 3.4, only=LAND, seed=6)
-line([(170, 26), (178, 30), (195, 30), (200, 22)], T['snowmount'], 2.4, only=LAND, seed=7)   # ring round Lumen
 line([(120, 30), (128, 40)], T['snowmount'], 2.0, only=LAND, seed=8)
-blob(96, 14, 7, 6, T['crater'], only=LAND, seed=17)                       # the Crater
 blob(226, 124, 4, 4, T['lava'], only=LAND, seed=18)                       # Mount Cinder's caldera
 line([(46, 116), (50, 104), (60, 92)], T['hills'], 2.0, only=LAND, seed=9)
 line([(132, 92), (126, 100)], T['hills'], 2.0, only=LAND, seed=10)
+# ridged ranges: long crooked spines of peaks inland, the way FF7's ranges snake across a continent
+def coast_d(x, y, r=3):
+    return any(at(x + dx, y + dy) == T['sea'] for dx in range(-r, r + 1) for dy in range(-r, r + 1))
+for y in range(H):
+    for x in range(W):
+        t0 = at(x, y)
+        if t0 not in (T['grass'], T['forest'], T['desert'], T['snow'], T['jungle'], T['farm']) or coast_d(x, y): continue
+        if any(abs(x - px) <= 4 and abs(y - py) <= 4 for (px, py) in PLACE_XY): continue
+        ridge = 1 - abs(2 * fbm(x * 0.06 + 90, y * 0.06 + 40, 3) - 1); mask = fbm(x * 0.02 + 7, y * 0.02 + 3)
+        if mask < 0.47: continue
+        snowy = t0 == T['snow']
+        if ridge > 0.955: put(x, y, T['snowmount'] if snowy else T['mount'])
+        elif ridge > 0.9 and not snowy: put(x, y, T['hills'])
 # rivers
 line([(118, 60), (112, 76), (106, 92), (102, 106), (108, 124), (112, 140)], T['river'], 1.2, rough=0.3, only=LAND, seed=11)
 line([(60, 64), (58, 80), (64, 92)], T['river'], 1.0, rough=0.3, only=LAND, seed=12)
@@ -107,6 +161,88 @@ for y in range(H):
     for x in range(W):
         if at(x, y) in (T['grass'], T['jungle']) and any(at(x + dx, y + dy) == T['shallow'] for dx in (-1, 0, 1) for dy in (-1, 0, 1)) and fbm(x * 0.3, y * 0.3) > 0.45: g[y][x] = T['beach']
 blob(140, 172, 5, 4, T['deep'], only={T['sea'], T['shallow']}, seed=20)  # the trench over the Coral Sanctum
+
+# ---------- story geography: what each way of travelling can reach (checked by tools/check_world.py) ----------
+import heapq
+FOOT = {2, 3, 4, 5, 7, 8, 10, 11, 13, 14, 15, 18, 19, 21}
+# the Coral trench: open water, deep in the middle
+for y in range(160, 185):
+    for x in range(128, 153):
+        d = math.hypot(x - 140, y - 172)
+        if d < 7 + (fbm(x * 0.3, y * 0.3) - 0.5) * 3: g[y][x] = T['deep'] if d < 3.5 else (T['sea'] if d < 6 else T['shallow'])
+def ring(cx, cy, r_in, r_out, wall, floor, seed=0):
+    """A ring of peaks (closed all the way round) with a hidden floor inside: only the airship gets in."""
+    R = int(r_out * 1.5) + 2
+    for y in range(cy - R, cy + R + 1):
+        for x in range(cx - R, cx + R + 1):
+            a = math.atan2(y - cy, x - cx)
+            wob = 1 + 0.28 * math.sin(a * 3 + seed) + 0.16 * math.sin(a * 5 + seed * 2.3) + (fbm(x * 0.2 + seed, y * 0.2) - 0.5) * 0.6
+            d = math.hypot(x - cx, y - cy) / wob
+            if d < r_in: put(x, y, floor)
+            elif d < r_out: put(x, y, wall)
+ring(96, 14, 6, 10.5, T['snowmount'], T['snow'], 1); blob(96, 14, 3, 3, T['crater'], rough=0.3, seed=17)       # the Crater
+ring(186, 22, 5, 8.5, T['snowmount'], T['forest'], 2); blob(186, 22, 2.2, 2, T['snow'], rough=0.2, seed=18)   # Lumen's hidden wood
+ring(60, 30, 3, 6.5, T['mount'], T['hills'], 3)                                                              # the Fallen Isle
+def gold_isle(cx, cy, r):
+    """Cliffs all round and thick forest inside: no beach for a boat, nowhere for the airship. Only the Gold Talonbird."""
+    for y in range(cy - r - 3, cy + r + 4):
+        for x in range(cx - r - 3, cx + r + 4):
+            if at(x, y) in (T['sea'], T['shallow'], T['deep']): continue
+            put(x, y, T['forest'] if math.hypot(x - cx, (y - cy) * 0.8) < r - 2.2 else T['mount'])
+    put(cx, cy, T['forest'])
+gold_isle(150, 88, 5); gold_isle(12, 170, 5)
+def path(a, b, cost):
+    """Cheapest route a -> b; cost(tile) is None where it cannot go."""
+    dist = {a: 0}; prev = {}; q = [(0, a)]
+    while q:
+        d, c = heapq.heappop(q)
+        if c == b: break
+        if d > dist[c]: continue
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            n = (c[0] + dx, c[1] + dy)
+            if not (0 <= n[0] < W and 0 <= n[1] < H): continue
+            k = cost(at(*n)) if n != b else 1
+            if k is None: continue
+            if d + k < dist.get(n, 1e9): dist[n] = d + k; prev[n] = c; heapq.heappush(q, (d + k, n))
+    out = [b]
+    while out[-1] != a:
+        if out[-1] not in prev: return None
+        out.append(prev[out[-1]])
+    return out[::-1]
+PASS = {T['shallow']: (25, T['grass']), T['sea']: (40, T['grass']), T['river']: (6, T['road']), T['mount']: (9, T['hills']), T['snowmount']: (9, T['snow']), T['mesa']: (9, T['desert'])}
+def foot_cost(t): return 1 if t in FOOT else PASS[t][0] if t in PASS else None
+def walkable(a, b):
+    """Make sure you can walk a -> b: fords become bridges, a pass is cut through any range in the way."""
+    p = path(a, b, foot_cost)
+    if p is None: print('no land route', a, b); return
+    for (x, y) in p:
+        if at(x, y) in (T['sea'], T['shallow']):
+            for dx, dy in ((0, 0), (1, 0), (0, 1)):
+                if at(x + dx, y + dy) in (T['sea'], T['shallow'], T['deep']): put(x + dx, y + dy, T['grass'])
+        elif at(x, y) in PASS: put(x, y, PASS[at(x, y)][1])
+STAND = {(96, 14): T['crater']}
+for (px, py) in PLACE_XY:
+    if at(px, py) not in FOOT and (px, py) not in STAND: put(px, py, T['desert'] if at(px, py) == T['mesa'] else T['hills'] if at(px, py) == T['mount'] else T['grass'])
+for yy in (133, 134):                 # the foot of the Gilded Spire, where the Skimmer is left
+    for xx in (35, 36, 37): put(xx, yy, T['desert'])
+for k in [(104, 84), (116, 70), (98, 120), (89, 76), (120, 54), (36, 132), (132, 110), (73, 144), (91, 104), (83, 91)]: walkable((70, 100), k)
+for k in [(195, 155), (178, 146), (225, 168), (212, 142), (222, 128), (150, 132), (200, 165)]: walkable((157, 120), k)
+def gold_cost(t): return None if t == T['lava'] else 4 if t == T['deep'] else 1
+for k in [(150, 88), (12, 170)]:                 # a run of shoals the Gold Talonbird can wade along from Plumage Isle
+    for (x, y) in path((30, 82), k, gold_cost) or []:
+        if at(x, y) == T['deep']: put(x, y, T['shallow'])
+for y in range(H):
+    for x in range(W):
+        if at(x, y) in (T['sea'], T['deep']) and math.hypot(x - 140, y - 172) > 7 and any(at(x + dx, y + dy) not in (T['sea'], T['shallow'], T['deep']) for dx in (-1, 0, 1) for dy in (-1, 0, 1)): g[y][x] = T['shallow']
+def dock(near, water):
+    """A foot tile next to water a vessel can sail, as close to `near` as possible: where the vessel is moored."""
+    best = None
+    for y in range(H):
+        for x in range(W):
+            if at(x, y) in FOOT and any(at(x + dx, y + dy) in water for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                d = (x - near[0]) ** 2 + (y - near[1]) ** 2
+                if best is None or d < best[0]: best = (d, x, y)
+    return [best[1], best[2]]
 
 # ---------- places: id -> (x, y, map, entry x, entry y, kind, name) ----------
 PLACES = {
@@ -153,7 +289,7 @@ def region(x0, y0, x1, y1, name):
 region(0, 48, 143, 191, 'w_meridia_s'); region(48, 80, 95, 127, 'w_ashfields'); region(96, 48, 143, 95, 'w_meridia_n'); region(0, 112, 63, 159, 'w_mesa')
 region(144, 112, 255, 191, 'w_solmara'); region(176, 128, 239, 175, 'w_desert'); region(208, 112, 239, 143, 'w_cinder')
 region(0, 0, 255, 47, 'w_nordheim'); region(160, 0, 207, 39, 'w_lumen_wood')
-VEHICLES = {'talon': None, 'skimmer': (190, 152), 'boat': (134, 112), 'sub': (156, 124), 'airship': (212, 146)}
+VEHICLES = {'talon': None, 'skimmer': (190, 152), 'boat': dock((134, 112), {T['sea'], T['shallow']}), 'sub': dock((156, 124), {T['sea'], T['shallow']}), 'airship': dock((212, 146), FOOT)}
 
 def main():
     os.makedirs('build', exist_ok=True)

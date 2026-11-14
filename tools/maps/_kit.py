@@ -62,7 +62,29 @@ def house(m, x, y, kind='orange', to=None, name=None):
     return (dx, dy)
 def fence_h(m, x0, x1, y):
     for x in range(x0, x1 + 1): m.stamp('house', 10 if x == x0 else 12 if x == x1 else 11, 4, x, y, col=LOW)
+def _walk_parts(m):
+    W, H = m.w, m.h; seen = bytearray(W * H); n = 0
+    for s0 in range(W * H):
+        if seen[s0] or m.col[s0] not in (OPEN, 6, 8): continue
+        n += 1; st = [s0]; seen[s0] = 1
+        while st:
+            i = st.pop(); x, y = i % W, i // W
+            for j in ((i - 1) if x > 0 else -1, (i + 1) if x < W - 1 else -1, i - W, i + W):
+                if 0 <= j < W * H and not seen[j] and m.col[j] in (OPEN, 6, 8): seen[j] = 1; st.append(j)
+    return n
 def savepoint(m, x, y):
+    if getattr(m, '_genrooms', None):      # shaped rooms: a save crystal must stand on floor and never block a passage
+        base = _walk_parts(m); best = None
+        for r in range(0, 6):
+            for dy in range(-r, r + 1):
+                for dx in range(-r, r + 1):
+                    X, Y = x + dx, y + dy
+                    if best or max(abs(dx), abs(dy)) != r or not m.ok(X, Y) or m.wall[m.i(X, Y)] is not None or m.col[m.i(X, Y)] != OPEN or m.layers['deco'][m.i(X, Y)] >= 0: continue
+                    if any(e['x'] <= X < e['x'] + e.get('w', 1) and e['y'] <= Y < e['y'] + e.get('h', 1) for e in m.events + m.warps): continue
+                    m.col[m.i(X, Y)] = SOLID; ok = _walk_parts(m) <= base; m.col[m.i(X, Y)] = OPEN
+                    if ok: best = (X, Y)
+            if best: break
+        if best: x, y = best
     m.stamp('nature', 1, 15, x, y, col=SOLID); m.event(x, y, 'savepoint', touch=False); m.extra.setdefault('saves', []).append([x, y])
 def sign(m, x, y, text): m.stamp('house', 6, 2, x, y, col=SOLID); m.sign(x, y, text)
 def lamp(m, x, y): m.stamp('dungeon', 4 + (x + y) % 4, 2, x, y, col=SOLID)

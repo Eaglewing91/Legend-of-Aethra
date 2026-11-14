@@ -139,6 +139,49 @@ class Room:
     def c(s): return (s.x + s.w // 2, s.y + s.h // 2)
     def cells(s): return [(x, y) for y in range(s.y, s.y + s.h) for x in range(s.x, s.x + s.w)]
 
+def shape(q, r, theme):
+    """The cells of a room: picked from a few organic shapes, in 2x2 blocks, always holding the room's centre."""
+    bw, bh = max(2, q.w // 2), max(2, q.h // 2); cx, cy = (bw - 1) / 2, (bh - 1) / 2
+    kind = r.choice(['cave', 'cave', 'oval', 'oval', 'cross', 'ell', 'rect'] if theme not in ('ship', 'tower') else ['rect', 'rect', 'cross', 'ell', 'oval'])
+    B = set()
+    for j in range(bh):
+        for i in range(bw):
+            u, v = (i - cx) / (bw / 2), (j - cy) / (bh / 2)
+            if kind == 'oval': ok = u * u + v * v < 1.05 + r.uniform(-0.15, 0.15)
+            elif kind == 'cross': ok = abs(u) < 0.45 or abs(v) < 0.45
+            elif kind == 'ell': ok = not (u > 0.15 and v < -0.15)
+            elif kind == 'cave': ok = u * u + v * v < 1.35 + r.uniform(-0.45, 0.25)
+            else: ok = True
+            if ok: B.add((i, j))
+    if kind == 'cave':                     # bite a few chunks out of the edge
+        for _ in range(r.randint(1, 3)):
+            bi, bj = r.choice([(0, r.randrange(bh)), (bw - 1, r.randrange(bh)), (r.randrange(bw), 0), (r.randrange(bw), bh - 1)])
+            for i in range(bi - 1, bi + 1):
+                for j in range(bj - 1, bj + 1): B.discard((i, j))
+    c = (int(cx), int(cy)); B.add(c); keep = {c}; st = [c]
+    while st:                              # only what joins up with the centre
+        i, j = st.pop()
+        for n in ((i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)):
+            if n in B and n not in keep: keep.add(n); st.append(n)
+    out = [(q.x + i * 2 + a, q.y + j * 2 + b) for (i, j) in keep for a in (0, 1) for b in (0, 1)]
+    return [(x, y) for (x, y) in out if x < q.x + q.w + 1 and y < q.y + q.h + 1]
+
+def open_spots(m, pts):
+    """Story code places things by room corners (q.x + 1, ...); where a shaped room left rock there, dig a short way
+    from the spot back to the room's floor."""
+    for (px, py) in pts:
+        for q, fl in getattr(m, '_genrooms', []):
+            if not (q.x - 1 <= px <= q.x + q.w and q.y - 1 <= py <= q.y + q.h): continue
+            x, y = min(max(px, q.x), q.x + q.w - 1), min(max(py, q.y), q.y + q.h - 1)    # a door in the room's wall: dig from just inside it
+            M = set(q.mask); cx, cy = q.c()
+            if (x, y) in M: break
+            for _ in range(q.w + q.h):
+                carve(m, x, y, x, y, fl)
+                if (x, y) in M: break
+                if abs(cx - x) >= abs(cy - y): x += (cx > x) - (cx < x)
+                else: y += (cy > y) - (cy < y)
+            break
+
 def gen(mid, name, w, h, theme, seed, music=None, enc=None, rooms=14, minr=(6, 5), maxr=(13, 9), loops=0.25, chests=(), dark=None, corridor=2, under=None, pools=0):
     T = THEMES[theme]; r = random.Random(seed)
     m = Map(mid, w, h, name, music=music or T['music'], kind='dungeon', enc=enc, dark=T['dark'] if dark is None else dark)
@@ -157,12 +200,26 @@ def gen(mid, name, w, h, theme, seed, music=None, enc=None, rooms=14, minr=(6, 5
     chain = [R.pop(0)]
     while R:
         last = chain[-1]; R.sort(key=lambda q: abs(q.c()[0] - last.c()[0]) + abs(q.c()[1] - last.c()[1])); chain.append(R.pop(0))
-    for q in chain: carve(m, q.x, q.y, q.x + q.w - 1, q.y + q.h - 1, T['floor'])
+    # rooms are not boxes: caverns with bitten edges, ovals, crosses, L-bends; carved in 2x2 blocks so walls stay clean
+    for q in chain:
+        q.mask = shape(q, r, theme)
+        for (x, y) in q.mask: carve(m, x, y, x, y, T['floor'])
+    m._genrooms = [(q, T['floor']) for q in chain]
     def corr(a, b):
-        (x0, y0), (x1, y1) = a.c(), b.c()
-        if r.random() < 0.5: xs, ys = [(x, y0) for x in range(min(x0, x1), max(x0, x1) + 1)], [(x1, y) for y in range(min(y0, y1), max(y0, y1) + 1)]
-        else: xs, ys = [(x0, y) for y in range(min(y0, y1), max(y0, y1) + 1)], [(x, y1) for x in range(min(x0, x1), max(x0, x1) + 1)]
-        for (x, y) in xs + ys:
+        # a winding passage: mostly heads for the next room, but wanders, doubles round and jogs sideways
+        (x, y), (x1, y1) = a.c(), b.c(); cells = [(x, y)]; drift = None
+        for _ in range(600):
+            if (x, y) == (x1, y1): break
+            dx, dy = (x1 > x) - (x1 < x), (y1 > y) - (y1 < y)
+            if drift and r.random() < 0.75: mx, my = drift
+            elif dx and dy: mx, my = ((dx, 0) if r.random() < 0.5 else (0, dy))
+            else: mx, my = dx, dy
+            if r.random() < 0.18: drift = r.choice([(0, 1), (0, -1)] if mx else [(1, 0), (-1, 0)])
+            elif r.random() < 0.35: drift = None
+            nx, ny = x + mx, y + my
+            if not (2 <= nx < w - 2 - corridor and 3 <= ny < h - 2 - corridor): drift = None; continue
+            x, y = nx, ny; cells.append((x, y))
+        for (x, y) in cells:
             for dx in range(corridor):
                 for dy in range(corridor):
                     X, Y = x + dx, y + dy
@@ -173,7 +230,9 @@ def gen(mid, name, w, h, theme, seed, music=None, enc=None, rooms=14, minr=(6, 5
     # pools of water/lava in big rooms
     for q in chain[1:-1]:
         if pools and T.get('water') and q.w >= 9 and q.h >= 7 and r.random() < pools:
-            m.ground(T['water'], q.x + 2, q.y + 2, q.x + q.w - 3, q.y + q.h - 3)
+            M = set(q.mask)
+            for (x, y) in q.mask:
+                if abs(x - q.c()[0]) < q.w // 2 - 1 and abs(y - q.c()[1]) < q.h // 2 - 1 and all((x + i, y + j) in M for i in (-2, -1, 0, 1, 2) for j in (-2, -1, 0, 1, 2)): m.ground(T['water'], x, y, x, y)
     # dress the rooms (the entry and exit rooms stay clear for story scenes)
     for q in chain[1:-1]:
         for f in r.sample(DRESS[theme], min(len(DRESS[theme]), r.randint(3, 4))): f(m, q, r)

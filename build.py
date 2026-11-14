@@ -13,6 +13,7 @@ os.makedirs('build', exist_ok=True)
 env = dict(os.environ, PYTHONHASHSEED='0')
 if not os.path.exists('art/private/ms_people.png') and os.path.isdir('/home/claude/private-art/manaseed'): subprocess.run(['python3', '-c', "import sys;sys.path.insert(0,'tools');import manaseed as M;M.main()"], check=True)
 if not os.path.exists('art/private/ms_kael.png') and os.path.isdir('/home/claude/private-art/manaseed'): subprocess.run(['python3', 'tools/actors.py'], check=True)
+subprocess.run(['python3', 'tools/worldgen.py'], check=True, env=env)
 subprocess.run(['python3', 'tools/build_maps.py'] + (['--fast'] if FAST else []), check=True, env=env)
 sys.path.insert(0, 'tools')
 import mapkit as MK
@@ -93,7 +94,8 @@ maps = json.load(open('build/maps.json'))
 bossfw = {}
 for f in glob.glob('art/na/boss/*_Idle*.png'):
     im = Image.open(f); n = os.path.basename(f)[:-4].split('_')[0]; bossfw[n] = im.size[1] if im.size[0] % im.size[1] == 0 else im.size[0] // max(1, round(im.size[0] / im.size[1]))
-data = {'version': VERSION, 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'maps': maps, 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw}
+world = json.load(open('build/world.json'))
+data = {'version': VERSION, 'world': world, 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'maps': maps, 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw}
 src = '\n'.join(open(f).read() for f in sorted(glob.glob('src/*.js')) + sorted(glob.glob('src/content/*.js')))
 blob = json.dumps(data)
 open('build/data.js', 'w').write('window.AE_DATA = ' + blob + ';')

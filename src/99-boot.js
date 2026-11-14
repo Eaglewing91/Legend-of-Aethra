@@ -2,7 +2,7 @@
 AE.boot = function (host, data, opts) {
   opts = opts || {};
   AE.VERSION = data.version; AE.SHEETS = data.sheets; AE.FILL_ORDER = data.fills; AE.FXMETA = data.fx; AE.MS = data.ms || null; AE.BOSSFW = data.bossfw || {};
-  AE.MAPS = data.maps; AE.SFX = data.sfx || {}; AE.MUSIC = Object.assign(AE.MUSIC || {}, data.music || {});
+  AE.MAPS = data.maps; AE.WORLD = data.world; AE.SFX = data.sfx || {}; AE.MUSIC = Object.assign(AE.MUSIC || {}, data.music || {});
   const canvas = document.createElement('canvas'); canvas.className = 'ae-canvas'; host.appendChild(canvas);
   canvas.style.imageRendering = 'pixelated'; canvas.style.width = '100%'; canvas.style.height = '100%'; canvas.style.objectFit = 'contain'; canvas.tabIndex = 0;
   const g = new AE.Game(canvas);

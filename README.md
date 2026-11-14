@@ -4,7 +4,7 @@ A 16-bit style role-playing game for [Torn](https://www.torn.com), in the spirit
 It plays inside the **Torn Arcade** phone (Legends folder) or in its own window from the Tampermonkey menu.
 
 **Install:** [Legend-of-Aethra.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra.user.js)
-(about 1.8 MB). Optional music, five parts (about 1.8 MB each):
+(about 0.7 MB) and its [Art & Sound](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js) script (needed, about 1.1 MB). Optional music, five parts (about 1.8 MB each):
 [1](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-1.user.js) ·
 [2](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-2.user.js) ·
 [3](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-3.user.js) ·

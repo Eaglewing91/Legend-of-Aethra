@@ -5,6 +5,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   await p.setContent('<html><body style="background:#333"><div id="phone" style="position:relative;width:560px;height:480px;margin:40px;background:#111"></div></body></html>');
   await p.evaluate(() => { const st = {}; window.GM_getValue = (k, d) => (k in st ? st[k] : d); window.GM_setValue = (k, v) => { st[k] = v; }; window.GM_registerMenuCommand = () => {}; window.ST = st; });
+  if (!process.argv[3]) await p.addScriptTag({ content: fs.readFileSync('build/Legend-of-Aethra-Art.user.js', 'utf8') });
   await p.addScriptTag({ content: fs.readFileSync('build/Legend-of-Aethra.user.js', 'utf8') });
   const here = await p.evaluate(() => new Promise(r => { document.addEventListener('aethra:here', e => r(e.detail)); document.dispatchEvent(new CustomEvent('aethra:ping')); }));
   console.log('here', here);

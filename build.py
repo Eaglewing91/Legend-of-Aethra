@@ -172,6 +172,45 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
         open('build/' + fname, 'w').write(txt)
         print('soundtrack part %d: %d tracks, %.2f MB' % (part, len(tracks), len(txt) / 1e6))
 
+# ---------- the Art & Sound script: every picture and sound effect (the main script carries code, maps and story) ----------
+main_blob = json.dumps({k: v for k, v in data.items() if k not in ('art', 'sfx')})
+art_blob = json.dumps({'art': data['art'], 'sfx': data['sfx']})
+ART_URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js'
+art_js = '''// ==UserScript==
+// @name         Legend of Aethra - Art & Sound
+// @namespace    eaglewing.legend-of-aethra
+// @version      ''' + VERSION + '''
+// @description  The pictures and sound effects for Legend of Aethra (needed to play). Hands them to the game when it starts; makes no requests and stores nothing.
+// @author       Eaglewing [571041]
+// @copyright    2026, Eaglewing [571041]. All rights reserved.
+// @license      All Rights Reserved - for use on Torn (torn.com) only (see LICENCE)
+// @match        https://www.torn.com/*
+// @updateURL    ''' + ART_URL + '''
+// @downloadURL  ''' + ART_URL + '''
+// @grant        none
+// @run-at       document-idle
+// @noframes
+// ==/UserScript==
+/* Art, sound and music: "Ninja Adventure" by Pixel-boy and AAA (CC0). Characters and townspeople: "Mana Seed" by Seliel the
+   Shaper, used under licence with permission (not CC0; don't extract or reuse it). Packaging (c) Eaglewing [571041].
+   This script makes no requests and needs no API key. It only answers the game's 'aethra-art:request' page event with one
+   'aethra-art' event carrying its pictures and sounds.
+   TERMS OF SERVICE
+   | Data Storage          | No                       |
+   | Data Sharing          | Nobody                   |
+   | Purpose of Use        | Public amusement         |
+   | Key Storage & Sharing | Not stored / Not shared  |
+   | Key Access Level      | None (no API key needed) |
+*/
+(function () {
+  const A = ''' + art_blob + ''';
+  document.addEventListener('aethra-art:request', function () { document.dispatchEvent(new CustomEvent('aethra-art', { detail: JSON.stringify(A) })); });
+  document.documentElement.dataset.aethraArt = \'''' + VERSION + '''\';
+})();
+'''
+open('build/Legend-of-Aethra-Art.user.js', 'w').write(art_js)
+print('art & sound script: %.2f MB' % (len(art_js) / 1e6))
+
 # ---------- the userscript ----------
 URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/'
 header = '''// ==UserScript==
@@ -199,13 +238,14 @@ header = '''// ==UserScript==
  * licence with permission (not CC0; don't extract or reuse it). Unofficial fan project, not affiliated with Torn.
  *
  * HOW IT WORKS
- * - The whole game is inside this script. Pages where you don't play only add a Tampermonkey menu entry and listen for
+ * - The game's code, maps and story are inside this script; its pictures and sounds are in the Art & Sound script. Pages where you don't play only add a Tampermonkey menu entry and listen for
  *   Torn Arcade: nothing is unpacked, drawn or run until you press Play.
  * - It never reads, clicks or changes Torn's page, makes no network requests of any kind, uses no API key and no
  *   websockets. Keys are only read while the game window is open.
  * - Save files (three slots and a resume point) are kept in Tampermonkey storage on your device.
  * - Torn Arcade link (page events only): 'aethra:ping' / 'aethra:here' (installed? version), 'aethra:open' (play inside
- *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume'. The five optional Soundtrack scripts answer
+ *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume'. The Art & Sound script (needed) answers
+ *   'aethra-art:request' with 'aethra-art'; the five optional Soundtrack scripts answer
  *   'aethra-music:request' with 'aethra-music'.
  *
  * TERMS OF SERVICE
@@ -219,13 +259,25 @@ header = '''// ==UserScript==
 launcher = '''
 AE.store = { get: function (k) { try { return GM_getValue(k, null); } catch (e) { return null; } }, set: function (k, v) { try { GM_setValue(k, v); } catch (e) {} } };
 let readying = null;
-const DATA = ''' + blob + ''';
+const DATA = ''' + main_blob + ''';
 const ensure = function () { return readying || (readying = Promise.resolve(AE)); };
 // music arrives from the optional Soundtrack scripts
 document.addEventListener('aethra-music', function (e) { try { const d = JSON.parse(e.detail); AE.MUSIC = Object.assign(AE.MUSIC || {}, d.tracks || {}); DATA.music = Object.assign(DATA.music || {}, d.tracks || {}); if (AE.Music && AE.Music.cur && !AE.Music.src) { const n = AE.Music.cur; AE.Music.cur = null; AE.Music.play(n); } } catch (x) {} });
-const play = function (parent, o) { o = o || {}; document.dispatchEvent(new CustomEvent('aethra-music:request')); return AE.host.open(parent || null, DATA, o).then(function () { if (o.muted !== undefined && AE.setMuted) AE.setMuted(o.muted); if (o.volume !== undefined && AE.setVolume) AE.setVolume(o.volume / 100); document.documentElement.dataset.aethraOpen = '1'; }); };
+// pictures and sounds come from the Art & Sound script (asked for once, when you first press Play)
+let gotArt = !!DATA.art;
+document.addEventListener('aethra-art', function (e) { try { const d = JSON.parse(e.detail); DATA.art = d.art; DATA.sfx = d.sfx; gotArt = true; } catch (x) {} });
+const needArt = function (parent) {
+  const box = document.createElement('div'); box.style.cssText = (parent ? 'position:absolute;' : 'position:fixed;z-index:2147483000;') + 'inset:0;background:#0a0c1c;color:#dde;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font:15px sans-serif;text-align:center;padding:20px';
+  box.innerHTML = '<b style="font-size:18px">Legend of Aethra needs its Art &amp; Sound script</b><span>Install it, then reload the page. It holds every picture and sound in the game.</span><a href="''' + ART_URL + '''" target="_blank" rel="noopener" style="color:#9cf">Install Legend of Aethra - Art &amp; Sound</a><button type="button" style="margin-top:8px;padding:4px 14px">Close</button>';
+  box.querySelector('button').addEventListener('click', function () { box.remove(); try { document.dispatchEvent(new CustomEvent('aethra:closed')); } catch (x) {} });
+  (parent || document.body).appendChild(box);
+};
+const play = function (parent, o) { o = o || {}; document.dispatchEvent(new CustomEvent('aethra-music:request'));
+  if (!gotArt) document.dispatchEvent(new CustomEvent('aethra-art:request'));
+  if (!gotArt) { needArt(parent); return Promise.resolve(); }
+  return AE.host.open(parent || null, DATA, o).then(function () { if (o.muted !== undefined && AE.setMuted) AE.setMuted(o.muted); if (o.volume !== undefined && AE.setVolume) AE.setVolume(o.volume / 100); document.documentElement.dataset.aethraOpen = '1'; }); };
 if (typeof GM_registerMenuCommand === 'function') GM_registerMenuCommand('Play Legend of Aethra', function () { play(); });
-document.addEventListener('aethra:ping', function () { document.dispatchEvent(new CustomEvent('aethra:here', { detail: JSON.stringify({ version: \'''' + VERSION + '''\', music: document.documentElement.dataset.aethraMusic || '' }) })); });
+document.addEventListener('aethra:ping', function () { document.dispatchEvent(new CustomEvent('aethra:here', { detail: JSON.stringify({ version: \'''' + VERSION + '''\', art: document.documentElement.dataset.aethraArt || '' }) })); });
 document.addEventListener('aethra:open', function (e) { let d = null; try { d = JSON.parse(e.detail || 'null'); } catch (x) {} const host = d && typeof d.host === 'string' ? document.getElementById(d.host) : null; play(host, { muted: d && typeof d.muted === 'boolean' ? d.muted : undefined, volume: d && typeof d.volume === 'number' ? d.volume : undefined }); });
 document.addEventListener('aethra:close', function () { AE.host.close(); delete document.documentElement.dataset.aethraOpen; });
 document.addEventListener('aethra:mute', function (e) { let m = false; try { m = !!JSON.parse(e.detail).muted; } catch (x) {} if (AE.setMuted) AE.setMuted(m); });

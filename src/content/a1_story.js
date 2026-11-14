@@ -494,6 +494,20 @@
     await s('sable', 'A rail guardian. They bolted a rail guardian to the train.');
     await s('bram', 'Then we unbolt it!');
     await cs.battle(['juggernaut'], { bg: 'factory', boss: 1, noRun: 1 });
+    // the chase: Aurex skimmer-bikes run the train down on the Ashfields road
+    cs.music('battle');
+    await AE.say('Freight Nine lurches out of the yards. Behind it, engines scream: a whole squadron of Aurex skimmer-bikes pours out of the gate.');
+    await s('sable', 'There\'s a skimmer chained to the flatcar! Warden, can you ride?');
+    await s('kael', 'The Academy taught us.');
+    await s('sable', 'The Academy taught you EVERYTHING, didn\'t it. Go!');
+    for (;;) {
+      const r = await AE.chase({ secs: 70 });
+      if (r === 'win') break;
+      const again = await AE.ask('The bikes have the train boxed in! Try again?', ['Again!', 'Again (Sable drives slower)'], { name: 'BRAM' });
+      if (again === 1) AE.S_.flags.chase_easy = 1;
+    }
+    AE.S_.gold += 1200; AE.Sfx.play('coin'); await AE.notice('The Aurex riders drop 1,200 G on the road.');
+    await s('bram', 'HA! Look at them tumble! Kid, you ride like a lunatic.');
     cs.music('story');
     await cs.narrate(['Freight Nine tore out of the Halcyon yards at dawn, four stowaways in its coal tender.',
       'Behind them, the plate shone like a crown over the dark of the Sumps.', 'Ahead lay the Ashfields, and beyond them, the whole of Meridia.',

@@ -6,3 +6,4 @@ AE.cs.title = function (t, s) { window.LOGS.push('# ' + t + ' ' + (s || '')); re
 const sb = AE.startBattle;
 AE.startBattle = function (form, o) { window.LOGS.push('BATTLE ' + form.enemies.join(',')); if (window.realBattles) return sb(form, o); return Promise.resolve('win'); };
 'fast'
+AE.chase = function () { window.LOGS.push('CHASE'); return Promise.resolve('win'); };

@@ -68,3 +68,44 @@ def patch(M):
     X, Y = spot(sw, sw.w // 2, sw.h // 2); sw.chest(X, Y, 'surge_manual_sable')
     ot = M['orin_tower_6']
     X, Y = spot(ot, ot.entry[0] + 2, ot.entry[1]); ot.chest(X, Y, 'surge_manual_orin')
+
+# ---------- open up locked houses: every town gets homes you can walk into ----------
+LINES = {
+    'thornbrook': ['We came back after the fire. Where else would we go?', 'My grandmother says the fire burned blue at the orphanage. Fire isn\'t blue.', 'Mother Ilse fed us all, that first winter. She still sends soup.'],
+    'kestrel': ['Talonbird feathers in the soup again. Every day. Lovely.', 'Joda breeds the fastest birds in Meridia. He says so himself. Often.'],
+    'windhaven': ['We pray to the wind. Lately it doesn\'t answer.', 'Aurex offered every family in Windhaven a year\'s wages to sell the shrine. Nobody sold.'],
+    'portlark': ['The sea\'s been strange. Warm in the wrong places.', 'My son\'s a sailor. Sailors\' mothers don\'t sleep.'],
+    'saltmere': ['Sand in the bread, sand in the bed. That\'s Saltmere.', 'The ferry brings strangers. Strangers bring trouble. You look like trouble. Tea?'],
+    'sunscar': ['Water is life out here. Sit, sit, have some. Not too much.', 'My grandfather dug in the ruins. He came back singing songs nobody knew.'],
+    'frostgate': ['Close the door! The cold gets in and never leaves.', 'Three shifts a day in the mines. Aurex pays well. Aurex pays in the end, too.'],
+    'lumen': ['Ring softly. The bells remember everything.', 'Ember was such a quiet child. Then the Echoes started answering her.'],
+    'mideel': ['People wash up in the shallows sometimes. Some of them remember who they were.', 'The water glows at night. My children call it the river of stars.'],
+    'sumps': ['Close the door, love, the soot gets in.', 'We were on Ash Lane once. Now we\'re here. Next year, who knows.', 'My boy works the reactors. Comes home coughing.', 'Undercurrent? Never heard of them. Tea?'],
+}
+LOOT = ['potion', 'hi_potion', 'ether', 'phoenix_down', 'antidote', ('gold', 300), 'tent', 'remedy']
+WHO = ['Villager', 'Villager2', 'Villager3', 'Woman', 'OldMan', 'OldWoman', 'Villager5', 'Villager6', 'Hunter', 'Cavegirl']
+
+def open_homes(M):
+    import random
+    r = random.Random(17)
+    added = []
+    for tid, lines in LINES.items():
+        t = M.get(tid)
+        if not t: continue
+        locked = [k for k, v in t.signs.items() if v == 'Locked.' or v.startswith('Locked') or 'Nobody answers' in v or 'snoring' in v]
+        r.shuffle(locked)
+        for n, k in enumerate(locked[:8 if tid == 'sumps' else 4]):
+            x, y = map(int, k.split(','))
+            hid = '%s_home%d' % (tid, n + 1)
+            h = interior(hid, 'A Home', 12, 10, (tid, x, y + 1), floor='planks', wall='wood', door=6)
+            bed(h, 1, 3); bed(h, 3, 3, n % 3); table(h, 5, 6); drawers(h, 8, 2)
+            h.npc(r.randint(2, 9), 8, r.choice(WHO), name='RESIDENT', walk=1, say=[r.choice(lines), r.choice(lines)])
+            if r.random() < 0.6:
+                it = r.choice(LOOT); h.chest(10, 6, it if isinstance(it, str) else it[0], 1 if isinstance(it, str) else it[1])
+            del t.signs[k]; t.setcol(x, y, OPEN); t.warp(x, y, hid, h.entry[0], h.entry[1], 0)
+            M[hid] = h; added.append(hid)
+    return added
+
+_patch0 = patch
+def patch(M):
+    _patch0(M); open_homes(M)

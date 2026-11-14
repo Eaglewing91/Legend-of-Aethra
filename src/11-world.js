@@ -332,6 +332,7 @@ AE.World.prototype.draw = function (ctx) {
   const V = AE.S_.vehicles;
   for (const k in V) { const q = V[k]; if (q && q.have && q.x > 0) { const p = proj(q.x + 0.5, q.y + 0.5); if (p && seen(p, 10)) items.push({ p: p, kind: 'veh', v: k }); } }
   this._pv = { PY: hz + (camH - pH) * focal / back, tile: S * focal / back };
+  this._proj = proj; this._seen = seen;
   items.sort(function (a, b) { return b.p.d - a.p.d; });
   const nat = AE.IMG.nature, hs = AE.IMG.house;
   const self = this;

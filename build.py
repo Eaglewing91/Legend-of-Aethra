@@ -243,7 +243,7 @@ header = '''// ==UserScript==
  *   websockets. Keys are only read while the game window is open.
  * - Save files (three slots and a resume point) are kept in Tampermonkey storage on your device.
  * - Torn Arcade link (page events only): 'aethra:ping' / 'aethra:here' (installed? version), 'aethra:open' (play inside
- *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume'. The Art & Effects script (needed) answers
+ *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume', 'aethra:pad'. The Art & Effects script (needed) answers
  *   'aethra-art:request' with 'aethra-art'; the five optional Soundtrack scripts answer
  *   'aethra-music:request' with 'aethra-music'.
  *
@@ -277,8 +277,9 @@ const play = function (parent, o) { o = o || {}; document.dispatchEvent(new Cust
   return AE.host.open(parent || null, DATA, o).then(function () { if (o.muted !== undefined && AE.setMuted) AE.setMuted(o.muted); if (o.volume !== undefined && AE.setVolume) AE.setVolume(o.volume / 100); document.documentElement.dataset.aethraOpen = '1'; }); };
 if (typeof GM_registerMenuCommand === 'function') GM_registerMenuCommand('Play Legend of Aethra', function () { play(); });
 document.addEventListener('aethra:ping', function () { document.dispatchEvent(new CustomEvent('aethra:here', { detail: JSON.stringify({ version: \'''' + VERSION + '''\', art: document.documentElement.dataset.aethraArt || '' }) })); });
-document.addEventListener('aethra:open', function (e) { let d = null; try { d = JSON.parse(e.detail || 'null'); } catch (x) {} const host = d && typeof d.host === 'string' ? document.getElementById(d.host) : null; play(host, { muted: d && typeof d.muted === 'boolean' ? d.muted : undefined, volume: d && typeof d.volume === 'number' ? d.volume : undefined }); });
+document.addEventListener('aethra:open', function (e) { let d = null; try { d = JSON.parse(e.detail || 'null'); } catch (x) {} const host = d && typeof d.host === 'string' ? document.getElementById(d.host) : null; play(host, { pad: d && typeof d.pad === 'boolean' ? d.pad : undefined, muted: d && typeof d.muted === 'boolean' ? d.muted : undefined, volume: d && typeof d.volume === 'number' ? d.volume : undefined }); });
 document.addEventListener('aethra:close', function () { AE.host.close(); delete document.documentElement.dataset.aethraOpen; });
+document.addEventListener('aethra:pad', function (e) { let on = false; try { on = !!JSON.parse(e.detail).on; } catch (x) {} AE.setPad(on); });
 document.addEventListener('aethra:mute', function (e) { let m = false; try { m = !!JSON.parse(e.detail).muted; } catch (x) {} if (AE.setMuted) AE.setMuted(m); });
 document.addEventListener('aethra:volume', function (e) { let v = 100; try { v = Number(JSON.parse(e.detail).volume); } catch (x) {} if (isFinite(v) && AE.setVolume) AE.setVolume(v / 100); });
 document.documentElement.dataset.aethra = \'''' + VERSION + '''\';

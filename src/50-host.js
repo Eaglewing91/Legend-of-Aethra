@@ -17,6 +17,8 @@ AE.host = {
     const r = this.root;
     if (parent) { r.style.position = 'absolute'; r.style.inset = '0'; parent.appendChild(r); } else { r.style.position = 'fixed'; document.body.appendChild(r); }
     if (o.noClose) this.closeBtn.style.display = 'none';
+    const touch = (function () { try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
+    AE.setPad(o.pad !== undefined ? o.pad : (AE.pad.want !== undefined ? AE.pad.want : touch));
     r.style.display = 'flex'; this.game.input.clear(); this.game.start();
     const c = r.querySelector('canvas'); if (c) c.focus();
     if (AE.Music && AE.S_ && AE.S_.playing) { const f = AE.field(); AE.Music.cur = null; AE.Music.play(f ? f.map.d.music : 'world'); }
@@ -53,3 +55,31 @@ AE.suspend = function () {
     if (this.resume && !this.sub) { AE.text(ctx, 'Resume', 112, 168, '#ffe080'); if (this.sel === 2) AE.cursor(ctx, 94, 168); }
   };
 })();
+// ---------- touch pad: a d-pad and buttons over the game, for phones and tablets ----------
+AE.pad = {
+  el: null,
+  make: function (root) {
+    const p = this.el = document.createElement('div'); p.className = 'ae-pad';
+    p.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:1;user-select:none;-webkit-user-select:none;touch-action:none';
+    const btn = function (label, key, css) {
+      const b = document.createElement('div'); b.textContent = label;
+      b.style.cssText = 'position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;font:bold 15px sans-serif;border-radius:10px;' + css;
+      const on = function (e) { e.preventDefault(); AE.ac(); if (AE.game) AE.game.input.press(key, true); b.style.background = 'rgba(255,255,255,.35)'; };
+      const off = function (e) { e.preventDefault(); if (AE.game) AE.game.input.press(key, false); b.style.background = 'rgba(255,255,255,.14)'; };
+      b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+      p.appendChild(b);
+    };
+    btn('▲', 'up', 'left:52px;bottom:104px;width:46px;height:46px'); btn('▼', 'down', 'left:52px;bottom:10px;width:46px;height:46px');
+    btn('◀', 'left', 'left:6px;bottom:57px;width:46px;height:46px'); btn('▶', 'right', 'left:98px;bottom:57px;width:46px;height:46px');
+    btn('OK', 'ok', 'right:14px;bottom:60px;width:56px;height:56px;border-radius:28px'); btn('✕', 'back', 'right:76px;bottom:16px;width:46px;height:46px;border-radius:23px');
+    btn('MENU', 'menu', 'right:14px;bottom:126px;width:56px;height:30px;font-size:11px'); btn('RUN', 'run', 'right:76px;bottom:126px;width:46px;height:30px;font-size:11px');
+    btn('MAP', 'map', 'left:6px;top:8px;width:46px;height:28px;font-size:11px');
+    root.appendChild(p);
+  },
+  set: function (on) {
+    const r = AE.host.root; if (!r) { AE.pad.want = on; return; }
+    if (!this.el) this.make(r);
+    this.el.style.display = on ? 'block' : 'none';
+  }
+};
+AE.setPad = function (on) { AE.pad.set(!!on); };

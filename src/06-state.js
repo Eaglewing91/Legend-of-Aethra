@@ -3,7 +3,7 @@
    Stats at a level come from each character's base and growth; gear and Prisms add to them. */
 AE.newState = function () {
   return {
-    v: 1, playing: false, time: 0, steps: 0, chapter: 1, gold: 300,
+    v: 1, playing: false, time: 0, steps: 0, chapter: 1, Gil: 300,
     party: ['kael'], reserve: [], m: {}, inv: {}, prisms: [], flags: {}, chests: {}, cards: {},
     map: 'start', x: 0, y: 0, dir: 2, world: null, vehicles: {}, talon: { owned: [] },
     cfg: { atb: 'wait', speed: 3, text: 2, win: null, autorun: false, music: 1, cursor: 'reset' },
@@ -74,14 +74,14 @@ AE.addPrism = function (id, ap) { AE.S_.prisms.push({ id: id, ap: ap || 0 }); re
 AE.has = function (id) { return AE.S_.inv[id] || 0; };
 AE.addItem = function (id, n) { const S = AE.S_; S.inv[id] = AE.clamp((S.inv[id] || 0) + (n === undefined ? 1 : n), 0, 99); if (!S.inv[id]) delete S.inv[id]; };
 AE.itemName = function (id) {
-  if (id === 'gold') return 'Gold';
+  if (id === 'gold') return 'Gil';
   if (id.indexOf('prism:') === 0) return (AE.PRISMS[id.slice(6)] || {}).name + ' Prism';
   const d = AE.ITEMDB(id); return d ? d.name : id;
 };
 // gain(id, n): items, gold, Prisms ('prism:fire'), key items; shows the notice
 AE.gain = function (id, n) {
   n = n || 1;
-  if (id === 'gold') { AE.S_.gold = Math.min(9999999, AE.S_.gold + n); return AE.notice('Found ' + AE.fmt(n) + ' G'); }
+  if (id === 'gold') { AE.S_.gold = Math.min(9999999, AE.S_.gold + n); return AE.notice('Found ' + AE.fmt(n) + ' Gil'); }
   if (id.indexOf('prism:') === 0) { for (let i = 0; i < n; i++) AE.addPrism(id.slice(6)); return AE.notice('Received ' + AE.itemName(id) + (n > 1 ? ' x' + n : '')); }
   if (id.indexOf('card:') === 0) { AE.S_.cards[id.slice(5)] = (AE.S_.cards[id.slice(5)] || 0) + n; return AE.notice('Got the Arcana card ' + ((AE.CARDS || {})[id.slice(5)] || {}).name); }
   AE.addItem(id, n);

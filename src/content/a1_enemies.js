@@ -61,7 +61,7 @@
 
   AE.SPECIALS.pilfer = async function (B, u, ts) {
     const t = ts[0]; B.say('Pilfer', 50); await B.step(u, true); B.hitOnce(u, t, 0.6, {});
-    const g = Math.min(AE.S_.gold, 20 + AE.rand(40)); AE.S_.gold -= g; u.loot = (u.loot || 0) + g; if (g) B.say('Stole ' + g + ' G!', 60);
+    const g = Math.min(AE.S_.gold, 20 + AE.rand(40)); AE.S_.gold -= g; u.loot = (u.loot || 0) + g; if (g) B.say('Stole ' + g + ' Gil!', 60);
     await AE.wait(20); await B.step(u, false);
   };
 

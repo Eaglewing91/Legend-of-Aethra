@@ -27,7 +27,7 @@
     if (!Q('mill')) Q('mill', 1);
   };
   EV.q_bears = hunt('bears', 'FENCER', 'mossbear', 3, 'Moss Bears keep breaking my fences. Three of the brutes, out of Mistwood and the woods round here. Thin them out?',
-    ['Three bears! The birds can sleep again. Here, the good feed.', 'Fences holding. Bears sulking.'], async function () { await AE.gain('sweetroot', 3); AE.S_.gold += 800; await AE.notice('Received 800 G'); });
+    ['Three bears! The birds can sleep again. Here, the good feed.', 'Fences holding. Bears sulking.'], async function () { await AE.gain('sweetroot', 3); AE.S_.gold += 800; await AE.notice('Received 800 Gil'); });
   EV.q_tip = async function () {
     if (Q('tip') === 'done') { await sayAs('TIPSTER', 'I knew that bird had it in her. I always know. Mostly.'); return; }
     if (!S().mybird) { await sayAs('TIPSTER', 'Got a bird of your own? No? Kestrel Ranch has chicks. A rider with their own bird and a little luck could make me rich. I mean, us.'); return; }
@@ -41,11 +41,11 @@
   EV.q_crate = async function () {
     if (Q('crate') === 'done') { await sayAs('SHIFTY SAILOR', 'Pleasure doing business. You never saw me.'); return; }
     if (Q('crate') === 1) { await sayAs('SHIFTY SAILOR', 'The merchant in Saltmere. Big hat. Don\'t open it.'); return; }
-    const r = await AE.ask('SHIFTY SAILOR: You going to Saltmere? Take this crate to the merchant there. No questions. 2,000 G on delivery.', ['Take it', 'No'], { name: 'SHIFTY SAILOR', cancel: 1 });
+    const r = await AE.ask('SHIFTY SAILOR: You going to Saltmere? Take this crate to the merchant there. No questions. 2,000 Gil on delivery.', ['Take it', 'No'], { name: 'SHIFTY SAILOR', cancel: 1 });
     if (r === 0) { Q('crate', 1); await AE.gain('sealed_crate'); }
   };
   EV.q_crate_end = async function () {
-    if (AE.has('sealed_crate')) { AE.take('sealed_crate'); Q('crate', 'done'); await sayAs('MERCHANT', 'Ah, my... spices. Yes. Spices. Here\'s your fee.'); AE.S_.gold += 2000; await AE.notice('Received 2,000 G'); return; }
+    if (AE.has('sealed_crate')) { AE.take('sealed_crate'); Q('crate', 'done'); await sayAs('MERCHANT', 'Ah, my... spices. Yes. Spices. Here\'s your fee.'); AE.S_.gold += 2000; await AE.notice('Received 2,000 Gil'); return; }
     await sayAs('MERCHANT', 'Spices, silks, things that aren\'t spices or silks. Ask about anything. Except that.');
   };
   // Saltmere: the dying reef
@@ -64,7 +64,7 @@
   // Frostgate: the missing miner
   EV.q_miner = async function () {
     if (Q('miner') === 'done') { await sayAs('WORRIED WIFE', 'He\'s home. He\'s grumpy. He\'s HOME.'); return; }
-    if (F().q_miner_saved) { Q('miner', 'done'); await sayAs('WORRIED WIFE', 'You found him! The frozen lake level? That fool. Thank you, thank you.'); await AE.gain('elixir'); AE.S_.gold += 1500; await AE.notice('Received 1,500 G'); return; }
+    if (F().q_miner_saved) { Q('miner', 'done'); await sayAs('WORRIED WIFE', 'You found him! The frozen lake level? That fool. Thank you, thank you.'); await AE.gain('elixir'); AE.S_.gold += 1500; await AE.notice('Received 1,500 Gil'); return; }
     await sayAs('WORRIED WIFE', 'My husband went down for the Aurex night shift three days ago. The frozen lake level. He hasn\'t come up.');
     if (!Q('miner')) Q('miner', 1);
   };

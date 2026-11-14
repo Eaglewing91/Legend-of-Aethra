@@ -50,7 +50,7 @@ AE.raceRun = function (birds, pick) {
 // ---------- slots: three reels, stop each with OK ----------
 AE.SLOTSYM = ['7', 'B', 'C', 'Q', 'S', 'T'];
 AE.slots = async function () {
-  if (AE.tokens(0) < 3) { await AE.say('The slot machines take 3 tokens a spin. Win tokens at the races, or trade gold at the Exchange.'); return; }
+  if (AE.tokens(0) < 3) { await AE.say('The slot machines take 3 tokens a spin. Win tokens at the races, or trade Gil at the Exchange.'); return; }
   const r = await AE.ask('Spin for 3 tokens? (You have ' + AE.tokens(0) + ')', ['Spin', 'Leave'], { cancel: 1 }); if (r !== 0) return;
   AE.tokens(-3);
   const reels = [0, 1, 2].map(function () { return { i: AE.rand(6), stop: false, v: 0.35 + Math.random() * 0.2 }; });
@@ -74,8 +74,8 @@ AE.slots = async function () {
 
 // ---------- shooting gallery: a target slides along; press OK when the sight is on it ----------
 AE.gallery = async function () {
-  if (AE.S_.gold < 50) { await AE.say('Fifty gold a round.', { name: 'GALLERY MAN' }); return; }
-  const r = await AE.ask('Ten shots, 50 G. Hit eight for a prize!', ['Shoot', 'Leave'], { name: 'GALLERY MAN', cancel: 1 }); if (r !== 0) return;
+  if (AE.S_.gold < 50) { await AE.say('Fifty Gil a round.', { name: 'GALLERY MAN' }); return; }
+  const r = await AE.ask('Ten shots, 50 Gil. Hit eight for a prize!', ['Shoot', 'Leave'], { name: 'GALLERY MAN', cancel: 1 }); if (r !== 0) return;
   AE.S_.gold -= 50;
   const hits = await AE.miniScene({
     shot: 0, hit: 0, x: 0, v: 2.2, flash: 0,
@@ -99,8 +99,8 @@ AE.gallery = async function () {
 
 // ---------- Battle Square: fights in a row; tokens grow with the streak ----------
 AE.arena = async function () {
-  const r = await AE.ask('Up to five fights in a row. Each win pays more tokens. Lose, and you keep what you won. 100 G to enter.', ['Fight', 'Leave'], { name: 'ARENA MASTER', cancel: 1 });
-  if (r !== 0) return; if (!AE.pay(100)) { await AE.say('100 G, please.', { name: 'ARENA MASTER' }); return; }
+  const r = await AE.ask('Up to five fights in a row. Each win pays more tokens. Lose, and you keep what you won. 100 Gil to enter.', ['Fight', 'Leave'], { name: 'ARENA MASTER', cancel: 1 });
+  if (r !== 0) return; if (!AE.pay(100)) { await AE.say('100 Gil, please.', { name: 'ARENA MASTER' }); return; }
   let won = 0;
   for (let k = 0; k < 5; k++) {
     const sets = AE.ENC.arena.sets; const form = sets[AE.rand(sets.length)];
@@ -116,7 +116,7 @@ AE.arena = async function () {
 // ---------- the Exchange ----------
 AE.EXCHANGE = [['elixir', 400], ['cat_bell', 800], ['card:c_sylphine', 1500], ['prism:exp_plus', 2000], ['megalixir', 2400], ['sprint_shoes', 3000], ['prism:gold_plus', 4000], ['lucky_coin', 5000], ['ribbon', 9999]];
 AE.exchange = async function () {
-  const r = await AE.ask('Tokens: ' + AE.tokens(0) + '. Buy tokens (10 G each) or trade them for prizes?', ['Buy 50 tokens (500 G)', 'Prizes', 'Leave'], { name: 'EXCHANGER', cancel: 2 });
+  const r = await AE.ask('Tokens: ' + AE.tokens(0) + '. Buy tokens (10 Gil each) or trade them for prizes?', ['Buy 50 tokens (500 Gil)', 'Prizes', 'Leave'], { name: 'EXCHANGER', cancel: 2 });
   if (r === 0) { if (AE.pay(500)) { AE.tokens(50); AE.Sfx.play('coin'); } else await AE.say('Not enough gold.'); return; }
   if (r !== 1) return;
   const c = await AE.ask('Prizes (you have ' + AE.tokens(0) + ' tokens):', AE.EXCHANGE.map(function (p) { return AE.itemName(p[0]) + ' - ' + p[1]; }).concat(['Back']), { name: 'EXCHANGER', cancel: AE.EXCHANGE.length });

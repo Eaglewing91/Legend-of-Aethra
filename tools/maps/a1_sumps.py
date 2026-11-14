@@ -158,7 +158,7 @@ def homes():
     counter(s, 3, 10, 6); shelf(s, 2, 3); shelf(s, 4, 3); shelf(s, 6, 3); bookcase(s, 8, 3)
     for (x, y) in ((14, 5), (19, 5), (14, 10), (19, 10)): table(s, x, y)
     for (x, y) in ((2, 13), (21, 13)): plant(s, x, y)
-    for (x, y) in ((20, 3), (21, 3), (22, 4)): s.stamp('house', 17, 14, x, y, col=SOLID)
+    for (x, y) in ((20, 3), (21, 3), (22, 4)): s.stamp('elem', 1, 0, x, y, col=SOLID)
     s.stamp('elem', 7, 11, 2, 9); s.warp(2, 9, 'spillway_b', 4, 4, 2)          # stairs down to the hideout
     s.npc(6, 5, 'Princess', id='tess', name='TESS', ev='a1_tess', dir=2, still=1)
     s.npc(15, 6, 'pip', id='pip', ev='a1_pip_bar', dir=2, still=1, if_='a1_spill')

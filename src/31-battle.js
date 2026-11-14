@@ -17,7 +17,7 @@ AE.Battle = function (form, o) {
   this.enemies = form.enemies.map(function (e, i) { return AE.mkEnemy(typeof e === 'string' ? e : e.id, i, typeof e === 'string' ? {} : e); });
   this.layout();
   this.queue = []; this.ready = []; this.busy = false; this.menu = null; this.phase = 'intro'; this.t = 0; this.pops = []; this.fx = []; this.banner = null;
-  this.allUses = {}; this.runHold = 0; this.result = null; this.spoils = { exp: 0, ap: 0, gold: 0, items: [] };
+  this.allUses = {}; this.runHold = 0; this.result = null; this.spoils = { exp: 0, ap: 0, Gil: 0, items: [] };
   // ambush / first strike
   const pre = Math.max(0, ...this.party.map(function (f) { return f.abil.indep.pre || 0; }));
   this.pre = form.pre || (!form.boss && Math.random() < 0.06 + pre * 0.12) ? 1 : (!form.boss && Math.random() < 0.05) ? -1 : 0;
@@ -197,7 +197,7 @@ AE.gainQuiet = function (id) {
 };
 AE.Battle.prototype.endPages = function () {
   const sp = this.spoils, pages = [];
-  pages.push(['EXP ' + AE.fmt(sp.exp), 'AP ' + AE.fmt(sp.ap), AE.fmt(sp.gold) + ' G']);
+  pages.push(['EXP ' + AE.fmt(sp.exp), 'AP ' + AE.fmt(sp.ap), AE.fmt(sp.gold) + ' Gil']);
   if (sp.items.length) pages.push(['Found:'].concat(sp.items.map(AE.itemName)));
   const lv = (sp.ups || []).map(function (u) { return AE.CHARS[u.id].name + ' reached Lv ' + u.to + '!'; });
   if (lv.length) pages.push(lv);

@@ -66,8 +66,8 @@ def savepoint(m, x, y):
     m.stamp('nature', 1, 15, x, y, col=SOLID); m.event(x, y, 'savepoint', touch=False); m.extra.setdefault('saves', []).append([x, y])
 def sign(m, x, y, text): m.stamp('house', 6, 2, x, y, col=SOLID); m.sign(x, y, text)
 def lamp(m, x, y): m.stamp('dungeon', 4 + (x + y) % 4, 2, x, y, col=SOLID)
-def barrel(m, x, y): m.stamp('house', 17, 14, x, y, col=SOLID)
-def crate(m, x, y): m.stamp('house', 16, 14, x, y, col=SOLID)
+def barrel(m, x, y): m.stamp('elem', (1, 4)[(x + y) % 2], 0, x, y, col=SOLID)
+def crate(m, x, y): m.stamp('elem', (0, 8)[(x + y) % 2], 0, x, y, col=SOLID)
 
 # ---------- rooms ----------
 def room(m, x0, y0, x1, y1, floor='brick', wall='brick', thick=2):
@@ -114,11 +114,11 @@ def interior(mid, name, w, h, to, floor='planks', wall='wood', music='village', 
     return m
 def rug(m, x, y, w=3, h=2): m.stamp('elem', 9, 3, x, y) if False else m.ground('carpet', x, y, x + w - 1, y + h - 1)
 def table(m, x, y): m.stamp('elem', 2, 10, x, y, 3, 1, col=SOLID)
-def shelf(m, x, y): m.stamp('elem', 2, 7, x, y, 1, 2, overrows=1, col=SOLID)
+def shelf(m, x, y): m.stamp('elem', 2, 7, x, y, 2, 2, overrows=1, col=SOLID)
 def bookcase(m, x, y): m.stamp('elem', 8, 7, x, y, 2, 2, overrows=1, col=SOLID)
 def drawers(m, x, y): m.stamp('elem', 6, 7, x, y, 2, 2, overrows=1, col=SOLID)
 def bed(m, x, y, c=0): m.stamp('bed', (5, 12, 12)[c], (3, 3, 0)[c], x, y, 1, 2, col=SOLID)
 def counter(m, x0, x1, y):
-    for x in range(x0, x1 + 1): m.stamp('elem', 3, 10, x, y, col=COUNTER)
+    for x in range(x0, x1 + 1): m.stamp('elem', 2 if x == x0 else 4 if x == x1 else 3, 10, x, y, col=COUNTER)
 def plant(m, x, y): m.stamp('nature', (x + y) % 4, 10, x, y, col=SOLID)
-def pots(m, x, y): m.stamp('house', 16 + (x % 3), 12, x, y, col=SOLID)
+def pots(m, x, y): m.stamp('house', 21, 13 + (x % 3), x, y, col=SOLID)

@@ -19,7 +19,7 @@
     if (AE.has('clerk_pass')) {
       AE.take('clerk_pass'); Q('pass', 'done');
       await sayAs('HAGGARD CLERK', 'My badge! Where... the Spire Stair? I was never on the Spire Stair. I don\'t know why it was there. Don\'t tell anyone.');
-      AE.S_.gold += 500; await AE.notice('Received 500 G'); await AE.gain('hi_potion', 2); return;
+      AE.S_.gold += 500; await AE.notice('Received 500 Gil'); await AE.gain('hi_potion', 2); return;
     }
     await sayAs('HAGGARD CLERK', 'I\'ve lost my security badge. If Aurex finds out I\'ll be sent down to the Sumps. Permanently.');
     await sayAs('HAGGARD CLERK', 'I may, possibly, have taken a shortcut home via the Spire Stair. Once. Hypothetically.');
@@ -51,7 +51,7 @@
       AE.take('moss_flower'); Q('moss', 'done');
       await sayAs('BOY', 'It\'s glowing! With no reactor or anything! Is the whole Sumps like this?');
       if (AE.S_.party.indexOf('lyra') >= 0) await cs.s('lyra', 'Just one garden. Maybe one day more.');
-      await AE.gain('speed_draught', 2); AE.S_.gold += 300; await AE.notice('Received 300 G'); return;
+      await AE.gain('speed_draught', 2); AE.S_.gold += 300; await AE.notice('Received 300 Gil'); return;
     }
     await sayAs('BOY', 'My teacher says there\'s a flower in the Sumps that glows by itself. I don\'t believe it. Nothing glows by itself.');
     await sayAs('BOY', 'If you brought me one, I\'d believe it.');
@@ -113,7 +113,7 @@
     await bo.apply(this, arguments);
     const k = (AE.S_.bestiary.sumprat || 0);
     if (!Q('rats')) {
-      const r = await AE.ask('WARDEN CLERK: Small job, if you want it. Drain 9 rats are getting into the grain. Kill eight Sump Rats. 400 G.', ['Take it', 'No thanks'], { name: 'WARDEN CLERK', cancel: 1 });
+      const r = await AE.ask('WARDEN CLERK: Small job, if you want it. Drain 9 rats are getting into the grain. Kill eight Sump Rats. 400 Gil.', ['Take it', 'No thanks'], { name: 'WARDEN CLERK', cancel: 1 });
       if (r === 0) { Q('rats', 1); AE.S_.ratsFrom = k; }
       return;
     }

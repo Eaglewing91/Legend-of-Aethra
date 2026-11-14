@@ -140,6 +140,10 @@ PLACES = {
     'chapel': (150, 88, 'chapel', 0, 0, 'temple', 'Isle Chapel'),
     'mideel': (73, 144, 'mideel', 0, 0, 'village', 'Mideel Shallows'),
     'academy': (91, 104, 'academy', 0, 0, 'tower', 'Vanguard Academy'),
+    'camp': (83, 91, 'camp', 0, 0, 'village', 'Cinder Camp'),
+    'refinery': (200, 165, 'refinery_1', 0, 0, 'tower', 'Aurex Sand Refinery'),
+    'outpost': (130, 30, 'outpost_1', 0, 0, 'tower', 'Northwatch Outpost'),
+    'skyruins': (60, 30, 'skyruins_1', 0, 0, 'ruins', 'Fallen Isle'),
 }
 # encounter regions: a coarse grid (16 x 16 tiles per cell) of encounter groups by area
 REG = {}

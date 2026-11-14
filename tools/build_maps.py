@@ -18,6 +18,9 @@ def main():
     # modules may add to other modules' maps (more people, more events) before the tiles are made
     for mod in mods:
         if hasattr(mod, 'patch'): mod.patch(maps)
+    # no half trees: a tree cut by a map edge, a doorway or an exit is removed (a bush goes where it stood)
+    import check_cuts as CC
+    for m in maps.values(): CC.prune(m)
     for m in maps.values(): m.finish()
     # a warp to (0, 0) means "the target's entry point"
     for m in maps.values():

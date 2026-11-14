@@ -39,7 +39,7 @@ AE.FileScreen.prototype.draw = function (ctx) {
     const h = d.head; AE.text(ctx, 'File ' + (i + 1), 28, y + 8, '#ffe080');
     (h.party || [h.lead]).forEach(function (id, k) { AE.actor(ctx, id, 'idle', 2, 0, 44 + k * 22, y + 50, 0.75); });
     AE.text(ctx, AE.CHARS[h.lead].name + '  Lv ' + h.lv, 110, y + 8, '#fff');
-    AE.text(ctx, h.place || '', 110, y + 22, '#9cf'); AE.text(ctx, 'Time ' + AE.time(h.time) + '   ' + AE.fmt(h.gold || 0) + ' G', 110, y + 36, '#fff');
+    AE.text(ctx, h.place || '', 110, y + 22, '#9cf'); AE.text(ctx, 'Time ' + AE.time(h.time) + '   ' + AE.fmt(h.gold || 0) + ' Gil', 110, y + 36, '#fff');
   }
   if (this.msg > 0 && this.saved) { AE.window(ctx, 70, 96, 116, 22); AE.text(ctx, 'Saved.', 128, 103, '#fff', { align: 'center' }); }
 };
@@ -115,7 +115,7 @@ AE.Shop.prototype.update = function (g) {
 };
 AE.Shop.prototype.draw = function (ctx) {
   const S = AE.S_, self = this;
-  AE.window(ctx, 0, 0, AE.W, 22); AE.text(ctx, this.D.name || 'Shop', 10, 7, '#ffe080'); AE.text(ctx, AE.fmt(S.gold) + ' G', 246, 7, '#fff', { align: 'right' });
+  AE.window(ctx, 0, 0, AE.W, 22); AE.text(ctx, this.D.name || 'Shop', 10, 7, '#ffe080'); AE.text(ctx, AE.fmt(S.gold) + ' Gil', 246, 7, '#fff', { align: 'right' });
   AE.window(ctx, 0, 22, AE.W, 22);
   ['Buy', 'Sell', 'Leave'].forEach(function (m, i) { AE.text(ctx, m, 28 + i * 70, 29, '#fff'); if (i === self.mode && self.phase === 'mode') AE.cursor(ctx, 12 + i * 70, 29); });
   if (this.phase === 'mode') return;
@@ -134,11 +134,11 @@ AE.Shop.prototype.draw = function (ctx) {
     // who can equip it
     if (d && (d.atk !== undefined && d.type)) S.party.concat(S.reserve).forEach(function (cid, i) { const ok = AE.CHARS[cid].weap === d.type; AE.actor(ctx, cid, 'idle', 2, 0, 166 + i * 18, 200, 0.6, { alpha: ok ? 1 : 0.25 }); });
   }
-  if (this.phase === 'qty') { AE.window(ctx, 40, 90, 170, 34); AE.text(ctx, 'How many?  ' + this.qty, 52, 97, '#fff'); AE.text(ctx, 'Total ' + AE.fmt(AE.priceOf(id) * this.qty * (this.mode === 1 ? 0.5 : 1)) + ' G', 52, 109, '#9cf'); }
+  if (this.phase === 'qty') { AE.window(ctx, 40, 90, 170, 34); AE.text(ctx, 'How many?  ' + this.qty, 52, 97, '#fff'); AE.text(ctx, 'Total ' + AE.fmt(AE.priceOf(id) * this.qty * (this.mode === 1 ? 0.5 : 1)) + ' Gil', 52, 109, '#9cf'); }
 };
 // ---------- inn and save points ----------
 AE.inn = async function (price, name) {
-  const r = await AE.ask((name || 'INNKEEPER') + ': A bed for the night is ' + price + ' G. Stay?', ['Stay', 'No thanks'], { cancel: 1 });
+  const r = await AE.ask((name || 'INNKEEPER') + ': A bed for the night is ' + price + ' Gil. Stay?', ['Stay', 'No thanks'], { cancel: 1 });
   if (r !== 0) return false;
   if (AE.S_.gold < price) { await AE.say('You don\'t have enough money.'); return false; }
   AE.S_.gold -= price; await AE.game.fadeOut(0.03); AE.healAll(); if (AE.Music) AE.Music.play('levelup'); await AE.wait(90); await AE.game.fadeIn(0.03);

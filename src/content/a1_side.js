@@ -18,7 +18,7 @@
       AE.take('tam_medicine'); Q('tam', 'done'); cs.flag('q_tam_done');
       await sayAs('ADA TELLER', 'Doc Marrow\'s tonic! Oh, oh, thank you. Tam, love, drink this. All of it. Yes, I know it tastes like a drain.');
       await sayAs('ADA TELLER', 'Please, take these. Tam\'s father wore them when he worked the reactors. They kept the bad air out of him, at least for a while.');
-      await AE.gain('star_pendant'); AE.S_.gold += 300; await AE.notice('Received 300 G');
+      await AE.gain('star_pendant'); AE.S_.gold += 300; await AE.notice('Received 300 Gil');
       return;
     }
     await sayAs('ADA TELLER', 'My boy Tam has the reactor cough. Everyone on Lantern Row gets it in the end, but he\'s only eight.');
@@ -119,12 +119,12 @@
     }
     const R = ROUNDS[k];
     if (k === 0) await sayAs('PITMASTER VORN', 'Fresh meat! Five bouts. Win them all and you face Gorr the Unbroken. Lose, and you walk out. Or get carried.');
-    const c = await AE.ask('PITMASTER VORN: Bout ' + (k + 1) + ' of 5: ' + R.name + '. Entry is 100 G. Prize ' + R.prize + ' G. Ready?', ['Fight', 'Not yet'], { name: 'PITMASTER VORN', cancel: 1 });
+    const c = await AE.ask('PITMASTER VORN: Bout ' + (k + 1) + ' of 5: ' + R.name + '. Entry is 100 Gil. Prize ' + R.prize + ' Gil. Ready?', ['Fight', 'Not yet'], { name: 'PITMASTER VORN', cancel: 1 });
     if (c !== 0) return;
     if (!AE.pay(100)) { await sayAs('PITMASTER VORN', 'No money, no blood. Come back richer.'); return; }
     const res = await cs.battle(R.foes, { bg: 'ruins', boss: R.boss, noRun: 1, canLose: 1 });
     if (res !== 'win') { AE.healAll(); await sayAs('PITMASTER VORN', 'Carried out! Ha! The crowd loved it. Heal up and try again.'); return; }
-    AE.S_.gold += R.prize; AE.Sfx.play('coin'); await AE.notice('Won ' + R.prize + ' G');
+    AE.S_.gold += R.prize; AE.Sfx.play('coin'); await AE.notice('Won ' + R.prize + ' Gil');
     if (k === 4) {
       Q('pit', 'done');
       await sayAs('PITMASTER VORN', 'GORR IS BROKEN! Thirty-one wins and the Warden breaks him! The crowd is losing its mind!');
@@ -139,14 +139,14 @@
   // ---------- Wardens' Hall bounties ----------
   EV.a1_bounty_board = async function () {
     const L = ['WARDENS\' HALL - HALCYON CHAPTER. Open bounties:'];
-    L.push(Q('b_rustback') === 'done' ? '[CLAIMED] Rustback - a giant red crawler in Drain 9.' : 'RUSTBACK. A giant crawler nesting in the upper tunnels of Drain 9. 600 G.');
-    L.push(Q('b_leviathan') === 'done' ? '[CLAIMED] The Sump Leviathan.' : 'THE SUMP LEVIATHAN. Something huge in the deep cistern of Drain 9. 1,500 G and a Prism.');
+    L.push(Q('b_rustback') === 'done' ? '[CLAIMED] Rustback - a giant red crawler in Drain 9.' : 'RUSTBACK. A giant crawler nesting in the upper tunnels of Drain 9. 600 Gil.');
+    L.push(Q('b_leviathan') === 'done' ? '[CLAIMED] The Sump Leviathan.' : 'THE SUMP LEVIATHAN. Something huge in the deep cistern of Drain 9. 1,500 Gil and a Prism.');
     for (const l of L) await AE.say(l);
   };
   EV.a1_bounty = async function () {
     let paid = false;
-    if (F().bounty_rustback && Q('b_rustback') !== 'done') { Q('b_rustback', 'done'); AE.S_.gold += 600; paid = true; await sayAs('WARDEN CLERK', 'Rustback, confirmed dead. 600 gold, Warden. Sign here. And here. And here.'); await AE.notice('Received 600 G'); }
-    if (F().bounty_leviathan && Q('b_leviathan') !== 'done') { Q('b_leviathan', 'done'); AE.S_.gold += 1500; paid = true; await sayAs('WARDEN CLERK', 'The Sump Leviathan! The whole Hall owes you a drink. 1,500 gold, and the chapter\'s own Prism.'); await AE.notice('Received 1,500 G'); await AE.gain('prism:elemental'); }
+    if (F().bounty_rustback && Q('b_rustback') !== 'done') { Q('b_rustback', 'done'); AE.S_.gold += 600; paid = true; await sayAs('WARDEN CLERK', 'Rustback, confirmed dead. 600 Gil, Warden. Sign here. And here. And here.'); await AE.notice('Received 600 Gil'); }
+    if (F().bounty_leviathan && Q('b_leviathan') !== 'done') { Q('b_leviathan', 'done'); AE.S_.gold += 1500; paid = true; await sayAs('WARDEN CLERK', 'The Sump Leviathan! The whole Hall owes you a drink. 1,500 Gil, and the chapter\'s own Prism.'); await AE.notice('Received 1,500 Gil'); await AE.gain('prism:elemental'); }
     if (!paid) await sayAs('WARDEN CLERK', 'Bounties are on the board. Kill the thing, come back, get paid. Academy badge? Good. No forms for you, then. Some forms.');
     if (!Q('b_rustback')) Q('b_rustback', 1); if (!Q('b_leviathan')) Q('b_leviathan', 1);
   };

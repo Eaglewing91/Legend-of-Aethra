@@ -23,12 +23,12 @@ THEMES = {
     'factory': dict(wall='metal', floor='metal', accent='darkmetal', props=['crate', 'console', 'pipe_h', 'pipe_v', 'barrel'], music='factory', dark=0),
 }
 SIZE = {'pipe_v': (1, 3), 'pipe_h': (4, 1), 'gpipe_v': (1, 3), 'gpipe_h': (4, 1), 'machine': (2, 2), 'crystal_big': (2, 2), 'desk': (3, 1),
-        'shelf': (1, 2), 'statue': (1, 2), 'pillar': (1, 2), 'cart': (2, 1), 'stump': (2, 1), 'bigrock': (2, 2), 'drawers': (2, 2), 'bed': (1, 2)}
+        'shelf': (2, 2), 'statue': (2, 2), 'pillar': (1, 3), 'cart': (2, 2), 'stump': (2, 1), 'bigrock': (2, 2), 'drawers': (2, 2), 'bed': (1, 2)}
 def prop(m, kind, x, y):
     """One prop with its top-left on a floor cell (solid unless noted). SIZE lists the bigger ones."""
     v = (x * 7 + y * 3)
-    if kind == 'crate': m.stamp('house', 16, 14, x, y, col=SOLID)
-    elif kind == 'barrel': m.stamp('house', 17, 14, x, y, col=SOLID)
+    if kind == 'crate': m.stamp('elem', (0, 8)[v % 2], 0, x, y, col=SOLID)
+    elif kind == 'barrel': m.stamp('elem', (1, 4)[v % 2], 0, x, y, col=SOLID)
     elif kind == 'pipe_v': m.stamp('pipes', 5, 0, x, y, 1, 3, overrows=1, col=SOLID)
     elif kind == 'pipe_h': m.stamp('pipes', 6, 0, x, y, 4, 1, col=SOLID)
     elif kind == 'gpipe_v': m.stamp('pipes', 10, 0, x, y, 1, 3, overrows=1, col=SOLID)
@@ -42,21 +42,21 @@ def prop(m, kind, x, y):
     elif kind == 'grate': m.stamp('dungeon', 5, 1, x, y)
     elif kind == 'plant': m.stamp('nature', v % 4, 10, x, y, col=SOLID)
     elif kind == 'desk': m.stamp('elem', 2, 10, x, y, 3, 1, col=SOLID)
-    elif kind == 'shelf': m.stamp('elem', 2 + v % 2, 7, x, y, 1, 2, overrows=1, col=SOLID)
+    elif kind == 'shelf': m.stamp('elem', 2, 7, x, y, 2, 2, overrows=1, col=SOLID)
     elif kind == 'drawers': m.stamp('elem', 6, 7, x, y, 2, 2, overrows=1, col=SOLID)
     elif kind == 'chair': m.stamp('elem', 11, 0, x, y)
-    elif kind == 'rock': m.stamp('nature', (14, 15, 18, 19)[v % 4], 9, x, y, col=SOLID)
-    elif kind == 'bigrock': m.stamp('nature', 12 if v % 2 else 16, 8, x, y, 2, 2, overrows=1, col=SOLID)
+    elif kind == 'rock': m.stamp('nature', *((15, 9), (18, 9), (18, 13), (19, 13))[v % 4], x, y, col=SOLID)
+    elif kind == 'bigrock': m.stamp('nature', 13 if v % 2 else 16, 8, x, y, 2, 2, overrows=1, col=SOLID)
     elif kind == 'crystal_s': m.stamp('nature', 4 + v % 3, 14 + (v // 3) % 2, x, y, col=SOLID)
-    elif kind == 'stal': m.stamp('nature', (14, 15)[v % 2], 9, x, y, col=SOLID)
-    elif kind == 'statue': m.stamp('house', 6 + v % 2, 15, x, y, 1, 2, overrows=1, col=SOLID)
-    elif kind == 'pillar': m.stamp('house', 7, 17, x, y, 1, 2, overrows=1, col=SOLID)
+    elif kind == 'stal': m.stamp('nature', (15, 18)[v % 2], 9, x, y, col=SOLID)
+    elif kind == 'statue': m.stamp('house', 3, 15, x, y, 2, 2, overrows=1, col=SOLID)
+    elif kind == 'pillar': m.stamp('house', 0, 15, x, y, 1, 3, overrows=1, col=SOLID)
     elif kind == 'torch': m.stamp('dungeon', 6, 2, x, y, col=SOLID)
-    elif kind == 'urn': m.stamp('house', 16 + v % 3, 12, x, y, col=SOLID)
-    elif kind == 'cart': m.stamp('elem', 0, 3, x, y, 2, 1, col=SOLID)
+    elif kind == 'urn': m.stamp('house', 21, 13 + v % 3, x, y, col=SOLID)
+    elif kind == 'cart': m.stamp('elem', 0, 3, x, y, 2, 2, overrows=1, col=SOLID)
     elif kind == 'bush': bush(m, x, y)
     elif kind == 'flowers': flowers(m, [(x, y)])
-    elif kind == 'stump': m.stamp('nature', 4, 8, x, y, col=SOLID)
+    elif kind == 'stump': m.stamp('nature', 4, 13, x, y, col=SOLID)
     elif kind == 'bed': m.stamp('bed', 5, 3, x, y, 1, 2, col=SOLID)
 
 def free(m, x, y, w=1, h=1):

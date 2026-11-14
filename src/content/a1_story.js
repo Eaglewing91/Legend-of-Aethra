@@ -242,14 +242,14 @@
     await s('kael', 'The contract was in and out. I got you in. You got yourselves out. One thousand five hundred.');
     await s('sable', 'Oh, he\'s cold. I like him. I don\'t trust him, but I like him.');
     await s('bram', '...Fair\'s fair. You did your job.');
-    AE.S_.gold += 1500; AE.Sfx.play('coin'); await AE.notice('Received 1,500 G');
+    AE.S_.gold += 1500; AE.Sfx.play('coin'); await AE.notice('Received 1,500 Gil');
     await s('bram', 'Come down to the hideout when you\'re ready. Behind the bar, down the stairs. I might have another job, if you\'ve the stomach.');
     cs.remove('bram'); cs.remove('sable'); cs.flag('a1_spill');
     await sayAs('TESS', 'And you two, wipe your feet. This is a respectable terrorist bar.');
   };
   EV.a1_tess = async function () {
     if (!F().a1_spill) { await sayAs('TESS', 'Lyra! Gods, girl, they said Reactor 4 went up with the night shift in it.'); return; }
-    const r = await AE.ask('TESS: What\'ll it be?', ['Drink (heals, 30 G)', 'Rumours', 'Nothing'], { name: 'TESS', cancel: 2 });
+    const r = await AE.ask('TESS: What\'ll it be?', ['Drink (heals, 30 Gil)', 'Rumours', 'Nothing'], { name: 'TESS', cancel: 2 });
     if (r === 0) { if (!AE.pay(30)) { await sayAs('TESS', 'No tabs. Not after Pip.'); return; } AE.healAll(); AE.Sfx.play('heal'); await sayAs('TESS', 'On the house. Well. On thirty gold of the house.'); return; }
     if (r === 1) {
       const R = ['Gorr the Unbroken fights in the Pit at the Market Ward. Thirty-one wins. If you beat him, folk say Old Hask wants a word.',
@@ -506,7 +506,7 @@
       const again = await AE.ask('The bikes have the train boxed in! Try again?', ['Again!', 'Again (Sable drives slower)'], { name: 'BRAM' });
       if (again === 1) AE.S_.flags.chase_easy = 1;
     }
-    AE.S_.gold += 1200; AE.Sfx.play('coin'); await AE.notice('The Aurex riders drop 1,200 G on the road.');
+    AE.S_.gold += 1200; AE.Sfx.play('coin'); await AE.notice('The Aurex riders drop 1,200 Gil on the road.');
     await s('bram', 'HA! Look at them tumble! Kid, you ride like a lunatic.');
     cs.music('story');
     await cs.narrate(['Freight Nine tore out of the Halcyon yards at dawn, four stowaways in its coal tender.',

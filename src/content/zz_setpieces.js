@@ -4,7 +4,7 @@
   const run = async function (theme, secs, intro, after, gold) {
     for (const [who, line] of intro) await (who ? cs.s(who, line) : AE.say(line));
     for (;;) { const r = await AE.chase({ theme: theme, secs: secs }); if (r === 'win') break; await AE.ask('Again?', ['Again!'], { name: 'TIP' }); }
-    AE.S_.gold += gold; AE.Sfx.play('coin'); await AE.notice('Salvaged ' + gold + ' G from the wreckage.');
+    AE.S_.gold += gold; AE.Sfx.play('coin'); await AE.notice('Salvaged ' + gold + ' Gil from the wreckage.');
     for (const [who, line] of after) await (who ? cs.s(who, line) : AE.say(line));
   };
   EV['enter:coral_1'] = async function () {

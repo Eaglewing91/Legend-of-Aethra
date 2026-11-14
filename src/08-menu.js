@@ -52,7 +52,7 @@ AE.MainMenu.prototype.draw = function (ctx) {
   this.cmds.forEach(function (c, i) { AE.text(ctx, c, 196, 7 + i * 12, c === 'Save' && !AE.canSave() ? '#808090' : '#fff'); if (i === self.list.sel && !self.pick && !self.sub) AE.cursor(ctx, 182, 7 + i * 12); });
   AE.window(ctx, 180, 166, 76, 34);
   AE.text(ctx, 'Time', 186, 172, '#9cf'); AE.text(ctx, AE.time(S.time), 250, 172, '#fff', { align: 'right' });
-  AE.text(ctx, AE.fmt(S.gold), 238, 185, '#fff', { align: 'right' }); AE.text(ctx, 'G', 250, 185, '#9cf', { align: 'right' });
+  AE.text(ctx, AE.fmt(S.gold), 230, 185, '#fff', { align: 'right' }); AE.text(ctx, 'Gil', 250, 185, '#9cf', { align: 'right' });
   const f = AE.field(), loc = AE.S_.world ? 'World map' : f ? f.map.name : '';
   AE.window(ctx, 120, 200, 136, 24); AE.text(ctx, loc, 250, 207, '#fff', { align: 'right' });
   if (this.toast > 0) { this.toast--; AE.window(ctx, 30, 96, 140, 20); AE.text(ctx, 'Save at a save point.', 100, 102, '#fff', { align: 'center' }); }

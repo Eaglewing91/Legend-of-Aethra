@@ -29,7 +29,7 @@ def market():
     # stalls: counters with goods along the square
     for (x, y, k) in ((23, 16, 'food'), (27, 16, 'cloth'), (37, 16, 'tools'), (23, 29, 'herbs'), (37, 29, 'junk')):
         for d in range(3): m.stamp('elem', 3, 10, x + d, y, col=COUNTER)
-        m.stamp('house', 16 + (x % 3), 12, x - 1, y, col=SOLID); m.stamp('house', 17, 14, x + 3, y, col=SOLID)
+        m.stamp('house', 21, 13 + (x % 3), x - 1, y, col=SOLID); m.stamp('elem', 0, 0, x + 3, y, col=SOLID)
     m.npc(24, 15, 'Villager4', name='GRILL COOK', still=1, dir=2, say=['Skewers! Sump-rat skewers! ...It\'s chicken. Mostly.'])
     m.npc(28, 15, 'Woman', name='CLOTH SELLER', still=1, dir=2, say=['Aurex blue is out of fashion this week. Everyone\'s wearing grey. Grey hides the soot.'])
     m.npc(38, 15, 'Villager5', name='TOOL TRADER', shop='market_tools', still=1, dir=2)

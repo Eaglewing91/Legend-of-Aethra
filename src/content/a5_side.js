@@ -21,15 +21,15 @@
     const won = await AE.race({ birds: field, pick: 3, ranked: 1 });
     if (!won) { await sayAs('RACE SCOUT', 'Not this time. Train your bird with Choco-Wen and come back.'); return; }
     S.raceRank++; AE.Sfx.play('save');
-    if (S.raceRank < 4) { AE.S_.gold += R[3]; await AE.notice(R[0] + '-rank won! +' + R[3] + ' G'); return; }
+    if (S.raceRank < 4) { AE.S_.gold += R[3]; await AE.notice(R[0] + '-rank won! +' + R[3] + ' Gil'); return; }
     await sayAs('RACE SCOUT', 'S-RANK! ' + S.mybird.name + ' is the fastest bird in Aethra! The old breeder will want to see you.');
     Q('races', 'done');
   };
   EV.a5_breeder = async function () {
     const S = AE.S_;
     if (!S.mybird) { await sayAs('CHOCO-WEN', 'Every racer starts as a chick. Kestrel Ranch, on the mainland, has them.'); return; }
-    const r = await AE.ask('CHOCO-WEN: Training session for ' + S.mybird.name + '? 1,000 G. (Speed ' + S.mybird.spd.toFixed(1) + '/12, stamina ' + S.mybird.sta + '/120)', ['Train speed', 'Train stamina', 'Not now'], { name: 'CHOCO-WEN', cancel: 2 });
-    if (r === 2) return; if (!AE.pay(1000)) { await sayAs('CHOCO-WEN', 'Birds eat a lot, you know. 1,000 G.'); return; }
+    const r = await AE.ask('CHOCO-WEN: Training session for ' + S.mybird.name + '? 1,000 Gil. (Speed ' + S.mybird.spd.toFixed(1) + '/12, stamina ' + S.mybird.sta + '/120)', ['Train speed', 'Train stamina', 'Not now'], { name: 'CHOCO-WEN', cancel: 2 });
+    if (r === 2) return; if (!AE.pay(1000)) { await sayAs('CHOCO-WEN', 'Birds eat a lot, you know. 1,000 Gil.'); return; }
     if (r === 0) S.mybird.spd = Math.min(12, S.mybird.spd + 0.6); else S.mybird.sta = Math.min(120, S.mybird.sta + 10);
     AE.Sfx.play('ok'); await AE.notice(S.mybird.name + ' trained hard. Speed ' + S.mybird.spd.toFixed(1) + ', stamina ' + S.mybird.sta + '.');
   };

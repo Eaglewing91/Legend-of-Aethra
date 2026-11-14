@@ -74,7 +74,7 @@ AE.PRISMS = {
   encounter_down: { name: 'Quiet Step', type: 'indep', col: 'purple', effect: 'encdown', per: 1, ap: [0, 10000, 50000], price: 0 },
   encounter_up: { name: 'Lure', type: 'indep', col: 'purple', effect: 'encup', per: 1, ap: [0, 10000, 50000], price: 0 },
   exp_plus: { name: 'EXP Plus', type: 'indep', col: 'purple', effect: 'exp', per: 1, ap: [0, 60000, 150000], price: 0 },
-  gold_plus: { name: 'Gold Plus', type: 'indep', col: 'purple', effect: 'gold', per: 1, ap: [0, 80000, 150000], price: 0 },
+  gold_plus: { name: 'Gil Plus', type: 'indep', col: 'purple', effect: 'gold', per: 1, ap: [0, 80000, 150000], price: 0 },
   // echoes (summons)
   sylphine: { name: 'Sylphine', type: 'echo', col: 'red', echo: 'sylphine', ap: [0, 5000, 20000, 40000, 60000] },
   marrowtide: { name: 'Marrowtide', type: 'echo', col: 'red', echo: 'marrowtide', ap: [0, 8000, 25000, 50000, 80000] },

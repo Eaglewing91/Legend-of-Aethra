@@ -56,7 +56,7 @@ make herself its god.
 ## Systems
 - **ATB** (Active or Wait, battle speed 1–5). Commands: Attack, (Prism commands), Magic, Echo, Item, Surge when
   full. Defend and Row (front/back) as in the classics. Run by holding both flee keys.
-- **Stats**: HP, MP, Str, Def, Mag, Spr, Spd, Luck; levels 1–99; AP for Prisms; Gold (G).
+- **Stats**: HP, MP, Str, Def, Mag, Spr, Spd, Luck; levels 1–99; AP for Prisms; Gil.
 - **Prisms**: slotted in weapon and armour slots, some linked in pairs. Types:
   - *Magic*: Fire/Ice/Bolt (3 tiers), Cure (4), Esuna, Life, Barrier (Protect/Shell), Haste/Slow, Sleep,
     Silence, Poison, Gravity, Quake, Aero, Holy, Flare, Ultima, Meteor-class "Starfall".

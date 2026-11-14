@@ -103,7 +103,7 @@ AE.World.prototype.enterPlace = function (k) {
   const M = AE.MAPS[p[2]]; if (!M) { this.notice = { text: p[6] + ' (not built yet)', t: 90 }; return; }
   this.busy = true;
   AE.game.fadeOut(0.1).then(function () {
-    S.world.ret = [Math.floor(self.x), Math.floor(self.y)];
+    S.worldRet = [Math.floor(self.x), Math.floor(self.y)];
     S.world = null; AE.game.pop(self);
     const e = M.entry || [M.w >> 1, M.h - 2];
     const f = new AE.Field(p[2], e[0], e[1], 0); AE.game.push(f); f.title = 120;
@@ -115,7 +115,6 @@ AE.World.prototype.action = function () {
   if (this.v) {
     // get out: land next to here
     const t = AE.wtile(this.x, this.y), L = AE.LAND[this.v];
-    if (this.v === 'talon') { this.v = null; S.world.v = null; AE.Sfx.play('run'); return; }
     if (this.v === 'sub' && t === 22) { const p = this.placeAt(this.x, this.y); if (p === 'coral' || (AE.WORLD.places.coral[0] === Math.floor(this.x) && AE.WORLD.places.coral[1] === Math.floor(this.y))) { this.enterPlace("coral"); return; } }
     let spot = null;
     if (L && L.indexOf(t) >= 0) spot = [this.x, this.y];

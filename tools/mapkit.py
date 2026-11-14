@@ -143,7 +143,7 @@ class Map:
         if col is not None: self.setcol(x, y + overrows, col, w, h - overrows)
     def warp(self, x, y, to, tx, ty, dir=2, w=1, flag=None):
         for k in range(w):
-            self.warps.append({'x': x + k, 'y': y, 'to': to, 'tx': tx + k, 'ty': ty, 'dir': dir})
+            self.warps.append({'x': x + k, 'y': y, 'to': to, 'tx': tx + k if (tx or ty) else 0, 'ty': ty, 'dir': dir})
             if flag: self.warps[-1]['flag'] = flag
             self.setcol(x + k, y, OPEN)
     def npc(self, x, y, who, **kw):

@@ -4,6 +4,7 @@ gen(mid, name, w, h, theme, seed, ...) -> (Map, info). info has the rooms (entry
 dead ends and free floor cells, so story scripts can place people and events precisely."""
 import random
 from _kit import *
+from mapkit import ref
 
 THEMES = {
     # wall, floors (main, accent), props, music, encounter background
@@ -177,6 +178,7 @@ def gen(mid, name, w, h, theme, seed, music=None, enc=None, rooms=14, minr=(6, 5
     for q in chain[1:-1]:
         for f in r.sample(DRESS[theme], min(len(DRESS[theme]), r.randint(3, 4))): f(m, q, r)
     hollow(m, 2)
+    if theme == 'forest': forestify(m, r)
     m.entry = list(chain[0].c())
     info = {'rooms': chain, 'map': m, 'theme': T}
     # dead ends: floor cells with three walls around (good for chests)
@@ -194,6 +196,26 @@ def gen(mid, name, w, h, theme, seed, music=None, enc=None, rooms=14, minr=(6, 5
         if m.col[m.i(x, y)] == OPEN: m.chest(x, y, it if isinstance(it, str) else it[0], 1 if isinstance(it, str) else it[1])
     if enc: m.enc = enc
     return m, info
+
+def forestify(m, r):
+    """Forest dungeons: every non-floor cell becomes thick woods (trees on grass) instead of walls."""
+    W, H = m.w, m.h
+    wood = [[m.wall[m.i(x, y)] is not None or m.mat[m.i(x, y)] == 'void' for x in range(W)] for y in range(H)]
+    for y in range(H):
+        for x in range(W):
+            if wood[y][x]:
+                i = m.i(x, y); m.wall[i] = None; m.mat[i] = 'grass'; m.col[i] = SOLID
+    kinds = ['round', 'pine', 'bushy', 'round', 'light']
+    for y in range(-1, H, 2):
+        for x in range(-1 + (y // 2) % 2, W, 2):
+            cells = [(x + a, y + b) for a in (0, 1) for b in (0, 1) if 0 <= x + a < W and 0 <= y + b < H]
+            if cells and all(wood[q][p] for (p, q) in cells):
+                k = r.choice(kinds); tx, ty = TREES[k]
+                for (p, q) in cells:
+                    m.put('over' if q == y else 'deco', ref('nature', tx + p - x, ty + q - y), p, q)
+    for y in range(H):
+        for x in range(W):
+            if wood[y][x] and m.layers['deco'][m.i(x, y)] < 0 and m.layers['over'][m.i(x, y)] < 0: bush(m, x, y)
 
 def hollow(m, keep=2):
     """Wall cells further than 'keep' from any floor become black void, so rooms read as rooms."""

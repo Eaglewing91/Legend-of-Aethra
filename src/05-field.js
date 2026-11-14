@@ -118,7 +118,7 @@ AE.Field.prototype.takeWarp = function (w) {
   if (this.transit) return; this.transit = true; const self = this;
   AE.Sfx && AE.Sfx.play(w.sound || 'door');
   AE.game.fadeOut(0.12).then(function () {
-    if (w.to === '@world') { AE.toWorld(w.tx, w.ty); }
+    if (w.to === '@world') { const p = (w.tx || w.ty) ? AE.landNear(w.tx, w.ty) : (AE.S_.worldRet || AE.landNear(70, 100)); AE.toWorld(p[0], p[1]); }
     else self.load(w.to, w.tx, w.ty, w.dir === undefined ? self.player.dir : w.dir);
     self.transit = false; return AE.game.fadeIn(0.12);
   });

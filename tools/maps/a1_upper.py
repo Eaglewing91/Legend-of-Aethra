@@ -103,11 +103,13 @@ def market_interiors(D):
     return out
 
 def drains():
-    d1, i1 = gen('drains_1', 'Drain 9', 56, 42, 'sewer', 91, enc='drains', rooms=12, pools=0.7, chests=['antidote', ('potion', 2), 'eye_drops', ('gold', 180), 'prism:poison'])
-    d2, i2 = gen('drains_2', 'Drain 9 - Deep Cistern', 60, 44, 'sewer', 92, enc='drains', rooms=13, pools=0.8, chests=['hi_potion', 'stiletto', 'prism:hp_plus', ('gold', 260), 'echo_screen'])
+    d1, i1 = gen('drains_1', 'Drain 9', 56, 42, 'sewer', 91, enc='drains', rooms=12, pools=0.7, chests=['antidote', ('potion', 2), 'eye_drops', ('gold', 180), 'prism:toxin'])
+    d2, i2 = gen('drains_2', 'Drain 9 - Deep Cistern', 60, 44, 'sewer', 92, enc='drains', rooms=13, pools=0.8, chests=['glowcap', 'hi_potion', 'stiletto', 'prism:hp_plus', ('gold', 260), 'echo_screen'])
     e = i1['rooms'][0]; dx = e.x + e.w // 2
     door_up(d1, dx, e.y - 1, 'sumps', 33, 47, 1); d1.entry = [dx, e.y + 1]
     link(d1, i1['rooms'][-1], d2, i2['rooms'][0])
+    rb = i1['rooms'][len(i1['rooms']) // 2]
+    d1.event(rb.x, rb.y + rb.h // 2, 'a1_rustback', rb.w, 1, unless='bounty_rustback')
     q = i2['rooms'][-1]; cx = q.x + q.w // 2 - 1
     door_up(d2, cx, q.y - 1, 'drains_lair', 11, 17)
     savepoint(d2, q.x + 1, q.y + 1)
@@ -242,10 +244,10 @@ def tower(spire_top):
     t1.chest(31, 21, 'potion', 3); t1.chest(3, 21, 'phoenix_down')
     out.append(t1)
     # generated floors
-    spec = [('tower_2', 'Aurex Tower - Records', 'tower', 501, ['hi_potion', 'prism:sleep', ('gold', 600)]),
+    spec = [('tower_2', 'Aurex Tower - Records', 'tower', 501, ['hi_potion', 'prism:mystify', ('gold', 600)]),
             ('tower_3', 'Aurex Tower - Records Annex', 'tower', 502, ['mythril_vest', 'ether', 'eye_drops', 'prism:mp_plus']),
             ('tower_4', 'Aurex Tower - Laboratories', 'factory', 503, ['remedy', 'breach_lance', ('hi_potion', 2)]),
-            ('tower_5', 'Aurex Tower - Specimen Labs', 'factory', 504, ['prism:haste', 'mythril_knife', 'phoenix_down', ('gold', 800)])]
+            ('tower_5', 'Aurex Tower - Specimen Labs', 'factory', 504, ['prism:time', 'mythril_knife', 'phoenix_down', ('gold', 800)])]
     gens = []
     for (mid, name, th, seed, loot) in spec:
         m, info = gen(mid, name, 54, 40, th, seed, enc='tower', rooms=11, chests=loot)
@@ -301,14 +303,15 @@ def tower(spire_top):
     # the Cradle vault: rows of tanks
     t7 = Map('tower_7', 36, 30, 'Aurex Tower - Cradle Vault', music='mystic', kind='dungeon', dark=1); t7.under = 'crystal'
     room(t7, 0, 0, 35, 29, floor='darkmetal', wall='crystal', thick=3)
-    t7.ground('crystal', 15, 3, 20, 28)
-    for y in range(5, 24, 4):
-        for x in (3, 7, 26, 30): put(t7, 'crystal_big', x, y)
-    for y in range(6, 24, 4): put(t7, 'orb', 12, y); put(t7, 'orb', 23, y)
+    t7.ground('marble', 15, 3, 20, 28)
+    for y in range(5, 25, 4):
+        for x in (11, 22): put(t7, 'crystal_big', x, y)
+        for x in (4, 29): put(t7, 'orb', x, y + 1)
+        for x in (7, 26): put(t7, 'console', x, y + 1)
     put(t7, 'machine', 17, 4); put(t7, 'console', 16, 6); put(t7, 'console', 19, 6)
     stairs(t7, 17, 27, 'tower_6', 3, 14, down=True); t7.entry = [17, 26]
     t7.event(15, 12, 'a1_vault', 6, 1, unless='a1_vault')
-    t7.event(3, 9, 'a1_tank', 2, 1, touch=False); t7.event(30, 13, 'a1_tank2', 2, 1, touch=False)
+    t7.event(11, 10, 'a1_tank', 2, 1, touch=False); t7.event(22, 14, 'a1_tank2', 2, 1, touch=False)
     stairs(t7, 18, 3, 'tower_8', 20, 26, down=False); t7.gate('a1_vault', 18, 3, tile=('dungeon', 5, 1))
     t7.chest(33, 27, 'prism:barrier'); t7.chest(2, 27, 'surge_manual_kael') if False else t7.chest(2, 27, 'ether', 2)
     savepoint(t7, 21, 26)

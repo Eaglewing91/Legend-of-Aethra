@@ -58,7 +58,7 @@ FILLS = {
     'crystal': (('water', 13, 1), (0.8, 0.9, 1.15), None), 'void': (None, (0, 0, 0), None),
     'cave': (('infloor', 12, 13), (1.05, 0.9, 0.78), None), 'marble': (('infloor', 1, 1), (0.95, 0.97, 1.02), None),
     'ash': (('floor', 12, 8), (0.55, 0.52, 0.5), None), 'lava': (('water', 1, 7), (2.4, 0.55, 0.15), None),
-    'aether': (('water', 1, 7), (0.55, 1.6, 1.25), None),
+    'aether': (('water', 1, 7), (0.45, 1.2, 1.1), None),
 }
 FILL_ORDER = list(FILLS)
 # walls: top texture, face texture, tint

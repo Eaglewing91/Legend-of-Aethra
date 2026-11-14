@@ -132,10 +132,10 @@ def people(m):
     # east
     m.npc(52, 27, 'GladiatorBlue', name='MERC', still=1, dir=2, say=S('The Pit pays two hundred a bout. Fighters\' gate is in the Market Ward.', 'Bring something better than that letter-opener, Warden.'))
     m.npc(60, 26, 'Villager4', name='SMITH', walk=2, say=S('If you see Grett, tell him I want my anvil back.', 'Grett runs the arms shop. He has my anvil. He knows what he did.'))
-    m.npc(64, 36, 'OldWoman', name='GRANNY OSK', still=1, dir=2, say=S('My grandson went up the Spire Stair to work for Aurex.', 'He sends money every month. He never writes.'))
+    m.npc(64, 36, 'OldWoman', name='GRANNY OSK', still=1, dir=2, ev='a1_osk')
     m.npc(70, 24, 'Knight', name='AUREX GUARD', still=1, dir=3, say=S('Move along. Nothing to see.'), unless='a1_seal')
-    m.npc(65, 7, 'Knight', name='AUREX GUARD', still=1, dir=2, say=S('The Spire Stair is closed by order of Aurex Security.', 'Turn around.'), unless='a1_stair')
-    m.npc(66, 7, 'KnightGold', name='AUREX SERGEANT', still=1, dir=2, say=S('Under the Containment Order, the Sumps is sealed until the terrorists are found.', 'You\'d better hope you aren\'t one of them.'), if_='a1_seal&!a1_stair')
+    m.npc(63, 5, 'Knight', name='AUREX GUARD', still=1, dir=2, say=S('The Spire Stair is closed by order of Aurex Security.', 'Turn around.'), unless='a1_stair')
+    m.npc(67, 5, 'KnightGold', name='AUREX SERGEANT', still=1, dir=2, say=S('Under the Containment Order, the Sumps is sealed until the terrorists are found.', 'You\'d better hope you aren\'t one of them.'), if_='a1_seal&!a1_stair')
     m.npc(56, 46, 'Inspector', name='INSPECTOR', walk=2, say=S('Aurex Water and Sanitation. We are investigating the... smell.', 'It has been eleven years.'))
 
 def homes():
@@ -160,7 +160,6 @@ def homes():
     s.npc(20, 11, 'marlo', id='marlo', ev='a1_marlo_bar', dir=3, still=1, if_='a1_spill')
     s.npc(17, 11, 'Villager2', name='DRUNK', still=1, dir=1, say=['Thish bar... thish bar ish the besht bar.', 'Tess! Tesh. Another one.'])
     s.npc(13, 13, 'Monk', name='STRANGER', still=1, dir=0, say=['The Aetherflow remembers everything that ever lived.', 'Every reactor is a mouth drinking it. What happens to memories that are drunk?'])
-    s.event(10, 15, 'a1_spillway_enter', 3, 1, unless='a1_spill')
     out.append(s)
     b = Map('spillway_b', 22, 14, 'Undercurrent Hideout', music='story', kind='house'); b.under = 'darkcobble'
     room(b, 0, 0, 21, 13, floor='darkcobble', wall='dark', thick=3)
@@ -168,8 +167,8 @@ def homes():
     table(b, 9, 6); table(b, 12, 6); bookcase(b, 16, 3); drawers(b, 19, 3); put(b, 'machine', 18, 9); put(b, 'console', 7, 3)
     b.sign(10, 3, 'A hand-drawn map of the plate, the Spire Stair and Aurex Tower, pinned with knives.')
     b.stamp('house', 6, 2, 10, 3, col=SOLID)
-    b.npc(11, 5, 'bram', id='bram', ev='a1_bram_hideout', dir=2, still=1, unless='a1_stair')
-    b.npc(14, 8, 'sable', id='sable', ev='a1_sable_hideout', dir=3, still=1, unless='a1_stair')
+    b.npc(11, 5, 'bram', id='bram', ev='a1_bram_hideout', dir=2, still=1, unless='a1_plan')
+    b.npc(14, 8, 'sable', id='sable', ev='a1_sable_hideout', dir=3, still=1, unless='a1_plan')
     b.chest(20, 11, 'phoenix_down', 2)
     out.append(b)
     # inn

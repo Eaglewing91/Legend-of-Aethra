@@ -65,7 +65,7 @@ def fence_h(m, x0, x1, y):
 def savepoint(m, x, y):
     m.stamp('nature', 1, 15, x, y, col=SOLID); m.event(x, y, 'savepoint', touch=False); m.extra.setdefault('saves', []).append([x, y])
 def sign(m, x, y, text): m.stamp('house', 6, 2, x, y, col=SOLID); m.sign(x, y, text)
-def lamp(m, x, y): m.stamp('house', 22, 15, x, y, col=SOLID)
+def lamp(m, x, y): m.stamp('dungeon', 4 + (x + y) % 4, 2, x, y, col=SOLID)
 def barrel(m, x, y): m.stamp('house', 17, 14, x, y, col=SOLID)
 def crate(m, x, y): m.stamp('house', 16, 14, x, y, col=SOLID)
 

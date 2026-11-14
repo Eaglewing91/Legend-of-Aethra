@@ -57,8 +57,8 @@
   E('vesper1', 'Vesper Lune', 64, 90000, 180, 100, 180, 120, 44, 0, 0, 0, { cast: 'vesper', k: 1.5 }, { boss: 1, ai: [[2, 'v_cradle'], [1, 'v_count'], [1, 'holy_lance']] });
   E('vesper2', 'Vesper, Crowned', 66, 120000, 200, 110, 200, 130, 46, 0, 0, 0, { boss: 'GiantSpirit', anim: 'Idle', fw: 50, fh: 50, k: 2.6, hue: 180, bright: 1.4 }, { boss: 1, ai: [[2, 'v_shards'], [1, 'v_count'], [1, 'v_mend', 'hurt'], [1, 'holy_lance']] });
   E('vesper3', 'Vesper, Hollowed', 68, 140000, 220, 120, 220, 140, 48, 0, 0, 0, { boss: 'TenguBlue', anim: 'Idle', fw: 68, fh: 68, k: 2.3, hue: 200, bright: 0.7 }, { boss: 1, ai: [[2, 'v_shards'], [2, 'void_ray'], [1, 'nx_forget']] });
-  E('nyxar1', 'Nyxar, the Hollow Echo', 72, 200000, 240, 130, 240, 150, 50, 0, 0, 0, { boss: 'DragonBlue', anim: 'Head', fw: 44, fh: 46, k: 3.4, hue: 240, bright: 0.5 }, { boss: 1, ai: [[2, 'nx_grasp'], [2, 'void_ray'], [1, 'nx_forget'], [1, 'nx_hollow']] });
-  E('nyxar2', 'Nyxar, Last Memory', 75, 260000, 260, 140, 260, 160, 54, 0, 0, 0, { boss: 'SquidRed', anim: 'Idle', fw: 76, fh: 79, k: 2.3, hue: 240, bright: 0.4 }, { boss: 1, ai: 'nyxar' });
+  E('nyxar1', 'Nyxar, the Hollow Echo', 72, 150000, 220, 130, 240, 150, 50, 0, 0, 0, { boss: 'DragonBlue', anim: 'Head', fw: 44, fh: 46, k: 3.4, hue: 240, bright: 0.5 }, { boss: 1, ai: [[2, 'nx_grasp'], [2, 'void_ray'], [1, 'nx_forget'], [1, 'nx_hollow']] });
+  E('nyxar2', 'Nyxar, Last Memory', 75, 180000, 220, 140, 260, 160, 54, 0, 0, 0, { boss: 'SquidRed', anim: 'Idle', fw: 76, fh: 79, k: 2.3, hue: 240, bright: 0.4 }, { boss: 1, ai: 'nyxar' });
   AE.AI.nyxar = function (f, B) { const v = f.ai.vars; v.t = (v.t || 0) + 1; if (v.t % 5 === 0) return AE.mkAct(f, B, 'nx_end'); if (v.t % 3 === 0) return AE.mkAct(f, B, 'nx_hollow'); return AE.mkAct(f, B, ['nx_grasp', 'void_ray', 'nx_forget'][AE.rand(3)]); };
   // ---------- encounter tables ----------
   const T = function (bg, sets) { return { bg: bg, sets: sets.map(function (x) { return { enemies: x[0], w: x[1] || 1, unless: x[2] }; }) }; };

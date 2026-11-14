@@ -29,6 +29,7 @@ AE.physDamage = function (a, t, power, o) {
   let base = atk + ((atk + lv) / 32) * ((atk * lv) / 32);
   let dmg = (power * 16) * (512 - Math.min(511, o.pierce ? 0 : t.def)) * base / (16 * 512);
   if (o.crit) dmg *= 2;
+  if (a.side === 'enemy' && lv > 30) dmg *= Math.max(0.5, 1 - (lv - 30) * 0.0125);   // the level curve grows fast: late enemies hit a little softer
   if (!o.pierce && t.status.protect) dmg /= 2;
   if (t.defending) dmg /= 2;
   if (a.side === 'party' && a.row === 'back' && !a.long && !o.ranged) dmg /= 2;

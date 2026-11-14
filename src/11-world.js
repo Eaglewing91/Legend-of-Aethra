@@ -151,11 +151,13 @@ AE.World.prototype.update = function (g) {
   const I = g.input, S = AE.S_; this.t++;
   if (this.busy) return;
   if (I.pressed.menu || I.pressed.back) { AE.Sfx.play('open'); g.push(new AE.MainMenu()); return; }
-  if (I.pressed.map) this.mini = !this.mini;
-  if (I.held.prev) this.ang -= 0.03; if (I.held.next) this.ang += 0.03;
+  if (I.pressed.map) this.mini = this.mini === 1 || this.mini === true ? 2 : this.mini === 2 ? 0 : 1;
+  if (I.held.prev) { this.ang -= 0.03; this.turn = -0.03; } if (I.held.next) { this.ang += 0.03; this.turn = 0.03; }
+  // movement relative to the view; the airship steers like a ship: left and right turn it
+  let fx = 0, fy = 0; if (I.held.up) fy -= 1; if (I.held.down) fy += 1;
+  if (this.v === 'airship') { if (I.held.left) { this.ang -= 0.035; this.turn = -0.035; } if (I.held.right) { this.ang += 0.035; this.turn = 0.035; } }
+  else { if (I.held.left) fx -= 1; if (I.held.right) fx += 1; }
   S.world.ang = this.ang;
-  // movement relative to the view
-  let fx = 0, fy = 0; if (I.held.up) fy -= 1; if (I.held.down) fy += 1; if (I.held.left) fx -= 1; if (I.held.right) fx += 1;
   if (fx || fy) {
     const sp = this.speed() * (I.held.run && !this.v ? 1.6 : 1), c = Math.cos(this.ang), s = Math.sin(this.ang);
     const dx = (fx * c - fy * s) * sp, dy = (fx * s + fy * c) * sp;
@@ -229,20 +231,32 @@ AE.World.prototype.draw = function (ctx) {
   // a real landscape, ray-cast column by column (voxel terrain): hills and peaks stand up, the horizon bends away
   const W = AE.W, H = AE.H, T = AE.WT, buf = this.buf, air = this.v === 'airship', S = AE.WS;
   const c = Math.cos(this.ang), s = Math.sin(this.ang), fxv = s, fyv = -c;
-  const focal = 150, hz = air ? 40 : 50, curv = air ? 0.00022 : 0.0003;
-  const back = (air ? 22 : 13) * S;
-  const pH = AE.wheight(this.x, this.y) + (air ? 10 + Math.sin(this.t / 20) * 0.5 : 0);
+  this.airK = this.airK == null ? (air ? 1 : 0) : this.airK + ((air ? 1 : 0) - this.airK) * 0.04;   // take-off and landing ease the camera
+  const aK = this.airK, focal = 150, hz = 50 - 10 * aK, curv = 0.0003 - 0.00008 * aK;
+  const back = (13 + 9 * aK) * S;
+  const pH = AE.wheight(this.x, this.y) + aK * (10 + Math.sin(this.t / 20) * 0.5);
   const camX = this.x * S - fxv * back, camY = this.y * S - fyv * back;
   let clear = 0; for (let k = 0; k <= 1; k += 0.125) clear = Math.max(clear, AE.wheight((camX + fxv * back * k) / S, (camY + fyv * back * k) / S) + 6 + (1 - k) * 4);
-  const want = Math.max(pH + (air ? 48 : 26), clear);
+  const want = Math.max(pH + 26 + 22 * aK, clear);
   this.camH = this.camH == null ? want : this.camH + (want - this.camH) * 0.1;
   const camH = this.camH;
   const red = AE.S_ && AE.S_.chapter >= 5 && !(AE.S_.flags && AE.S_.flags.cleared);   // after the Sundering the sky is cracked and red
-  const sky1 = red ? [90, 20, 30] : air ? [52, 96, 186] : [70, 122, 206], sky2 = red ? [220, 110, 70] : [200, 222, 240];
+  const DL = AE.dayLight(), night = red ? 0 : DL.night;
+  const sky1 = red ? [90, 20, 30] : DL.sky1, sky2 = red ? [220, 110, 70] : DL.sky2, LT = red ? [1.05, 0.85, 0.8] : DL.tint, tint = LT[0] !== 1 || LT[1] !== 1 || LT[2] !== 1;
   for (let y = 0; y < H; y++) {
     const k = Math.min(1, Math.max(0, y / (hz + 20))), r = sky1[0] + (sky2[0] - sky1[0]) * k, gg = sky1[1] + (sky2[1] - sky1[1]) * k, b = sky1[2] + (sky2[2] - sky1[2]) * k;
     const col = (255 << 24) | (b << 16) | (gg << 8) | r, row = y * W; for (let x = 0; x < W; x++) buf[row + x] = col;
   }
+  // stars at night, the sun or the moon
+  if (night > 0.05) { for (let i = 0; i < 120; i++) { const a = (i * 2.399 - this.ang) % (Math.PI * 2), aa = ((a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; if (Math.abs(aa) > 1.1) continue;
+      const x = (W / 2 + Math.tan(aa) * focal) | 0, y = ((i * 37) % (hz + 4)) | 0, tw2 = 0.5 + 0.5 * Math.sin(this.t * 0.05 + i), v = (180 + 75 * tw2) * night | 0; if (x >= 0 && x < W && y >= 0) buf[y * W + x] = 0xff000000 | (v << 16) | (v << 8) | v; } }
+  { const sa = DL.sunA - this.ang, aa = ((sa + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+    if (Math.abs(aa) < 1.1) { const sx0 = W / 2 + Math.tan(aa) * focal, sy0 = hz - 8 - DL.sunH * (hz - 14), moon = DL.sunH < 0, rr = moon ? 5 : 7;
+      const syy = moon ? hz - 8 - (-DL.sunH) * (hz - 14) : sy0;
+      for (let y = Math.max(0, syy - rr * 3 | 0); y < Math.min(hz + 6, syy + rr * 3); y++) for (let x = Math.max(0, sx0 - rr * 3 | 0); x < Math.min(W, sx0 + rr * 3); x++) {
+        const d = Math.hypot(x - sx0, y - syy) / rr, i = y * W + x, o = buf[i]; let k = d < 1 ? 1 : Math.max(0, (3 - d) / 2) * 0.35; if (moon && d < 1 && Math.hypot(x - sx0 - 2, y - syy + 1) / rr < 0.8) k = 0.15;
+        if (k <= 0) continue; const cr = moon ? 230 : 255, cg = moon ? 235 : 245, cb = moon ? 255 : 200;
+        buf[i] = 0xff000000 | (((o >> 16 & 255) + (cb - (o >> 16 & 255)) * k) << 16) | (((o >> 8 & 255) + (cg - (o >> 8 & 255)) * k) << 8) | ((o & 255) + (cr - (o & 255)) * k); } } }
   // a few soft clouds that turn with the view
   if (!AE.WCLOUD) { AE.WCLOUD = []; for (let i = 0; i < 14; i++) AE.WCLOUD.push([Math.random() * Math.PI * 2, 8 + Math.random() * (hz - 30), 18 + Math.random() * 40, 3 + Math.random() * 5]); }
   for (const cl of AE.WCLOUD) {
@@ -276,6 +290,12 @@ AE.World.prototype.draw = function (ctx) {
       const sy = (hz + (camH - h + z * z * curv) * focal / z) | 0;
       if (sy < ybuf) {
         if (wet && (((mx * 7 + my * 13 + tt) & 31) === 0)) col = (col & 0xff000000) | Math.min(0xffffff, (col & 0xfefefe) + 0x303030);   // glints on the water
+        if (z < 120 && !wet) {   // fine grain up close: grass blades, pebbles, sand
+          const qx = ((camX + dx * z) * 5) | 0, qy = ((camY + dy * z) * 5) | 0, v = (((qx * 73856093) ^ (qy * 19349663)) >>> 0) % 23 - 11;
+          const r = Math.max(0, Math.min(255, (col & 255) + v)), g2 = Math.max(0, Math.min(255, ((col >> 8) & 255) + v)), b = Math.max(0, Math.min(255, ((col >> 16) & 255) + v));
+          col = 0xff000000 | (b << 16) | (g2 << 8) | r;
+        }
+        if (tint) col = 0xff000000 | (Math.min(255, ((col >> 16) & 255) * LT[2]) << 16) | (Math.min(255, ((col >> 8) & 255) * LT[1]) << 8) | Math.min(255, (col & 255) * LT[0]);
         if (z > fog0) {
           const f = Math.min(1, (z - fog0) / (maxZ - fog0)), r = col & 255, g2 = (col >> 8) & 255, b = (col >> 16) & 255;
           col = 0xff000000 | ((b + (fb - b) * f) << 16) | ((g2 + (fgc - g2) * f) << 8) | (r + (fr - r) * f);
@@ -287,7 +307,9 @@ AE.World.prototype.draw = function (ctx) {
     }
   }
   this.octx.putImageData(this.img, 0, 0);
-  ctx.drawImage(this.out, 0, 0);
+  this.bank = (this.bank || 0) * 0.9 + (this.turn || 0) * 0.1; this.turn = 0;
+  if (Math.abs(this.bank) > 0.002) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.rotate(-this.bank * 2.2); ctx.scale(1.12, 1.12); ctx.drawImage(this.out, -W / 2, -H / 2); ctx.restore(); }
+  else ctx.drawImage(this.out, 0, 0);
   // project world points to the screen (and test them against the terrain in front)
   const proj = function (wx, wy, up) {
     const rx = wx * S - camX, ry = wy * S - camY;
@@ -312,25 +334,27 @@ AE.World.prototype.draw = function (ctx) {
   this._pv = { PY: hz + (camH - pH) * focal / back, tile: S * focal / back };
   items.sort(function (a, b) { return b.p.d - a.p.d; });
   const nat = AE.IMG.nature, hs = AE.IMG.house;
+  const self = this;
   items.forEach(function (it) {
     const p = it.p, k = Math.min(3.2, p.k);
     if (it.kind === 'tree' || it.kind === 'jtree') { if (nat) ctx.drawImage(nat, it.kind === 'jtree' ? 96 : (it.tx % 2 ? 32 : 0), 0, 32, 32, p.x - 16 * k, p.y - 30 * k, 32 * k, 32 * k); }
     else if (it.kind === 'place') {
-      const ic = AE.PLACEICON[it.q[5]] || AE.PLACEICON.town, kk = Math.min(2.2, p.k * 1.4);
-      if (hs && ic) ctx.drawImage(AE.IMG[ic[0]], ic[1] * 16, ic[2] * 16, ic[3] * 16, ic[4] * 16, p.x - ic[3] * 8 * kk, p.y - ic[4] * 16 * kk, ic[3] * 16 * kk, ic[4] * 16 * kk);
+      AE.drawLandmark(ctx, it.place, it.q[5], p.x, p.y, Math.min(2.4, p.k * 1.5), night, self.t);
     } else if (it.kind === 'veh') AE.drawVehicle(ctx, it.v, p.x, p.y, Math.min(2, p.k * 1.4), 0);
   });
   // the player (or the vehicle carrying them)
   const PX = W / 2, PY = this._pv.PY;
-  if (this.v && this.v !== 'talon') AE.drawVehicle(ctx, this.v, PX, PY - (air ? 6 : 0), air ? 1.15 : 1.3, this.t);
+  if (this.v && this.v !== 'talon') { ctx.save(); ctx.translate(PX, PY - 6 * aK); ctx.rotate(this.bank * 4); AE.drawVehicle(ctx, this.v, 0, 0, 1.15 + 0.15 * (1 - aK), this.t); ctx.restore(); }
   else {
     if (this.v === 'talon' || this.v === 'gtalon') AE.drawVehicle(ctx, this.v, PX, PY, 1.2, this.t);
     const dir = this.moving ? AE.faceDir(this.face - this.ang) : 0;
     AE.actor(ctx, AE.S_.party[0], this.moving ? 'walk' : 'idle', dir, Math.floor(this.anim || 0), PX, PY - (this.v === 'talon' || this.v === 'gtalon' ? 10 : 0), 0.85);
   }
+  AE.drawWeather(ctx, this, night);
   // HUD: place name nearby, minimap
   const near = this.placeAt(this.x, this.y);
   if (this.notice && this.notice.t-- > 0) { const w = AE.textWidth(this.notice.text) + 20; AE.window(ctx, (W - w) / 2, 8, w, 18); AE.text(ctx, this.notice.text, W / 2, 13, '#fff', { align: 'center' }); }
+  if (this.mini === 2) { AE.drawFullMap(ctx, this); return; }
   if (this.mini) {
     const mw = 64, mh = 48; ctx.globalAlpha = 0.85; ctx.drawImage(AE.WMINI, W - mw - 6, H - mh - 6, mw, mh); ctx.globalAlpha = 1;
     ctx.strokeStyle = '#fff'; ctx.strokeRect(W - mw - 6.5, H - mh - 6.5, mw + 1, mh + 1);

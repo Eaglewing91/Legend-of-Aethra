@@ -172,12 +172,12 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
         open('build/' + fname, 'w').write(txt)
         print('soundtrack part %d: %d tracks, %.2f MB' % (part, len(tracks), len(txt) / 1e6))
 
-# ---------- the Art & Sound script: every picture and sound effect (the main script carries code, maps and story) ----------
+# ---------- the Art & Effects script: every picture and sound effect (the main script carries code, maps and story) ----------
 main_blob = json.dumps({k: v for k, v in data.items() if k not in ('art', 'sfx')})
 art_blob = json.dumps({'art': data['art'], 'sfx': data['sfx']})
 ART_URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js'
 art_js = '''// ==UserScript==
-// @name         Legend of Aethra - Art & Sound
+// @name         Legend of Aethra - Art & Effects
 // @namespace    eaglewing.legend-of-aethra
 // @version      ''' + VERSION + '''
 // @description  The pictures and sound effects for Legend of Aethra (needed to play). Hands them to the game when it starts; makes no requests and stores nothing.
@@ -238,13 +238,13 @@ header = '''// ==UserScript==
  * licence with permission (not CC0; don't extract or reuse it). Unofficial fan project, not affiliated with Torn.
  *
  * HOW IT WORKS
- * - The game's code, maps and story are inside this script; its pictures and sounds are in the Art & Sound script. Pages where you don't play only add a Tampermonkey menu entry and listen for
+ * - The game's code, maps and story are inside this script; its pictures and sounds are in the Art & Effects script. Pages where you don't play only add a Tampermonkey menu entry and listen for
  *   Torn Arcade: nothing is unpacked, drawn or run until you press Play.
  * - It never reads, clicks or changes Torn's page, makes no network requests of any kind, uses no API key and no
  *   websockets. Keys are only read while the game window is open.
  * - Save files (three slots and a resume point) are kept in Tampermonkey storage on your device.
  * - Torn Arcade link (page events only): 'aethra:ping' / 'aethra:here' (installed? version), 'aethra:open' (play inside
- *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume'. The Art & Sound script (needed) answers
+ *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume'. The Art & Effects script (needed) answers
  *   'aethra-art:request' with 'aethra-art'; the five optional Soundtrack scripts answer
  *   'aethra-music:request' with 'aethra-music'.
  *
@@ -263,12 +263,12 @@ const DATA = ''' + main_blob + ''';
 const ensure = function () { return readying || (readying = Promise.resolve(AE)); };
 // music arrives from the optional Soundtrack scripts
 document.addEventListener('aethra-music', function (e) { try { const d = JSON.parse(e.detail); AE.MUSIC = Object.assign(AE.MUSIC || {}, d.tracks || {}); DATA.music = Object.assign(DATA.music || {}, d.tracks || {}); if (AE.Music && AE.Music.cur && !AE.Music.src) { const n = AE.Music.cur; AE.Music.cur = null; AE.Music.play(n); } } catch (x) {} });
-// pictures and sounds come from the Art & Sound script (asked for once, when you first press Play)
+// pictures and sounds come from the Art & Effects script (asked for once, when you first press Play)
 let gotArt = !!DATA.art;
 document.addEventListener('aethra-art', function (e) { try { const d = JSON.parse(e.detail); DATA.art = d.art; DATA.sfx = d.sfx; gotArt = true; } catch (x) {} });
 const needArt = function (parent) {
   const box = document.createElement('div'); box.style.cssText = (parent ? 'position:absolute;' : 'position:fixed;z-index:2147483000;') + 'inset:0;background:#0a0c1c;color:#dde;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font:15px sans-serif;text-align:center;padding:20px';
-  box.innerHTML = '<b style="font-size:18px">Legend of Aethra needs its Art &amp; Sound script</b><span>Install it, then reload the page. It holds every picture and sound in the game.</span><a href="''' + ART_URL + '''" target="_blank" rel="noopener" style="color:#9cf">Install Legend of Aethra - Art &amp; Sound</a><button type="button" style="margin-top:8px;padding:4px 14px">Close</button>';
+  box.innerHTML = '<b style="font-size:18px">Legend of Aethra needs its Art &amp; Effects script</b><span>Install it, then reload the page. It holds every picture and sound in the game.</span><a href="''' + ART_URL + '''" target="_blank" rel="noopener" style="color:#9cf">Install Legend of Aethra - Art &amp; Effects</a><button type="button" style="margin-top:8px;padding:4px 14px">Close</button>';
   box.querySelector('button').addEventListener('click', function () { box.remove(); try { document.dispatchEvent(new CustomEvent('aethra:closed')); } catch (x) {} });
   (parent || document.body).appendChild(box);
 };

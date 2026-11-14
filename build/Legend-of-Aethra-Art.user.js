@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Legend of Aethra - Art & Sound
+// @name         Legend of Aethra - Art & Effects
 // @namespace    eaglewing.legend-of-aethra
 // @version      1.0.0
 // @description  The pictures and sound effects for Legend of Aethra (needed to play). Hands them to the game when it starts; makes no requests and stores nothing.

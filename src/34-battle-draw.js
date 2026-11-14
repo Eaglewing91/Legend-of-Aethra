@@ -52,11 +52,11 @@ AE.drawPartyMember = function (ctx, f, B, sel) {
   if (f.status.poison) filter.push('hue-rotate(40deg)');
   if (f.status.frog) filter.push('hue-rotate(90deg) saturate(2)');
   const X = f.x + (f.shake ? (f.shake % 2 ? 2 : -2) : 0), Y = f.y;
-  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(Math.round(X - 7), Math.round(Y - 2), 14, 4);
+  ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(X, Y, 10, 3, 0, 0, 7); ctx.fill();
   const al = f.status.vanish ? 0.35 : 1;
-  if (!AE.actor(ctx, f.id, 'b_' + anim, null, fr, X, Y, 1, { filter: filter.join(' ') || undefined, alpha: al, flip: !!f.flip })) { ctx.fillStyle = '#48c'; ctx.fillRect(X - 6, Y - 26, 12, 26); }
+  if (!AE.actor(ctx, f.id, 'b_' + anim, null, fr, X, Y, AE.PARTYK || 1.3, { filter: filter.join(' ') || undefined, alpha: al, flip: !!f.flip })) { ctx.fillStyle = '#48c'; ctx.fillRect(X - 6, Y - 26, 12, 26); }
   if (f.defending) { ctx.globalAlpha = 0.5; ctx.fillStyle = '#8cf'; ctx.fillRect(X - 14, Y - 30, 2, 26); ctx.globalAlpha = 1; }
-  if (sel) AE.cursor(ctx, X - 26, Y - 22, true);
+  if (sel) AE.cursor(ctx, X - 30, Y - 26, true);
   if (B.menu && B.menu.f === f && !B.menu.target) { ctx.fillStyle = '#ffe080'; const k = Math.floor(AE.game.frame / 10) % 2; ctx.fillRect(X - 2, Y - 40 - k, 4, 2); ctx.fillRect(X - 1, Y - 38 - k, 2, 2); }
 };
 // ---------- backdrops: sky/ceiling gradient + ground band textured from the area's floor ----------

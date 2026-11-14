@@ -217,6 +217,7 @@
     await cs.title('END OF ACT III', 'SOLMARA', 180);
     cs.flag('a3_done'); cs.chapter(4);
     const q = (AE.WORLD.vehicles && AE.WORLD.vehicles.airship) || AE.landNear(212, 146); AE.S_.vehicles.airship = { x: q[0], y: q[1], have: 1 };
+    if (AE.worldPan) { await AE.game.fadeIn(0.05); await AE.worldPan({ x: q[0], y: q[1], path: [[q[0], q[1] + 6], [q[0] - 20, q[1] - 30]], spin: -1.6, secs: 7, text: 'The Skylark climbs over Solmara.' }); }
     AE.toWorld(q[0], q[1] + 1);
     await AE.say('The Skylark is yours: board it on the world map and fly anywhere. The Earth Crystal lies north, in Nordheim. Frostgate is the gateway.', { name: 'TIP' });
   };

@@ -160,6 +160,7 @@
       'Its Headmaster had been waiting forty years for the sky to break.', '"Find them," he told the ones who were left. "The flow gives back what it takes. Sometimes."']);
     await cs.title('END OF ACT IV', 'THE SUNDERING', 200);
     cs.flag('a4_sundering'); cs.flag('a4_done'); cs.chapter(5);
+    if (AE.worldPan) { await AE.game.fadeIn(0.05); await AE.worldPan({ x: 96, y: 40, path: [[96, 60], [96, 26]], spin: 0.8, secs: 7, hideShip: 1, text: 'Above the Crater, the sky split open.' }); await AE.game.fadeOut(0.05); }
     await cs.warp('academy', 21, 20, 2);
     await AE.say('The world has changed. Sky Wardens roam the world map. Kael and Lyra are lost; rumours speak of something washed up in Mideel Shallows, far to the south-west.', { name: 'TIP' });
   };

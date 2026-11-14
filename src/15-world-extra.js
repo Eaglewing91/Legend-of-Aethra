@@ -113,3 +113,24 @@
     if (near) AE.text(ctx, 'Nearest: ' + near[1], W / 2, H - 14, '#fff', { align: 'center' });
   };
 })();
+// ---------- story camera: a sweeping shot over the world for big moments ----------
+AE.worldPan = function (o) {
+  return new Promise(function (res) {
+    const S = AE.S_, keep = S.world ? Object.assign({}, S.world) : null;
+    const w = new AE.World(o.x, o.y, o.v || 'airship'); w.mini = 0;
+    if (keep) S.world = keep; else S.world = null;
+    const N = Math.round((o.secs || 6) * 60), a0 = o.ang || 0, a1 = a0 + (o.spin === undefined ? 1.2 : o.spin);
+    const P = o.path || [[o.x, o.y], [o.x, o.y]];
+    const scene = { kind: 'pan', opaque: true, t: 0,
+      update: function (g) { if (++this.t >= N || (this.t > 30 && g.input.pressed.ok && o.skip !== false)) { AE.game.pop(this); res(); } },
+      draw: function (ctx) {
+        const k = this.t / N, e = k * k * (3 - 2 * k), seg = Math.min(P.length - 2, Math.floor(e * (P.length - 1))), f = e * (P.length - 1) - seg;
+        w.x = P[seg][0] + (P[seg + 1][0] - P[seg][0]) * f + 0.5; w.y = P[seg][1] + (P[seg + 1][1] - P[seg][1]) * f + 0.5; w.ang = a0 + (a1 - a0) * e; w.t++;
+        w.turn = (a1 - a0) / N * 3; if (o.hideShip) w.noPlayer = 1;
+        w.draw(ctx);
+        const bar = Math.min(22, this.t * 1.5, (N - this.t) * 1.5); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, AE.W, bar); ctx.fillRect(0, AE.H - bar, AE.W, bar);
+        if (o.text && this.t > 20 && this.t < N - 20) { const a = Math.min(1, (this.t - 20) / 30, (N - 20 - this.t) / 30); ctx.globalAlpha = a; AE.text(ctx, o.text, AE.W / 2, AE.H - 18, '#fff', { align: 'center' }); ctx.globalAlpha = 1; }
+      } };
+    AE.game.push(scene);
+  });
+};

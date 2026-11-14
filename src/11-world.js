@@ -344,11 +344,21 @@ AE.World.prototype.draw = function (ctx) {
   });
   // the player (or the vehicle carrying them)
   const PX = W / 2, PY = this._pv.PY;
-  if (this.v && this.v !== 'talon') { ctx.save(); ctx.translate(PX, PY - 6 * aK); ctx.rotate(this.bank * 4); AE.drawVehicle(ctx, this.v, 0, 0, 1.15 + 0.15 * (1 - aK), this.t); ctx.restore(); }
+  if (this.noPlayer) { /* a story camera shot */ }
+  else if (this.v && this.v !== 'talon') { ctx.save(); ctx.translate(PX, PY - 6 * aK); ctx.rotate(this.bank * 4); AE.drawVehicle(ctx, this.v, 0, 0, 1.15 + 0.15 * (1 - aK), this.t); ctx.restore(); }
   else {
     if (this.v === 'talon' || this.v === 'gtalon') AE.drawVehicle(ctx, this.v, PX, PY, 1.2, this.t);
     const dir = this.moving ? AE.faceDir(this.face - this.ang) : 0;
     AE.actor(ctx, AE.S_.party[0], this.moving ? 'walk' : 'idle', dir, Math.floor(this.anim || 0), PX, PY - (this.v === 'talon' || this.v === 'gtalon' ? 10 : 0), 0.85);
+  }
+  if (red) {   // the cracked sky: glowing fault lines that turn with the view
+    let sky = H; for (let x = 0; x < W; x += 8) for (let y = 0; y < sky; y++) if (zb[y * W + x] < 1e9) { sky = y; break; }
+    const hz2 = Math.max(20, sky - 4);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, hz2); ctx.clip(); ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 9; i++) { let a = (i * 0.7 - this.ang) % (Math.PI * 2); a = ((a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; if (Math.abs(a) > 1.2) continue;
+      let x = W / 2 + Math.tan(a) * focal, y = 0; ctx.strokeStyle = 'rgba(255,' + (150 + 60 * Math.sin(this.t * 0.05 + i)) + ',90,.75)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x, y);
+      for (let k = 1; k < 7; k++) { x += Math.sin(i * 7 + k * 3.1) * 12; y += hz2 / 6; ctx.lineTo(x, y); if (k === 3) { ctx.moveTo(x, y); ctx.lineTo(x + 14 * Math.sin(i), y + 6); ctx.moveTo(x, y); } } ctx.stroke(); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,90,40,.18)'; ctx.stroke(); }
+    ctx.restore();
   }
   AE.drawWeather(ctx, this, night);
   // HUD: place name nearby, minimap

@@ -14,6 +14,10 @@ def main():
         for m in mod.build():
             if m.id in maps: raise SystemExit('duplicate map id ' + m.id)
             m.finish(); maps[m.id] = m
+    # a warp to (0, 0) means "the target's entry point"
+    for m in maps.values():
+        for w in m.warps:
+            if w['to'] in maps and w['tx'] == 0 and w['ty'] == 0: w['tx'], w['ty'] = maps[w['to']].entry
     # check warps point somewhere real
     for m in maps.values():
         for w in m.warps:

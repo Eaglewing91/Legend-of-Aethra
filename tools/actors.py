@@ -63,6 +63,17 @@ CAST = {
     'ember': (dict(skin=0, out=('pfdr', 5), hair=('bob1', 5), cloak=8), {}, 'bare'),
     'rook':  (dict(skin=7, out=('pfpn', 5), hair=('bob1', 0)), ONE('mc01'), 'blade'),
     'vesna': (dict(skin=5, out=('fstr', 5), hair=('bob1', 7), hat=('pfht', 2)), BOW('bo02'), 'bow'),
+    # story people (also used as human foes in battle)
+    'vesper':  (dict(skin=0, out=('alch', 1), hair=('pon1', 1), cloak=1), {}, 'bare'),
+    'corvin':  (dict(skin=2, out=('alch', 2), hair=('bob2', 3), cloak=8), {}, 'bare'),
+    'drago':   (dict(skin=4, out=('fstr', 1), hair=('dap1', 4)), POL('hb01'), 'pole'),
+    'trooper': (dict(skin=3, out=('fstr', 1), hair=('bob1', 11), hat=('pfht', 1)), ONE('sw01'), 'blade'),
+    'gunner':  (dict(skin=5, out=('pfpn', 1), hair=('dap1', 13), hat=('pfht', 1)), BOW('bo01'), 'bow'),
+    'officer': (dict(skin=1, out=('fstr', 4), hair=('dap1', 10)), ONE('sw02'), 'blade'),
+    'ilse':    (dict(skin=3, out=('pfdr', 3), hair=('pon1', 0), cloak=2), {}, 'bare'),
+    'pip':     (dict(skin=6, out=('pfpn', 4), hair=('bob1', 5)), POL('hb01'), 'pole'),
+    'marlo':   (dict(skin=1, out=('pfpn', 2), hair=('dap1', 11), hat=('pnty', 2)), ONE('sw01'), 'blade'),
+    'tech':    (dict(skin=4, out=('alch', 3), hair=('bob1', 9), cloak=3), {}, 'bare'),
 }
 
 def build(name, look, gear, kind):
@@ -96,5 +107,7 @@ def build(name, look, gear, kind):
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    for n, (look, gear, kind) in CAST.items(): build(n, look, gear, kind)
+    only = sys.argv[1:]
+    for n, (look, gear, kind) in CAST.items():
+        if not only or n in only: build(n, look, gear, kind)
     if MISSING: print('left off:', sorted(MISSING))

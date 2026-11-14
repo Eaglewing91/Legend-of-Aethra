@@ -41,6 +41,7 @@ MATS = {
     'water':  dict(fill=('water', 1, 7), soft=1, prio=9, liquid=1),
     'poison': dict(fill=('water', 13, 7), soft=1, prio=9, liquid=1),
     'lava':   dict(fill='lava', soft=1, prio=9, liquid=1),
+    'aether': dict(fill='aether', soft=1, prio=9, liquid=1),
     'ice':    dict(fill=('water', 13, 1), soft=1, prio=8),
     # hard floors
     'cobble': dict(fill=('infloor', 1, 13)), 'darkcobble': dict(fill=('infloor', 12, 13)),
@@ -57,6 +58,7 @@ FILLS = {
     'crystal': (('water', 13, 1), (0.8, 0.9, 1.15), None), 'void': (None, (0, 0, 0), None),
     'cave': (('infloor', 12, 13), (1.05, 0.9, 0.78), None), 'marble': (('infloor', 1, 1), (0.95, 0.97, 1.02), None),
     'ash': (('floor', 12, 8), (0.55, 0.52, 0.5), None), 'lava': (('water', 1, 7), (2.4, 0.55, 0.15), None),
+    'aether': (('water', 1, 7), (0.55, 1.6, 1.25), None),
 }
 FILL_ORDER = list(FILLS)
 # walls: top texture, face texture, tint
@@ -139,20 +141,31 @@ class Map:
             for k in range(w):
                 self.put('over' if j < overrows else layer, ref(sheet, tx + k, ty + j), x + k, y + j)
         if col is not None: self.setcol(x, y + overrows, col, w, h - overrows)
-    def warp(self, x, y, to, tx, ty, dir=2, w=1):
+    def warp(self, x, y, to, tx, ty, dir=2, w=1, flag=None):
         for k in range(w):
             self.warps.append({'x': x + k, 'y': y, 'to': to, 'tx': tx + k, 'ty': ty, 'dir': dir})
+            if flag: self.warps[-1]['flag'] = flag
             self.setcol(x + k, y, OPEN)
     def npc(self, x, y, who, **kw):
-        d = {'x': x, 'y': y, 'who': who}; d.update(kw); self.npcs.append(d); return d
+        d = {'x': x, 'y': y, 'who': who}; d.update({('if' if k == 'if_' else k): v for k, v in kw.items()}); self.npcs.append(d); return d
     def chest(self, x, y, item, n=1, gid=None):
         key = gid or '%s:%d,%d' % (self.id, x, y)
         self.chests['%d,%d' % (x, y)] = {'item': item, 'n': n, 'id': key}
         self.setcol(x, y, SOLID)
     def sign(self, x, y, text): self.signs['%d,%d' % (x, y)] = text
     def event(self, x, y, eid, w=1, h=1, touch=True, **kw):
-        d = {'x': x, 'y': y, 'w': w, 'h': h, 'id': eid, 'touch': touch}; d.update(kw); self.events.append(d)
+        d = {'x': x, 'y': y, 'w': w, 'h': h, 'id': eid, 'touch': touch}; d.update({('if' if k == 'if_' else k): v for k, v in kw.items()}); self.events.append(d)
     def zone(self, x, y, w, h, group): self.zones.append([x, y, w, h, group])
+    def variant(self, when, tiles=(), col=()):
+        """A story change: when the condition holds, put tiles [(layer, x, y, ref or -1)] and collision [(x, y, c)]."""
+        self.extra.setdefault('variants', []).append({'when': when, 'tiles': [[L, self.i(x, y), r] for (L, x, y, r) in tiles],
+                                                      'col': [[self.i(x, y), c] for (x, y, c) in col]})
+    def gate(self, when, x, y, w=1, h=1, tile=('dungeon', 0, 1), layer='deco'):
+        """A barrier (shutter, rubble, locked grille) that disappears when the condition holds."""
+        for j in range(h):
+            for k in range(w): self.put(layer, ref(*tile), x + k, y + j)
+        self.setcol(x, y, SOLID, w, h)
+        self.variant(when, [(layer, x + k, y + j, -1) for j in range(h) for k in range(w)], [(x + k, y + j, OPEN) for j in range(h) for k in range(w)])
 
     # ---------- painting from text ----------
     def paint(self, rows, legend, ox=0, oy=0):

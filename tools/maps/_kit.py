@@ -37,7 +37,7 @@ def grass_tufts(m, x0, y0, x1, y1, n=30, seed=5):
 # ---------- houses from the pack (tx, ty, w, h); the door column is found from the art ----------
 HOUSES = {'orange': (0, 0, 4, 3), 'tan': (4, 0, 4, 3), 'orange2': (8, 0, 4, 3), 'red': (12, 0, 4, 3), 'shop': (16, 0, 3, 3),
           'green': (19, 0, 4, 3), 'hut': (23, 0, 3, 3), 'wood': (26, 0, 3, 3), 'igloo': (0, 11, 3, 3), 'igloo2': (6, 11, 3, 3),
-          'mound': (0, 7, 3, 3), 'thatch': (3, 7, 3, 3)}
+          'mound': (0, 7, 3, 3), 'thatch': (3, 7, 3, 3), 'hall': (25, 7, 4, 7), 'longhouse': (25, 14, 4, 5)}
 _doors = {}
 def door_col(kind):
     if kind in _doors: return _doors[kind]
@@ -79,3 +79,46 @@ def carve(m, x0, y0, x1, y1, floor):
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             if m.ok(x, y): m.wall[m.i(x, y)] = None; m.ground(floor, x, y, x, y)
+
+# ---------- ASCII maps ----------
+def grid(m, rows, legend, ox=0, oy=0, base=None):
+    """Paint a map from text. legend[ch] = (ground, wall, prop) — any part may be None/missing — or fn(m, x, y).
+    Props are placed after all ground and walls (top-left cell of the prop is the character)."""
+    later = []
+    for j, row in enumerate(rows):
+        for k, ch in enumerate(row):
+            x, y = ox + k, oy + j
+            if not m.ok(x, y): continue
+            L = legend.get(ch)
+            if L is None:
+                if base: m.ground(base, x, y, x, y)
+                continue
+            if callable(L): later.append((L, x, y)); continue
+            g = L[0] if len(L) > 0 else None; w = L[1] if len(L) > 1 else None; p = L[2] if len(L) > 2 else None
+            if g: m.ground(g, x, y, x, y)
+            elif base and not w: m.ground(base, x, y, x, y)
+            if w: m.walls(w, x, y, x, y)
+            if p: later.append((p, x, y))
+    import _gen
+    for p, x, y in later:
+        if callable(p): p(m, x, y)
+        else: _gen.prop(m, p, x, y)
+
+def interior(mid, name, w, h, to, floor='planks', wall='wood', music='village', door=None, thick=3, kind='house'):
+    """A one-room interior: walls round a floor, the exit at the bottom (door x) leading to `to` = (map, x, y)."""
+    m = Map(mid, w, h, name, music=music, kind=kind); m.under = floor
+    room(m, 0, 0, w - 1, h - 1, floor=floor, wall=wall, thick=thick)
+    dx = door if door is not None else w // 2
+    m.wall[m.i(dx, h - 1)] = None; m.ground(floor, dx, h - 1, dx, h - 1)
+    m.warp(dx, h - 1, to[0], to[1], to[2], 2); m.entry = [dx, h - 2]
+    return m
+def rug(m, x, y, w=3, h=2): m.stamp('elem', 9, 3, x, y) if False else m.ground('carpet', x, y, x + w - 1, y + h - 1)
+def table(m, x, y): m.stamp('elem', 2, 10, x, y, 3, 1, col=SOLID)
+def shelf(m, x, y): m.stamp('elem', 2, 7, x, y, 1, 2, overrows=1, col=SOLID)
+def bookcase(m, x, y): m.stamp('elem', 8, 7, x, y, 2, 2, overrows=1, col=SOLID)
+def drawers(m, x, y): m.stamp('elem', 6, 7, x, y, 2, 2, overrows=1, col=SOLID)
+def bed(m, x, y, c=0): m.stamp('bed', (5, 12, 12)[c], (3, 3, 0)[c], x, y, 1, 2, col=SOLID)
+def counter(m, x0, x1, y):
+    for x in range(x0, x1 + 1): m.stamp('elem', 3, 10, x, y, col=COUNTER)
+def plant(m, x, y): m.stamp('nature', (x + y) % 4, 10, x, y, col=SOLID)
+def pots(m, x, y): m.stamp('house', 16 + (x % 3), 12, x, y, col=SOLID)

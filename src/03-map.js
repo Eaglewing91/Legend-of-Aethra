@@ -13,7 +13,7 @@ AE.Map.prototype.applyVariants = function () {
   const S = AE.S_; if (!this.d.variants || !S) return;
   const self = this; this.layers = JSON.parse(JSON.stringify(this.d.layers)); this.col = this.d.col.slice();
   this.d.variants.forEach(function (v) {
-    if (!S.flags[v.when]) return;
+    if (!AE.cond(v.when)) return;
     (v.tiles || []).forEach(function (t) { self.layers[t[0]][t[1]] = t[2]; });
     (v.col || []).forEach(function (c) { self.col[c[0]] = c[1]; });
   });

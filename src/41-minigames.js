@@ -5,17 +5,24 @@ AE.miniScene = function (o) { return new Promise(function (done) { o.done = done
 AE.miniEnd = function (o, v) { AE.game.pop(o); o.done(v); };
 
 // ---------- Talonbird race: pick a bird, bet tokens, watch ----------
-AE.race = async function () {
-  const birds = [['Gold-Crest', 7, 50, 30], ['Bruiser', 4, 40, 70], ['Featherfall', 6, 60, 20], ['Old Biscuit', 2, 30, 90]].map(function (b) { return { name: b[0], spd: b[1] + Math.random() * 3, sta: b[2] + AE.rand(20), luck: b[3] }; });
-  if (AE.S_.mybird) birds.push({ name: AE.S_.mybird.name + ' (yours)', spd: AE.S_.mybird.spd, sta: AE.S_.mybird.sta, luck: 50, mine: 1 });
+AE.race = async function (o) {
+  o = o || {};
+  const birds = o.birds ? o.birds.slice() : [['Gold-Crest', 7, 50, 30], ['Bruiser', 4, 40, 70], ['Featherfall', 6, 60, 20], ['Old Biscuit', 2, 30, 90]].map(function (b) { return { name: b[0], spd: b[1] + Math.random() * 3, sta: b[2] + AE.rand(20), luck: b[3] }; });
+  if (AE.S_.mybird && !o.birds) birds.push({ name: AE.S_.mybird.name + ' (yours)', spd: AE.S_.mybird.spd, sta: AE.S_.mybird.sta, luck: 50, mine: 1 });
   const odds = birds.map(function (b) { return Math.max(2, Math.round(20 / (b.spd + b.sta / 20))); });
-  const pick = await AE.ask('Which bird?', birds.map(function (b, i) { return b.name + '  x' + odds[i]; }).concat(['Leave']), { name: 'BOOKIE', cancel: birds.length });
+  const pick = o.pick !== undefined ? o.pick : await AE.ask('Which bird?', birds.map(function (b, i) { return b.name + '  x' + odds[i]; }).concat(['Leave']), { name: 'BOOKIE', cancel: birds.length });
   if (pick >= birds.length) return;
+  if (o.ranked) { const r = await AE.raceRun(birds, pick); return r === pick; }
   const have = AE.tokens(0), bets = [10, 50, 100].filter(function (v) { return v <= have; });
   let bet = 0;
   if (bets.length) { const r = await AE.ask('Bet how many tokens? (You have ' + have + ')', bets.map(String).concat(['Just watch']), { name: 'BOOKIE', cancel: bets.length }); bet = bets[r] || 0; }
   AE.tokens(-bet);
-  const res = await AE.miniScene({
+  const res = await AE.raceRun(birds, pick);
+  if (res === pick) { const won = Math.max(bet * odds[pick], 5); AE.tokens(won); AE.Sfx.play('coin'); await AE.say('Your bird won! You get ' + won + ' tokens.', { name: 'BOOKIE' }); }
+  else await AE.say(bet ? 'Better luck next time.' : 'Fun to watch, isn\'t it?', { name: 'BOOKIE' });
+};
+AE.raceRun = function (birds, pick) {
+  return AE.miniScene({
     pos: birds.map(function () { return 0; }), en: birds.map(function (b) { return b.sta; }), win: -1,
     update: function (g) {
       this.t++; if (this.t < 60) return;
@@ -38,8 +45,6 @@ AE.race = async function () {
       AE.text(ctx, this.t < 60 ? 'Ready...' : this.win >= 0 ? birds[this.win].name + ' wins!' : 'Hold OK to cheer your bird!', AE.W / 2, 8, '#fff', { align: 'center' });
     }
   });
-  if (res === pick) { const won = Math.max(bet * odds[pick], 5); AE.tokens(won); AE.Sfx.play('coin'); await AE.say('Your bird won! You get ' + won + ' tokens.', { name: 'BOOKIE' }); }
-  else await AE.say(bet ? 'Better luck next time.' : 'Fun to watch, isn\'t it?', { name: 'BOOKIE' });
 };
 
 // ---------- slots: three reels, stop each with OK ----------

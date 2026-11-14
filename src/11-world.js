@@ -11,7 +11,8 @@ AE.TERRAIN = {   // code -> [sheet, tx, ty, tint r,g,b], passable on foot
   20: ['infloor', 1, 7, 1, 0.85, 0.75], 21: ['water', 13, 1, 1, 1, 1], 22: ['water', 1, 7, 0.45, 0.5, 0.8]
 };
 AE.WALK = { foot: [2, 3, 4, 5, 7, 8, 10, 11, 13, 14, 15, 18, 19, 21], talon: [2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 18, 19, 21], skimmer: [2, 3, 7, 11, 13, 14, 18, 19],
-  boat: [0, 1, 12], sub: [0, 1, 22], airship: 'all' };
+  boat: [0, 1, 12], sub: [0, 1, 22], airship: 'all',
+  gtalon: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21] };   // the gold talonbird crosses mountains and shallow seas
 AE.LAND = { airship: [2, 3, 5, 7, 8, 11, 13, 19, 21], boat: [2], sub: [1] };
 AE.buildWorldTexture = function () {
   const D = AE.WORLD, S = 8, c = document.createElement('canvas'); c.width = D.w * S; c.height = D.h * S; const x = c.getContext('2d');
@@ -86,7 +87,7 @@ AE.World.prototype.onTile = function () {
     if (p) { this.enterPlace(p); return; }
   }
   // encounters: on foot, skimmer and boat (not the Talonbird or airship)
-  if (this.v === 'talon' || this.v === 'airship' || S.flags.noEnc) return;
+  if (this.v === 'talon' || this.v === 'gtalon' || this.v === 'airship' || S.flags.noEnc) return;
   const reg = AE.WORLD.reg[Math.floor(this.x / 16) + ',' + Math.floor(this.y / 16)];
   const t = AE.wtile(this.x, this.y), grp = this.v === 'boat' || this.v === 'sub' ? 'w_sea' : t === 4 || t === 15 ? (reg || 'w') + '_forest' : reg;
   const G = AE.ENC[grp] || AE.ENC[reg]; if (!G) return;
@@ -143,7 +144,8 @@ AE.World.prototype.draw = function (ctx) {
   const back = air ? 7 : 4.5, cx = this.x * 8 - (-s) * 0 - (s * back * 8) * 0, cy = this.y * 8;
   const fxv = s, fyv = -c;            // forward (view "up")
   const camX = this.x * 8 - fxv * back * 8, camY = this.y * 8 - fyv * back * 8;
-  const sky1 = air ? [70, 120, 200] : [100, 150, 220], sky2 = [190, 215, 240];
+  const red = AE.S_ && AE.S_.chapter >= 5 && !(AE.S_.flags && AE.S_.flags.cleared);   // after the Sundering the sky is cracked and red
+  const sky1 = red ? [90, 20, 30] : air ? [70, 120, 200] : [100, 150, 220], sky2 = red ? [220, 110, 70] : [190, 215, 240];
   for (let y = 0; y <= hz; y++) { const k = y / hz, r = sky1[0] + (sky2[0] - sky1[0]) * k, gg = sky1[1] + (sky2[1] - sky1[1]) * k, b = sky1[2] + (sky2[2] - sky1[2]) * k; const col = (255 << 24) | (b << 16) | (gg << 8) | r; for (let x = 0; x < W; x++) buf[y * W + x] = col; }
   const tw = T.w, th = T.h, px = T.px;
   for (let y = hz + 1; y < H; y++) {
@@ -203,9 +205,9 @@ AE.World.prototype.draw = function (ctx) {
   const PX = W / 2, PY = hz + camH * focal / (back * 8);
   if (this.v && this.v !== 'talon') AE.drawVehicle(ctx, this.v, PX, PY - (air ? 10 + Math.sin(this.t / 20) * 2 : 0), 1.4, this.t);
   else {
-    if (this.v === 'talon') AE.drawVehicle(ctx, 'talon', PX, PY, 1.2, this.t);
+    if (this.v === 'talon' || this.v === 'gtalon') AE.drawVehicle(ctx, this.v, PX, PY, 1.2, this.t);
     const dir = this.moving ? AE.faceDir(this.face - this.ang) : 0;
-    AE.actor(ctx, AE.S_.party[0], this.moving ? 'walk' : 'idle', dir, Math.floor(this.anim || 0), PX, PY - (this.v === 'talon' ? 10 : 0), 0.85);
+    AE.actor(ctx, AE.S_.party[0], this.moving ? 'walk' : 'idle', dir, Math.floor(this.anim || 0), PX, PY - (this.v === 'talon' || this.v === 'gtalon' ? 10 : 0), 0.85);
   }
   // HUD: place name nearby, minimap
   const near = this.placeAt(this.x, this.y);
@@ -223,7 +225,7 @@ AE.PLACEICON = { city: ['towers', 0, 0, 3, 3], town: ['house', 0, 0, 4, 3], vill
   cave: ['house', 0, 7, 3, 3], spire: ['towers', 3, 0, 3, 3], port: ['house', 8, 0, 4, 3], sea: ['water', 1, 7, 1, 1], ruins: ['village', 0, 0, 3, 3], tower: ['towers', 6, 0, 3, 3],
   wreck: ['village', 3, 0, 3, 3], volcano: ['nature', 4, 0, 2, 2], crater: ['nature', 4, 0, 2, 2], shrine: ['house', 0, 15, 2, 2], hut: ['house', 23, 0, 3, 3] };
 AE.drawVehicle = function (ctx, v, x, y, k, t) {
-  const col = { talon: '#f0c040', skimmer: '#c86040', boat: '#a07048', sub: '#5080c0', airship: '#c0a060' }[v] || '#fff';
+  const col = { gtalon: '#ffe060', talon: '#f0c040', skimmer: '#c86040', boat: '#a07048', sub: '#5080c0', airship: '#c0a060' }[v] || '#fff';
   ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
   ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(-10, -1, 20, 3);
   if (v === 'airship') {
@@ -233,6 +235,6 @@ AE.drawVehicle = function (ctx, v, x, y, k, t) {
     ctx.fillStyle = col; ctx.fillRect(-12, -6, 24, 6); ctx.fillStyle = v === 'sub' ? '#a0c0e0' : '#e8e0c8'; ctx.fillRect(-4, v === 'sub' ? -10 : -18, v === 'sub' ? 8 : 2, v === 'sub' ? 4 : 12);
     if (v === 'boat') { ctx.fillStyle = '#f0f0f0'; ctx.fillRect(-2, -18, 8, 9); }
   } else if (v === 'skimmer') { ctx.fillStyle = col; ctx.fillRect(-10, -8, 20, 6); ctx.fillStyle = '#303030'; ctx.fillRect(-9, -3, 5, 3); ctx.fillRect(4, -3, 5, 3); ctx.fillStyle = '#a0d0f0'; ctx.fillRect(-3, -11, 6, 3); }
-  else if (v === 'talon') { ctx.fillStyle = col; ctx.fillRect(-7, -14, 14, 9); ctx.fillRect(4, -20, 5, 8); ctx.fillStyle = '#f08020'; ctx.fillRect(8, -18, 4, 2); ctx.fillStyle = '#c09020'; const l = (t / 4) % 2 ? 2 : 0; ctx.fillRect(-4 + l, -5, 2, 5); ctx.fillRect(2 - l, -5, 2, 5); }
+  else if (v === 'talon' || v === 'gtalon') { ctx.fillStyle = col; ctx.fillRect(-7, -14, 14, 9); ctx.fillRect(4, -20, 5, 8); ctx.fillStyle = '#f08020'; ctx.fillRect(8, -18, 4, 2); ctx.fillStyle = '#c09020'; const l = (t / 4) % 2 ? 2 : 0; ctx.fillRect(-4 + l, -5, 2, 5); ctx.fillRect(2 - l, -5, 2, 5); }
   ctx.restore();
 };

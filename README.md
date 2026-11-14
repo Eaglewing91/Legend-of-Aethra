@@ -4,7 +4,7 @@ A 16-bit style role-playing game for [Torn](https://www.torn.com), in the spirit
 It plays inside the **Torn Arcade** phone (Legends folder) or in its own window from the Tampermonkey menu.
 
 **Install:** [Legend-of-Aethra.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra.user.js)
-(about 0.7 MB) and its [Art & Effects](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js) script (needed, about 1.1 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (every track, about 9 MB). Without it you still hear the sound effects, but no background music.
+(about 1.8 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (every track, about 9 MB). Without it you still hear the sound effects, but no background music.
 
 ## The game
 A newly sworn Warden of the Vanguard Academy takes his first contract: get the rebel cell Undercurrent into Aurex

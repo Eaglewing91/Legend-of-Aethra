@@ -208,8 +208,7 @@ art_js = '''// ==UserScript==
   document.documentElement.dataset.aethraArt = \'''' + VERSION + '''\';
 })();
 '''
-open('build/Legend-of-Aethra-Art.user.js', 'w').write(art_js)
-print('art & effects script: %.2f MB' % (len(art_js) / 1e6))
+# (one script now: the art and effects ship inside the game itself)
 
 # ---------- the userscript ----------
 URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/'
@@ -238,7 +237,7 @@ header = '''// ==UserScript==
  * licence with permission (not CC0; don't extract or reuse it). Unofficial fan project, not affiliated with Torn.
  *
  * HOW IT WORKS
- * - The game's code, maps and story are inside this script; its pictures and sounds are in the Art & Effects script. Pages where you don't play only add a Tampermonkey menu entry and listen for
+ * - The whole game (code, maps, story, pictures and sound effects) is inside this script. Pages where you don't play only add a Tampermonkey menu entry and listen for
  *   Torn Arcade: nothing is unpacked, drawn or run until you press Play.
  * - It never reads, clicks or changes Torn's page, makes no network requests of any kind, uses no API key and no
  *   websockets. Keys are only read while the game window is open.
@@ -259,7 +258,7 @@ header = '''// ==UserScript==
 launcher = '''
 AE.store = { get: function (k) { try { return GM_getValue(k, null); } catch (e) { return null; } }, set: function (k, v) { try { GM_setValue(k, v); } catch (e) {} } };
 let readying = null;
-const DATA = ''' + main_blob + ''';
+const DATA = ''' + blob + ''';
 const ensure = function () { return readying || (readying = Promise.resolve(AE)); };
 // music arrives from the optional Soundtrack scripts
 document.addEventListener('aethra-music', function (e) { try { const d = JSON.parse(e.detail); AE.MUSIC = Object.assign(AE.MUSIC || {}, d.tracks || {}); DATA.music = Object.assign(DATA.music || {}, d.tracks || {}); if (AE.Music && AE.Music.cur && !AE.Music.src) { const n = AE.Music.cur; AE.Music.cur = null; AE.Music.play(n); } } catch (x) {} });

@@ -217,8 +217,10 @@ def walkable(a, b):
     if p is None: print('no land route', a, b); return
     for (x, y) in p:
         if at(x, y) in (T['sea'], T['shallow']):
-            for dx, dy in ((0, 0), (1, 0), (0, 1)):
-                if at(x + dx, y + dy) in (T['sea'], T['shallow'], T['deep']): put(x + dx, y + dy, T['grass'])
+            rr = 1.2 + fbm(x * 0.2, y * 0.2) * 2.2        # an isthmus of uneven width, not a causeway
+            for dy in range(-3, 4):
+                for dx in range(-3, 4):
+                    if dx * dx + dy * dy <= rr * rr and at(x + dx, y + dy) in (T['sea'], T['shallow'], T['deep']): put(x + dx, y + dy, T['grass'])
         elif at(x, y) in PASS: put(x, y, PASS[at(x, y)][1])
 STAND = {(96, 14): T['crater']}
 for (px, py) in PLACE_XY:

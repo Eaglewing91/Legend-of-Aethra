@@ -209,7 +209,7 @@ art_js = '''// ==UserScript==
 })();
 '''
 open('build/Legend-of-Aethra-Art.user.js', 'w').write(art_js)
-print('art & sound script: %.2f MB' % (len(art_js) / 1e6))
+print('art & effects script: %.2f MB' % (len(art_js) / 1e6))
 
 # ---------- the userscript ----------
 URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/'

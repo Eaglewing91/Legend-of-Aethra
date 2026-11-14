@@ -1,7 +1,7 @@
 """Act IV: Nordheim (Frostgate and its mines, Lumen, the Deeproot Caverns, the Crater) and Act V (the Vanguard Academy,
 Mideel Shallows and Kael's Memory Dive, the Echo trials, the Sky Citadel and the Aetherflow, the Abyssal Spire)."""
 from _kit import *
-from _gen import gen, link, stairs, door_up, put, prop
+from _gen import switches, gen, link, stairs, door_up, put, prop
 from a1_sumps import fix_doors
 from a2_meridia import town, exit_south, doors, deco_town
 
@@ -46,6 +46,7 @@ def mines():
                      'ice', 1700, 'fgmine', [['prism:ice', 'x_potion'], ['dragon_mail', ('gold', 4200)], ['prism:glacielle' if False else 'prism:time', 'elixir'], ['echo_bell', 'turbo_ether'], ['aether_rifle', 'prism:hp_plus']], music='cave', dark=1)
     e = inf[0]['rooms'][0]; ms[0].warps[-1].update({'to': 'frostgate', 'tx': 27, 'ty': 5}); ms[0].warps[-2].update({'to': 'frostgate', 'tx': 27, 'ty': 5})
     for k in range(2, 5): ms[k].dark = 3
+    switches(ms[2], inf[2], 3, 'fm_levers3', 'lever')
     boss_at_end(ms[4], inf[4], 'a4_frostwyrm', 'a4_lumenbell')
     return ms
 
@@ -73,6 +74,7 @@ def deeproot():
     ms, inf = series('deeproot', ['Deeproot - Root Gate', 'Deeproot - Hanging Gardens', 'Deeproot - Glowing Fen', 'Deeproot - Bone Roots', 'Deeproot - World Vein', 'Deeproot - Earth Crystal'],
                      'cave', 1800, 'deeproot', [['prism:earth', 'elixir'], ['genesis_rod' if False else 'sage_rod', ('gold', 5000)], ['prism:gaiadon', 'ribbon' if False else 'safety_bit'], ['titan_grip', 'megalixir'],
                                                ['prism:ultima' if False else 'prism:flare', 'turbo_ether'], ['x_potion']], first_id='deeproot_1', pools=0.4, dark=1)
+    switches(ms[2], inf[2], 3, 'dr_roots3', 'crystal'); switches(ms[4], inf[4], 4, 'dr_roots5', 'crystal')
     boss_at_end(ms[5], inf[5], 'a4_sundering', 'a4_sundering', crystal=True)
     q = inf[3]['rooms'][len(inf[3]['rooms']) // 2]; ms[3].event(q.x, q.y + q.h // 2, 'a4_rootking', q.w, 1, unless='a4_rootking')
     return ms

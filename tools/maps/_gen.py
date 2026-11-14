@@ -248,3 +248,19 @@ def link(a, ra, b, rb, pos_a=None, pos_b=None, down=True):
     xa, ya = pos_a or (ra.x + ra.w // 2, ra.y + 1); xb, yb = pos_b or (rb.x + rb.w // 2, rb.y + 1)
     stairs(a, xa, ya, b.id, xb, yb + 1, down); stairs(b, xb, yb, a.id, xa, ya + 1, not down)
     a.setcol(xa, ya + 1, OPEN); b.setcol(xb, yb + 1, OPEN)
+
+KINDS = {'valve': ('dungeon', 3, 3), 'terminal': ('dungeon', 4, 3), 'lever': ('dungeon', 3, 3), 'rune': ('dungeon', 7, 3), 'crystal': ('dungeon', 7, 3), 'orb': ('dungeon', 5, 2)}
+def switches(m, info, n, key, kind='valve', stairs_room=-1):
+    """A floor puzzle: the way on (the stairs in the given room) is sealed until n switches in other rooms are all thrown.
+    The stairs sit at the top centre of the room (as link() puts them); the seal covers the three cells below."""
+    import random
+    r = random.Random(hash(key) & 0xffff)
+    q = info['rooms'][stairs_room]; sx, sy = q.x + q.w // 2, q.y + 1
+    m.gate(key, sx - 1, sy + 1, 3, 1, tile=('dungeon', 5, 1))
+    m.event(sx - 1, sy + 1, 'gen_seal', 3, 1, touch=False, key=key, of=n, kind=kind, unless=key)
+    rooms = [x for x in info['rooms'][1:-1]]; r.shuffle(rooms)
+    for k, rm in enumerate(rooms[:n]):
+        for _ in range(30):
+            x, y = rm.x + r.randint(1, rm.w - 2), rm.y + r.randint(1, rm.h - 2)
+            if m.col[m.i(x, y)] == OPEN and m.layers['deco'][m.i(x, y)] < 0:
+                m.stamp(*KINDS[kind], x, y, col=SOLID); m.event(x, y, 'gen_switch', touch=False, key=key, n=k, of=n, kind=kind); break

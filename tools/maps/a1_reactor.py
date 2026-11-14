@@ -6,7 +6,7 @@ r4_core   the core chamber: Lyra at the console, Bulwark guarding the core
 r4_escape the collapsing service catwalk (timed escape) -> the fall into the Sumps
 """
 from _kit import *
-from _gen import gen, link, stairs, door_up, put, prop
+from _gen import switches, gen, link, stairs, door_up, put, prop
 
 def pad(rows, w, ch='#'):
     for r in rows: assert len(r) <= w, (len(r), r)
@@ -162,6 +162,7 @@ def build():
     # stairs: intake -> pressure hall -> condenser deck
     link(f1, i1['rooms'][-1], f2, i2['rooms'][0])
     link(f2, i2['rooms'][-1], f3, i3['rooms'][0])
+    switches(f1, i1, 3, 'r4_valves1', 'valve')
     # the security shutter Lyra opens from inside (over the stairs down from the pressure hall)
     q = i2['rooms'][-1]; sx, sy = q.x + q.w // 2, q.y + 1
     f2.gate('r4_door', sx - 1, sy + 1, 3, 1, tile=('dungeon', 5, 1))

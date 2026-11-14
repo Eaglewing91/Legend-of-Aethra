@@ -9,7 +9,7 @@ tower_1..8        lobby, Records, Records Annex, Labs, Specimen Labs, Executive 
 railyards         the freight yards: steal a train, leave Halcyon
 """
 from _kit import *
-from _gen import gen, link, stairs, door_up, put, prop
+from _gen import switches, gen, link, stairs, door_up, put, prop
 from a1_reactor import pad
 
 def market():
@@ -132,6 +132,7 @@ def spire():
         m, info = gen('spire_%d' % (k + 1), 'Spire Stair - ' + names[k], 46, 40, 'factory', 300 + k, enc='spire', rooms=10, chests=loot[k], minr=(6, 5), maxr=(12, 8))
         maps.append(m); infos.append(info)
     for k in range(5): link(maps[k], infos[k]['rooms'][-1], maps[k + 1], infos[k + 1]['rooms'][0], down=False)
+    switches(maps[4], infos[4], 3, 'sp_levers5', 'lever')
     # bottom door back to the Sumps, top door to the plate
     e = infos[0]['rooms'][0]; dx = e.x + e.w // 2 - 1
     door_up(maps[0], dx, e.y + e.h, 'sumps', 64, 4, 3) if False else None
@@ -259,6 +260,7 @@ def tower(spire_top):
     stairs(m2, sx, sy, 'tower_1', 14, 4, down=True); m2.entry = [sx, sy + 1]
     t1.warp(14, 3, 'tower_2', sx, sy + 1, 2, 2)
     for k in range(3): link(gens[k][0], gens[k][1]['rooms'][-1], gens[k + 1][0], gens[k + 1][1]['rooms'][0], down=False)
+    switches(gens[1][0], gens[1][1], 3, 'tw_terms3', 'terminal'); switches(gens[2][0], gens[2][1], 4, 'tw_terms4', 'terminal')
     # story stops: Sable finds the Cradle file in the records; the specimen breaks loose in the labs
     q = i2['rooms'][len(i2['rooms']) // 2]; m2.event(q.x + 1, q.y + 1, 'a1_records', 1, 1, touch=False); put(m2, 'drawers', q.x + 1, q.y)
     m2.sign(q.x + 1, q.y + 1, '') if False else None

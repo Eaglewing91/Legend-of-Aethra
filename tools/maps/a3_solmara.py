@@ -4,7 +4,7 @@ Dunewreck (and the first Memory Dive: Thornbrook, seven years ago), Mount Cinder
 Flags: a3_ferry, a3_grotto (Sable's crew; the submersible), a3_coral (Drowned Warden), a3_sunscar, a3_ruins, a3_orin (joins),
 a3_rook (wakes), a3_dive (Memory Dive done; Engine Core), a3_drago3, a3_colossus, a3_done."""
 from _kit import *
-from _gen import gen, link, stairs, door_up, put, prop
+from _gen import switches, gen, link, stairs, door_up, put, prop
 from a1_sumps import fix_doors
 from a2_meridia import town, exit_south, doors, deco_town
 
@@ -61,6 +61,7 @@ def coral():
         m, info = gen('coral_%d' % (k + 1), 'Coral Sanctum - ' + ('Kelp Gate', 'Pearl Halls', 'Tide Organ', 'Drowned Choir', 'Heart of the Sea')[k], 54, 42, 'crystal', 1200 + k, enc='coral', rooms=11, chests=loot[k], pools=0.6, music='water')
         m.dark = 1; ms.append(m); infos.append(info)
     for k in range(4): link(ms[k], infos[k]['rooms'][-1], ms[k + 1], infos[k + 1]['rooms'][0])
+    switches(ms[1], infos[1], 3, 'cs_orbs2', 'orb'); switches(ms[3], infos[3], 4, 'cs_orbs4', 'orb')
     e = infos[0]['rooms'][0]; door_up(ms[0], e.x + e.w // 2 - 1, e.y - 1, '@world', 140, 172); ms[0].entry = [e.x + e.w // 2, e.y + 1]
     q = infos[4]['rooms'][-1]; ms[4].event(q.x, q.y + q.h // 2, 'a3_warden', q.w, 1, unless='a3_coral')
     savepoint(ms[2], infos[2]['rooms'][0].x + 1, infos[2]['rooms'][0].y + 1); savepoint(ms[4], infos[4]['rooms'][-2].x + 1, infos[4]['rooms'][-2].y + 1)
@@ -134,6 +135,7 @@ def cinder():
         m, info = gen('cinder_%d' % (k + 1), 'Mount Cinder - ' + ('Ash Road', 'Lava Tubes', 'Magma Falls', 'Obsidian Caves', 'Caldera Rim', 'Fire Crystal')[k], 54, 42, 'lava', 1600 + k, enc='cinder', rooms=11, chests=loot[k], pools=0.5, music='dungeon')
         ms.append(m); infos.append(info)
     for k in range(5): link(ms[k], infos[k]['rooms'][-1], ms[k + 1], infos[k + 1]['rooms'][0], down=False)
+    switches(ms[2], infos[2], 3, 'mc_valves3', 'valve')
     e = infos[0]['rooms'][0]; door_up(ms[0], e.x + e.w // 2 - 1, e.y - 1, '@world', 0, 0); ms[0].entry = [e.x + e.w // 2, e.y + 1]
     q = infos[4]['rooms'][len(infos[4]['rooms']) // 2]; ms[4].event(q.x, q.y + q.h // 2, 'a3_drago3', q.w, 1, unless='a3_drago3')
     q = infos[5]['rooms'][-1]; ms[5].event(q.x, q.y + q.h - 2, 'a3_colossus', q.w, 1, unless='a3_colossus'); put(ms[5], 'crystal_big', q.x + q.w // 2 - 1, q.y + 1)

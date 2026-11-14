@@ -67,3 +67,18 @@ AE.EV.timeout_reactor = async function () {
   await AE.cs.narrate(['Reactor 4 tore itself apart.', 'Nobody below the plate ever learned who had been inside.']);
   AE.Timer.stop(); AE.gameOver();
 };
+// generated-floor puzzles: n switches open the seal 'key' (see tools/maps/_gen.py switches())
+AE.EV.gen_switch = async function (e) {
+  const S = AE.S_, f = e.key + '_' + e.n, words = { valve: 'You heave the valve wheel round. Pipes groan somewhere.', terminal: 'You key the override into the terminal. It beeps grudgingly.',
+    lever: 'You pull the lever. Something clanks far away.', rune: 'You touch the rune. It flares and stays lit.', crystal: 'The crystal hums and turns bright.', orb: 'The orb lights up.' };
+  if (S.flags[f]) { await AE.say('Already done.'); return; }
+  S.flags[f] = 1; AE.Sfx.play('door');
+  let n = 0; for (let k = 0; k < e.of; k++) if (S.flags[e.key + '_' + k]) n++;
+  await AE.say((words[e.kind] || 'Done.') + ' (' + n + ' of ' + e.of + ')');
+  if (n >= e.of) { AE.cs.flag(e.key); AE.Sfx.play('secret'); await AE.notice('A seal on this floor opens.'); }
+};
+AE.EV.gen_seal = async function (e) {
+  let n = 0; for (let k = 0; k < e.of; k++) if (AE.S_.flags[e.key + '_' + k]) n++;
+  const what = { valve: 'valves', terminal: 'security terminals', lever: 'levers', rune: 'runes', crystal: 'crystals', orb: 'orbs' }[e.kind] || 'switches';
+  await AE.say('A heavy seal blocks the way on. ' + e.of + ' ' + what + ' somewhere on this floor control it. (' + n + ' of ' + e.of + ' done)');
+};

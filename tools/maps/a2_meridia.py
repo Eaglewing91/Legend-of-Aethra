@@ -6,7 +6,7 @@ a2_talon (first Talonbird), a2_spire (arrived at the Spire), a2_framed, a2_priso
 a2_drain (Aurex at the shrine), a2_engine (Tempest Engine beaten), a2_done (shard given; Act II over)."""
 import random
 from _kit import *
-from _gen import gen, link, stairs, door_up, put, prop
+from _gen import switches, gen, link, stairs, door_up, put, prop
 from a1_sumps import fix_doors
 
 def town(mid, name, W, H, ground='grass', path='dirt', music='town', border='forest', seed=1, dark=0):
@@ -221,6 +221,7 @@ def oldmine():
         m, info = gen('oldmine' if k == 0 else 'oldmine_%d' % (k + 1), 'Old Mine' + ('', ' - Lower Shafts', ' - Flooded Seam', ' - Deep Vein')[k], 58, 44, 'mine', 700 + k, enc='mine', rooms=12, chests=loot[k], pools=0.4 if k == 2 else 0)
         ms.append(m); infos.append(info)
     for k in range(3): link(ms[k], infos[k]['rooms'][-1], ms[k + 1], infos[k + 1]['rooms'][0])
+    switches(ms[1], infos[1], 3, 'mine_levers2', 'lever')
     e = infos[0]['rooms'][0]; door_up(ms[0], e.x + e.w // 2 - 1, e.y - 1, '@world', 0, 0); ms[0].entry = [e.x + e.w // 2, e.y + 1]
     q = infos[3]['rooms'][-1]; ms[3].event(q.x, q.y + q.h // 2, 'a2_moleking', q.w, 1, unless='a2_mine')
     door_up(ms[3], q.x + q.w // 2 - 1, q.y - 1, '@world', 114, 60)
@@ -277,6 +278,7 @@ def catacombs_shrine():
         m, info = gen('wind_shrine_%d' % (k + 1), 'Wind Shrine - ' + ('Gate of Breath', 'Hall of Echoes', 'Gale Stair', 'Sky Cloister', 'Crystal Heart')[k], 52, 42, 'temple', 950 + k, enc='shrine', rooms=11, chests=loot[k], music='temple')
         ss.append(m); infos.append(info)
     for k in range(4): link(ss[k], infos[k]['rooms'][-1], ss[k + 1], infos[k + 1]['rooms'][0], down=False)
+    switches(ss[1], infos[1], 4, 'ws_runes2', 'rune'); switches(ss[3], infos[3], 4, 'ws_runes4', 'rune')
     e = infos[0]['rooms'][0]; door_up(ss[0], e.x + e.w // 2 - 1, e.y + e.h, 'windhaven', 27, 5) if False else None
     m0 = ss[0]; y = e.y + e.h; x0 = e.x + e.w // 2 - 1
     for k in range(2): m0.wall[m0.i(x0 + k, y)] = None; m0.ground(m0.under, x0 + k, y, x0 + k, y)

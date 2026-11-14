@@ -271,7 +271,7 @@ AE.World.prototype.draw = function (ctx) {
   }
   const tw = T.w, th = T.h, px = T.px, hg = T.hgt, wa = T.water;
   const zb = this.zb || (this.zb = new Float32Array(W * H)); zb.fill(1e9);
-  const maxZ = air ? 1100 : 820, fog0 = air ? 450 : 330, fr = sky2[0], fgc = sky2[1], fb = sky2[2], tt = this.t >> 3;
+  const lowK = this.lowfx ? 0.6 : 1, maxZ = (air ? 1100 : 820) * lowK, fog0 = (air ? 450 : 330) * lowK, fr = sky2[0], fgc = sky2[1], fb = sky2[2], tt = this.t >> 3;
   for (let x = 0; x < W; x++) {
     const r0 = (x - W / 2) / focal, dx = fxv + c * r0, dy = fyv + s * r0;
     let ybuf = H, z = 1.5, dz = 0.5;
@@ -303,7 +303,7 @@ AE.World.prototype.draw = function (ctx) {
         for (let y = sy < 0 ? 0 : sy; y < ybuf; y++) { buf[y * W + x] = col; zb[y * W + x] = z; }
         ybuf = sy;
       }
-      z += dz; dz *= 1.011;
+      z += dz; dz *= this.lowfx ? 1.02 : 1.011;
     }
   }
   this.octx.putImageData(this.img, 0, 0);

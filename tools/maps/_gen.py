@@ -262,5 +262,5 @@ def switches(m, info, n, key, kind='valve', stairs_room=-1):
     for k, rm in enumerate(rooms[:n]):
         for _ in range(30):
             x, y = rm.x + r.randint(1, rm.w - 2), rm.y + r.randint(1, rm.h - 2)
-            if m.col[m.i(x, y)] == OPEN and m.layers['deco'][m.i(x, y)] < 0:
+            if m.col[m.i(x, y)] == OPEN and m.layers['deco'][m.i(x, y)] < 0 and _chest_ok(m, x, y) and not any(c == '%d,%d' % (x + dx, y + dy) for c in m.chests for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))):
                 m.stamp(*KINDS[kind], x, y, col=SOLID); m.event(x, y, 'gen_switch', touch=False, key=key, n=k, of=n, kind=kind); break

@@ -119,12 +119,12 @@ dev = """<!doctype html><html><head><meta charset="utf-8"><title>Legend of Aethr
 window.AE = AE; AE.boot(document.getElementById('host'), window.AE_DATA).then(function (g) { window.ready = true; });
 </script></body></html>"""
 open('build/dev.html', 'w').write(dev)
-# ---------- the soundtrack: four optional scripts (Opus, 18 kbps mono) so each stays under 2 MB ----------
+# ---------- the soundtrack: one optional script with every track (Opus, 18 kbps mono; larger than 2 MB by choice) ----------
 SPARTS = [(1, ['intro', 'adventure', 'fight', 'fight2', 'village', 'calm_village', 'manor', 'road', 'lost_village', 'peaceful'], 'the title, the world map, battles and towns'),
           (2, ['dungeon', 'cave', 'tension', 'temple', 'dark_forest', 'clearing', 'boat', 'aquatic', 'sunny'], 'dungeons, caves, reactors, temples, forests, the sea and the desert'),
           (3, ['story', 'sad', 'mystical', 'revelation', 'lament', 'melancholia', 'chill', 'quiet', 'dream'], 'story scenes and quiet places'),
           (4, ['final_area', 'dark_castle', 'ruins', 'crypt', 'curse', 'ascension', 'good_time', 'end_theme', 'credit'], 'the Citadel, ruins, crypts, the airship, the Gilded Spire and the ending')]
-NPARTS = 5
+NPARTS = 1
 if os.path.isdir(NA) and '--soundtrack' in sys.argv:
     order = [k for _, keys, _ in SPARTS for k in keys if k in MUSIC]
     enc = {}
@@ -138,12 +138,12 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
         groups[-1].append(k); acc += len(enc[k])
     for part, keys in enumerate(groups, 1):
         tracks = {k: enc[k] for k in keys}; what = ', '.join(keys).replace('_', ' ')
-        fname = 'Legend-of-Aethra-Soundtrack-%d.user.js' % part; url = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/' + fname
+        fname = 'Legend-of-Aethra-Soundtrack.user.js'; url = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/' + fname
         txt = """// ==UserScript==
-// @name         Legend of Aethra - Soundtrack Part %d
+// @name         Legend of Aethra - Soundtrack%s
 // @namespace    eaglewing.legend-of-aethra
 // @version      %s
-// @description  Optional music for Legend of Aethra, part %d of %d (%s). Hands the tracks to the game when it starts; makes no requests and stores nothing.
+// @description  Optional music for Legend of Aethra, every track: %s. Hands the tracks to the game when it starts; makes no requests and stores nothing.
 // @author       Eaglewing [571041]
 // @match        https://www.torn.com/*
 // @updateURL    %s
@@ -168,7 +168,7 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
   document.addEventListener('aethra-music:request', send);
   document.documentElement.dataset['aethraMusic%d'] = '%s';
 })();
-""" % (part, VERSION, part, len(groups), what, url, url, json.dumps(tracks), part, part, VERSION)
+""" % ('', VERSION, what, url, url, json.dumps(tracks), part, part, VERSION)
         open('build/' + fname, 'w').write(txt)
         print('soundtrack part %d: %d tracks, %.2f MB' % (part, len(tracks), len(txt) / 1e6))
 

@@ -4,12 +4,7 @@ A 16-bit style role-playing game for [Torn](https://www.torn.com), in the spirit
 It plays inside the **Torn Arcade** phone (Legends folder) or in its own window from the Tampermonkey menu.
 
 **Install:** [Legend-of-Aethra.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra.user.js)
-(about 0.7 MB) and its [Art & Sound](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js) script (needed, about 1.1 MB). Optional music, five parts (about 1.8 MB each):
-[1](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-1.user.js) ·
-[2](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-2.user.js) ·
-[3](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-3.user.js) ·
-[4](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-4.user.js) ·
-[5](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack-5.user.js)
+(about 0.7 MB) and its [Art & Sound](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js) script (needed, about 1.1 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (every track, about 9 MB).
 
 ## The game
 A newly sworn Warden of the Vanguard Academy takes his first contract: get the rebel cell Undercurrent into Aurex
@@ -34,7 +29,7 @@ hold Q+E to flee a battle.
 The game never reads, clicks or changes Torn's page, makes no network requests, uses no API key and no websockets.
 It reads keys only while its window is open. Saves stay in Tampermonkey storage on your device. It talks to Torn Arcade
 through page events only (`aethra:ping`, `aethra:here`, `aethra:open`, `aethra:close`, `aethra:closed`, `aethra:mute`,
-`aethra:volume`); the Soundtrack scripts answer `aethra-music:request` with `aethra-music`.
+`aethra:volume`); the Soundtrack script answers `aethra-music:request` with `aethra-music`.
 
 | Data Storage | Data Sharing | Purpose of Use | Key Storage & Sharing | Key Access Level |
 |---|---|---|---|---|

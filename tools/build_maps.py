@@ -140,6 +140,28 @@ def main():
                 if Y + j >= H or col[t] != 1 or L['deco'][t] < 0: break
                 L['deco'][t] = -1; L['over'][t] = -1; col[t] = 0
             cleared += 1
+    # fewer chests (FF7 hands out far less): at most one chest of consumables or gold per map (the most valuable is
+    # kept), and only a few of the rarest items in the whole game (the latest ones are kept)
+    COMMON = {'potion', 'hi_potion', 'ether', 'antidote', 'eye_drops', 'echo_screen', 'grenade', 'phoenix_down', 'remedy', 'glowcap', 'soft',
+              'maiden_kiss', 'tranquilizer', 'hyper', 'gold', 'tent', 'x_potion', 'elixir', 'megalixir', 'turbo_ether'}
+    CAP = {'megalixir': 4, 'elixir': 8, 'x_potion': 8, 'turbo_ether': 5, 'ribbon': 1}
+    VAL = {'megalixir': 9, 'elixir': 8, 'turbo_ether': 7, 'x_potion': 6, 'gold': 5, 'tent': 4, 'ether': 4, 'hi_potion': 3, 'phoenix_down': 3, 'remedy': 3}
+    order = list(out); drop = set()
+    for k in order:
+        ch = out[k]['chests'] if isinstance(out[k]['chests'], dict) else {}
+        com = sorted([c for c, v in ch.items() if v['item'] in COMMON], key=lambda c: (-VAL.get(ch[c]['item'], 1), c))
+        for c in com[1:]: drop.add((k, c))
+    seen_cap = {}
+    for k in reversed(order):
+        ch = out[k]['chests'] if isinstance(out[k]['chests'], dict) else {}
+        for c in sorted(ch):
+            it = ch[c]['item']
+            if (k, c) in drop or it not in CAP: continue
+            seen_cap[it] = seen_cap.get(it, 0) + 1
+            if seen_cap[it] > CAP[it]: drop.add((k, c))
+    for k, c in drop:
+        d = out[k]; x, y = map(int, c.split(',')); del d['chests'][c]; d['col'][y * d['w'] + x] = 0
+    print('chests removed: %d' % len(drop))
     print('prop tops made solid: %d, props removed from paths: %d, props cleared from the way to chests/people: %d, chests moved off stairs: %d' % (fixed, removed, cleared, moved))
     os.makedirs('build', exist_ok=True)
     json.dump(out, open('build/maps.json', 'w'), separators=(',', ':'))

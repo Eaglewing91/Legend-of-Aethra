@@ -26,6 +26,8 @@ AE.textWidth = function (s) {
   return Math.max(0, w - 1);
 };
 // text(ctx, s, x, y, col, opts{shadow, align:'right'|'center'})
+// shorten text to fit a width (ends with '.')
+AE.fit = function (s, w) { s = String(s); if (AE.textWidth(s) <= w) return s; while (s.length > 1 && AE.textWidth(s + '.') > w) s = s.slice(0, -1); return s.replace(/[ ,]+$/, '') + '.'; };
 AE.text = function (ctx, s, x, y, col, o) {
   s = String(s); o = o || {}; col = col || '#fff';
   if (o.align === 'right') x -= AE.textWidth(s); else if (o.align === 'center') x -= Math.floor(AE.textWidth(s) / 2);

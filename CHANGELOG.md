@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.7 — 2026-11-15
+
+- Fewer chests: 286 down to 208. Each area now has at most one chest of potions, ethers or gold (the best one is kept), and the rarest items are much scarcer in the whole game: 4 Megalixirs, 8 Elixirs, 8 X-Potions, 5 Turbo Ethers and 1 Ribbon. Gear, Prisms and key items are all still there. Act 1 alone has 32 fewer chests.
+- Menus: the level no longer overlaps "Wpn" / "Weapon" on the Prism and Equip screens, or the name on the Status screen; "Back" (back row) no longer overlaps other text; long names and messages fit the screen; long enemy names in battle are shortened to fit their box. A new test draws every menu and battle screen and checks no text overlaps.
+
 ## 1.0.6 — 2026-11-15
 
 - After the first boss (Bulwark), the escape no longer starts with the camera stuck on empty space: the camera now always comes back to you when a cutscene ends or you change map. Saves made on the stuck screen load normally.

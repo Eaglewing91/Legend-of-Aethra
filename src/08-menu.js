@@ -37,12 +37,12 @@ AE.memberCard = function (ctx, id, x, y, hl) {
   const m = AE.S_.m[id], C = AE.CHARS[id]; if (!m) return;
   AE.portrait(ctx, id, x + 14, y + 36);
   AE.text(ctx, C.name, x + 34, y + 4, hl ? '#ffe080' : '#fff');
-  AE.text(ctx, 'Lv ' + m.lv, x + 120, y + 4, '#9cf');
+  AE.text(ctx, 'Lv ' + m.lv, x + 120, y + 4, '#9cf', { align: 'right' });
   AE.text(ctx, 'HP', x + 34, y + 16, '#9cf'); AE.text(ctx, m.hp + '/' + m.maxhp, x + 120, y + 16, m.hp <= 0 ? '#e05050' : '#fff', { align: 'right' });
   AE.bar(ctx, x + 34, y + 26, 86, 2, m.hp / m.maxhp, '#60d080');
   AE.text(ctx, 'MP', x + 34, y + 30, '#9cf'); AE.text(ctx, m.mp + '/' + m.maxmp, x + 120, y + 30, '#fff', { align: 'right' });
   AE.bar(ctx, x + 34, y + 40, 86, 2, m.maxmp ? m.mp / m.maxmp : 0, '#60a0ff');
-  if (m.row === 'back') AE.text(ctx, 'Back', x + 124, y + 30, '#888');
+  if (m.row === 'back') AE.text(ctx, 'Back', x + 50, y + 30, '#888');
 };
 AE.MainMenu.prototype.draw = function (ctx) {
   const S = AE.S_, self = this;
@@ -147,7 +147,7 @@ AE.MagicScreen.prototype.draw = function (ctx) {
   const m = AE.S_.m[this.id], self = this;
   AE.window(ctx, 0, 0, AE.W, 50); AE.memberCard(ctx, this.id, 6, 4);
   AE.window(ctx, 0, 50, AE.W, AE.H - 50);
-  if (!this.spells.length) AE.text(ctx, 'No magic. Slot a magic Prism (green) into a weapon or armour.', 10, 58, '#888');
+  if (!this.spells.length) { AE.text(ctx, 'No magic. Slot a magic Prism (green)', 10, 58, '#888'); AE.text(ctx, 'into a weapon or armour.', 10, 70, '#888'); }
   this.spells.forEach(function (s, i) {
     const r = Math.floor(i / 2) - self.list.top, c = i % 2; if (r < 0 || r >= 12) return;
     const sp = AE.SPELLS[s], X = 22 + c * 120, Y = 58 + r * 12;
@@ -171,7 +171,7 @@ AE.StatusScreen.prototype.draw = function (ctx) {
   const m = AE.S_.m[this.id], C = AE.CHARS[this.id], st = m.st;
   AE.window(ctx, 0, 0, AE.W, AE.H);
   AE.memberCard(ctx, this.id, 8, 6);
-  AE.text(ctx, C.full + ', ' + C.title, 140, 10, '#ffe080');
+  AE.text(ctx, C.full, 140, 10, '#ffe080'); AE.text(ctx, C.title, 12, 56, '#c8b070');
   AE.text(ctx, 'EXP', 140, 26, '#9cf'); AE.text(ctx, AE.fmt(m.exp), 248, 26, '#fff', { align: 'right' });
   AE.text(ctx, 'Next', 140, 38, '#9cf'); AE.text(ctx, m.lv >= 99 ? '-' : AE.fmt(AE.expFor(m.lv + 1) - m.exp), 248, 38, '#fff', { align: 'right' });
   AE.text(ctx, 'Surge Lv ' + (m.surgeLv || 1), 140, 50, '#ff9ad0');

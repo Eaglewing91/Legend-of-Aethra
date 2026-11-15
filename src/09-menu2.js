@@ -47,8 +47,8 @@ AE.EquipScreen.prototype.update = function (I) {
 AE.EquipScreen.prototype.draw = function (ctx) {
   const m = AE.S_.m[this.id], self = this; AE.calc(this.id); const st = m.st;
   AE.window(ctx, 0, 0, AE.W, 88); AE.memberCard(ctx, this.id, 6, 4);
-  ['Weapon', 'Armour', 'Acc.'].forEach(function (n, i) {
-    const k = AE.EQUIP_SLOTS[i]; AE.text(ctx, n, 140, 8 + i * 12, '#9cf'); AE.text(ctx, m.equip[k] ? AE.itemName(m.equip[k]) : '-', 180, 8 + i * 12, '#fff');
+  ['Wpn', 'Arm', 'Acc'].forEach(function (n, i) {
+    const k = AE.EQUIP_SLOTS[i]; AE.text(ctx, n, 140, 8 + i * 12, '#9cf'); AE.text(ctx, m.equip[k] ? AE.itemName(m.equip[k]) : '-', 162, 8 + i * 12, '#fff');
     if (i === self.slot) AE.cursor(ctx, 126, 8 + i * 12, self.picking);
   });
   // slots preview

@@ -153,7 +153,7 @@ AE.Battle.prototype.drawHud = function (ctx) {
   const B = this, y0 = 150;
   AE.window(ctx, 0, y0, 92, AE.H - y0);
   const names = {}; this.enemies.filter(AE.alive).forEach(function (e) { names[e.name] = (names[e.name] || 0) + 1; });
-  Object.keys(names).slice(0, 5).forEach(function (n, i) { AE.text(ctx, n + (names[n] > 1 ? ' x' + names[n] : ''), 7, y0 + 7 + i * 12, '#fff'); });
+  Object.keys(names).slice(0, 5).forEach(function (n, i) { AE.text(ctx, AE.fit(n + (names[n] > 1 ? ' x' + names[n] : ''), 82), 7, y0 + 7 + i * 12, '#fff'); });
   AE.window(ctx, 92, y0, AE.W - 92, AE.H - y0);
   this.party.forEach(function (f, i) {
     const y = y0 + 8 + i * 20, ready = B.ready.indexOf(f) >= 0, active = B.menu && B.menu.f === f;

@@ -1,3 +1,4 @@
+// usage: node tests/battleshot.js /abs/path/dev.html out.png width height   A boss battle screenshot at a given window size
 const { chromium } = require('playwright');
 (async () => {
   const [page, out, w, h] = [process.argv[2], process.argv[3], +process.argv[4], +process.argv[5]];

@@ -13,4 +13,6 @@
   duel, the Battle Square, side quests, trials, roaming Weapons, super-bosses and the Abyssal Spire.
 - The Soundtrack: an optional script with an original 45-track score.
 - A touch pad for phones and tablets, with a Flee button in battles you can run from.
+- Sharper battles: the game draws at a resolution matched to your screen, sprites scale by whole pixels, the battle
+  backdrops are painted at three times the detail, and every boss faces your party.
 - Plays inside the Torn Arcade phone (Torn Arcade 2.57.0 or later) or from the Tampermonkey menu.

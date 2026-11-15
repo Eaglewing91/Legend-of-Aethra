@@ -89,33 +89,39 @@ AE.bar = function (ctx, x, y, w, h, frac, col, back) {
 AE.actorOn = function (id) { return !!(AE.MS && AE.MS[id] && AE.IMG['ms_' + id]); };
 // frame(ctx, id, anim, dir 0..3 (up, right, down, left) or null for 1-direction anims, f, X, Y, k scale, flip)
 AE.ROW = [1, 2, 0, 3];      // our dir -> atlas row (down, up, right, left)
+// Sharp scaling: every source pixel covers a whole number of screen pixels (no uneven, wobbly pixels), and sprites
+// sit on the screen's pixel grid. AE.S is the screen pixels per game pixel (see AE.fitCanvas).
+AE.fitK = function (k) { return Math.max(1, Math.round(k * AE.S)) / AE.S; };
+AE.px = function (v) { return Math.round(v * AE.S) / AE.S; };
 AE.actor = function (ctx, id, anim, dir, f, X, Y, k, o) {
   const M = AE.MS && AE.MS[id], A = M && M[anim], im = AE.IMG['ms_' + id]; if (!A || !im) return false;
-  o = o || {}; k = k || 1;
+  o = o || {}; k = AE.fitK(k || 1);
   const row = A.dirs === 4 ? AE.ROW[dir] : 0, fr = ((f % A.n) + A.n) % A.n;
   const sx = fr * A.w, sy = A.y + row * A.h;
   ctx.save();
   if (o.alpha !== undefined) ctx.globalAlpha = o.alpha;
   if (o.filter) ctx.filter = o.filter;
-  if (o.flip) { ctx.translate(Math.round(X), 0); ctx.scale(-1, 1); ctx.drawImage(im, sx, sy, A.w, A.h, -A.fx * k, Math.round(Y - A.fy * k), A.w * k, A.h * k); }
-  else ctx.drawImage(im, sx, sy, A.w, A.h, Math.round(X - A.fx * k), Math.round(Y - A.fy * k), A.w * k, A.h * k);
+  if (o.flip) { ctx.translate(AE.px(X), 0); ctx.scale(-1, 1); ctx.drawImage(im, sx, sy, A.w, A.h, AE.px(-A.fx * k), AE.px(Y - A.fy * k), A.w * k, A.h * k); }
+  else ctx.drawImage(im, sx, sy, A.w, A.h, AE.px(X - A.fx * k), AE.px(Y - A.fy * k), A.w * k, A.h * k);
   ctx.restore();
   return true;
 };
 // townsfolk atlas (ms_people): 7 cells per row (stand, walk 1-6), 4 rows per person
 AE.person = function (ctx, name, dir, f, X, Y, k) {
   const P = AE.MS && AE.MS.people, im = AE.IMG.ms_people; if (!P || !im) return false;
-  const i = P.names.indexOf(name); if (i < 0) return false; k = k || 1;
+  const i = P.names.indexOf(name); if (i < 0) return false; k = AE.fitK(k || 1);
   const cell = f < 0 ? 0 : 1 + (f % 6);
-  ctx.drawImage(im, cell * P.cw, (i * 4 + AE.ROW[dir]) * P.ch, P.cw, P.ch, Math.round(X - P.fx * k), Math.round(Y - P.fy * k), P.cw * k, P.ch * k);
+  ctx.drawImage(im, cell * P.cw, (i * 4 + AE.ROW[dir]) * P.ch, P.cw, P.ch, AE.px(X - P.fx * k), AE.px(Y - P.fy * k), P.cw * k, P.ch * k);
   return true;
 };
 // any image region scaled, optionally flipped and tinted by a CSS filter
 AE.blit = function (ctx, im, sx, sy, sw, sh, dx, dy, dw, dh, o) {
   if (!im) return; o = o || {};
+  // whole screen pixels per source pixel; keep the sprite centred and standing on the same spot
+  if (sw > 0 && sh > 0) { const w2 = sw * AE.fitK(dw / sw), h2 = sh * AE.fitK(dh / sh); dx += (dw - w2) / 2; dy += dh - h2; dw = w2; dh = h2; }
   ctx.save(); if (o.alpha !== undefined) ctx.globalAlpha = o.alpha; if (o.filter) ctx.filter = o.filter;
-  if (o.flip) { ctx.translate(Math.round(dx + dw), Math.round(dy)); ctx.scale(-1, 1); ctx.drawImage(im, sx, sy, sw, sh, 0, 0, dw, dh); }
-  else ctx.drawImage(im, sx, sy, sw, sh, Math.round(dx), Math.round(dy), dw, dh);
+  if (o.flip) { ctx.translate(AE.px(dx + dw), AE.px(dy)); ctx.scale(-1, 1); ctx.drawImage(im, sx, sy, sw, sh, 0, 0, dw, dh); }
+  else ctx.drawImage(im, sx, sy, sw, sh, AE.px(dx), AE.px(dy), dw, dh);
   ctx.restore();
 };
 // recolour an image by hue-rotating its pixels (cached): palette swaps for monster variants

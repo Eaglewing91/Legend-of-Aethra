@@ -11,6 +11,9 @@ AE.Battle.prototype.addFx = function (kind, t) {
 AE.enemyArt = function (f) {
   const A = f.d.art || {};
   if (A.mon) return { im: AE.IMG['mon_' + A.mon], fw: 16, fh: 16, k: A.k || 2, mon: 1 };
+  // bosses turned side-on to face the party (tools/sides), when there is a turned sprite for them
+  const SD = A.boss && AE.SIDES && AE.SIDES[A.boss];
+  if (SD && AE.IMG['side_' + A.boss]) return { im: AE.IMG['side_' + A.boss], fw: SD.fw, fh: SD.fh, n: SD.n, k: (A.k || 2) * SD.scale * ((A.fh || SD.origfh) / SD.origfh), side: 1 };
   if (A.boss) return { im: AE.IMG['boss_' + A.boss + '_' + (A.anim || 'Idle')], fw: A.fw, fh: A.fh, n: A.n, k: A.k || 2 };
   if (A.cast) return { cast: A.cast, k: A.k || 1.25 };
   return { none: 1 };
@@ -33,7 +36,7 @@ AE.drawEnemy = function (ctx, f, B, sel) {
     AE.blit(ctx, A.im, 3 * 16, fr * 16, 16, 16, X - 8 * A.k, Y - 16 * A.k + (f.status.float ? -6 : 0), 16 * A.k, 16 * A.k, { alpha: alpha, filter: fs });
   } else if (A.im) {
     const n = A.n || Math.max(1, Math.floor(A.im.width / A.fw)), fr = Math.floor(f.t * 7) % n;
-    AE.blit(ctx, A.im, fr * A.fw, 0, A.fw, A.fh, X - A.fw * A.k / 2, Y - A.fh * A.k, A.fw * A.k, A.fh * A.k, { alpha: alpha, filter: fs, flip: !D.noflip });
+    AE.blit(ctx, A.im, fr * A.fw, 0, A.fw, A.fh, X - A.fw * A.k / 2, Y - A.fh * A.k, A.fw * A.k, A.fh * A.k, { alpha: alpha, filter: fs, flip: !A.side && !D.noflip });
   } else if (A.cast) {
     const anim = f.flash > 6 ? 'b_slash' : 'b_ready';
     AE.actor(ctx, A.cast, anim, null, Math.floor(f.t * 6), X, Y, A.k, { flip: true, alpha: alpha, filter: fs });

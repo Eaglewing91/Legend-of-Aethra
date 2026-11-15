@@ -56,6 +56,6 @@ through page events only (`aethra:ping`, `aethra:here`, `aethra:open`, `aethra:c
 | Only locally (save files in Tampermonkey storage) | Nobody | Public amusement | Not stored / Not shared (no key used) | None (no API key needed) |
 
 ## Credits
-By Eaglewing [571041]. Art and sound effects: "Ninja Adventure" by Pixel-boy and AAA (CC0), and "Zelda-like tilesets and sprites" by ArMM1998 (CC0). Music: an original score in the style of the classic Final Fantasy soundtracks, composed and synthesised for this game (tools/music). Characters and townspeople:
+By Eaglewing [571041]. Art and sound effects: "Ninja Adventure" by Pixel-boy and AAA (CC0), and "Zelda-like tilesets and sprites" by ArMM1998 (CC0). The side-on boss sprites were turned from the Ninja Adventure originals (tools/sides). Music: an original score in the style of the classic Final Fantasy soundtracks, composed and synthesised for this game (tools/music). Characters and townspeople:
 "Mana Seed" by Seliel the Shaper, used under licence with permission (not CC0; don't extract or reuse it).
 All rights reserved, for use on Torn only: see [LICENCE](LICENCE).

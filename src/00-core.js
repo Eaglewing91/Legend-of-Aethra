@@ -77,6 +77,7 @@ AE.Game.prototype.step = function () {
   if (AE.Music) AE.Music.tick();
 };
 AE.Game.prototype.draw = function () {
+  if (this.frame % 30 === 0 && AE.fitCanvas) AE.fitCanvas(this);
   const c = this.ctx; c.setTransform(AE.S, 0, 0, AE.S, 0, 0); c.imageSmoothingEnabled = false;
   c.fillStyle = '#000'; c.fillRect(0, 0, AE.W, AE.H);
   // draw from the last opaque scene up

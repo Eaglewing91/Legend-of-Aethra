@@ -21,6 +21,8 @@ import mapkit as MK
 ART = {}
 for n, f in MK.SHEETS: ART[n] = f
 for f in sorted(glob.glob('art/na/mon/*.png')): ART['mon_' + os.path.basename(f)[:-4]] = f[4:]
+# side-on boss sprites (turned to face the party; made from the pack's art by tools/sides)
+for f in sorted(glob.glob('art/generated/sides/*.png')): ART['side_' + os.path.basename(f)[:-4]] = f[4:]
 for f in sorted(glob.glob('art/na/boss/*.png')):
     n = os.path.basename(f)[:-4]
     if n.endswith('_Idle') or n.endswith('_Head'): ART['boss_' + n] = f[4:]
@@ -106,7 +108,7 @@ for f in glob.glob('art/na/boss/*_Idle*.png'):
     im = Image.open(f); n = os.path.basename(f)[:-4].split('_')[0]; bossfw[n] = im.size[1] if im.size[0] % im.size[1] == 0 else im.size[0] // max(1, round(im.size[0] / im.size[1]))
 world = json.load(open('build/world.json'))
 gz = lambda o: base64.b64encode(gzip.compress(json.dumps(o, separators=(',', ':')).encode(), 9)).decode()
-data = {'version': VERSION, 'worldz': gz(world), 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'mapsz': gz(maps), 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw}
+data = {'version': VERSION, 'worldz': gz(world), 'sheets': [n for n, _ in MK.SHEETS], 'fills': MK.FILL_ORDER, 'fx': fx_meta(), 'ms': MS, 'mapsz': gz(maps), 'art': art, 'sfx': sfx, 'music': music, 'bossfw': bossfw, 'sides': json.load(open('art/generated/sides/sides.json')) if os.path.exists('art/generated/sides/sides.json') else {}}
 src = '\n'.join(open(f).read() for f in sorted(glob.glob('src/*.js')) + sorted(glob.glob('src/content/*.js')))
 blob = json.dumps(data)
 open('build/data.js', 'w').write('window.AE_DATA = ' + blob + ';')

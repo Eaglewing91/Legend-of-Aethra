@@ -1,0 +1,100 @@
+{
+ "DemonCyclop": {
+  "fh": 37,
+  "fw": 39,
+  "n": 4,
+  "origfh": 50,
+  "scale": 0.971
+ },
+ "DemonCyclop2": {
+  "fh": 37,
+  "fw": 37,
+  "n": 4,
+  "origfh": 50,
+  "scale": 0.998
+ },
+ "DragonBlue": {
+  "fh": 47,
+  "fw": 46,
+  "n": 4,
+  "origfh": 46,
+  "scale": 1.011
+ },
+ "DragonGreen": {
+  "fh": 46,
+  "fw": 45,
+  "n": 4,
+  "origfh": 46,
+  "scale": 1.034
+ },
+ "GiantBamboo": {
+  "fh": 56,
+  "fw": 49,
+  "n": 4,
+  "origfh": 62,
+  "scale": 0.992
+ },
+ "GiantBamboo2": {
+  "fh": 50,
+  "fw": 52,
+  "n": 4,
+  "origfh": 62,
+  "scale": 1.02
+ },
+ "GiantBlueSamurai": {
+  "fh": 41,
+  "fw": 44,
+  "n": 4,
+  "origfh": 48,
+  "scale": 0.913
+ },
+ "GiantRacoon": {
+  "fh": 54,
+  "fw": 59,
+  "n": 4,
+  "origfh": 60,
+  "scale": 0.954
+ },
+ "GiantRacoonGold": {
+  "fh": 54,
+  "fw": 58,
+  "n": 4,
+  "origfh": 60,
+  "scale": 0.962
+ },
+ "GiantRedSamurai": {
+  "fh": 41,
+  "fw": 43,
+  "n": 4,
+  "origfh": 48,
+  "scale": 0.924
+ },
+ "SquidGreen": {
+  "fh": 61,
+  "fw": 60,
+  "n": 4,
+  "origfh": 79,
+  "scale": 0.983
+ },
+ "SquidRed": {
+  "fh": 62,
+  "fw": 61,
+  "n": 4,
+  "origfh": 79,
+  "scale": 0.966
+ },
+ "TenguBlue": {
+  "fh": 39,
+  "fw": 53,
+  "n": 4,
+  "origfh": 68,
+  "scale": 0.963
+ },
+ "TenguRed": {
+  "fh": 42,
+  "fw": 65,
+  "n": 4,
+  "origfh": 82,
+  "scale": 0.833
+ }
+}

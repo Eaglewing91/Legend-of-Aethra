@@ -3,7 +3,7 @@
    drawn in true perspective from the area's ground texture) and then animated on top (clouds, embers, snow, rain,
    bubbles, motes). Spells and hits throw particles; heavy blows shake the screen. */
 (function () {
-  const W = AE.W, BH = 150, HZ = 74;
+  const W = AE.W, BH = 150, HZ = 74, BGR = 3;   // backdrops are painted at 3x and drawn smoothly
   const hash = function (x, y) { let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   const n1 = function (x, s) { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i, s) * (1 - u) + hash(i + 1, s) * u; };
   const ridge = function (x, s, o) { let v = 0, a = 1, n = 0, f = 1; for (let i = 0; i < (o || 4); i++) { v += a * n1(x * f, s + i * 17); n += a; a *= 0.5; f *= 2.1; } return v / n; };
@@ -46,38 +46,44 @@
   };
   const paint = function (kind) {
     const D = AE.BGS[kind] || AE.BGS.grass, A = P[kind] || P.grass, seed = kind.length * 31 + kind.charCodeAt(0);
-    const c = document.createElement('canvas'); c.width = W; c.height = BH; const x = c.getContext('2d');
+    const R = BGR, c = document.createElement('canvas'); c.width = W * R; c.height = BH * R; const x = c.getContext('2d'); x.setTransform(R, 0, 0, R, 0, 0);
     // sky
     const g = x.createLinearGradient(0, 0, 0, HZ); g.addColorStop(0, A.sky[0]); g.addColorStop(0.6, A.sky[1]); g.addColorStop(1, A.sky[2]); x.fillStyle = g; x.fillRect(0, 0, W, HZ + 2);
     if (A.sun) { const sg = x.createRadialGradient(200, 22, 2, 200, 22, 60); sg.addColorStop(0, A.sun === 2 ? 'rgba(255,240,200,1)' : 'rgba(255,255,240,.95)'); sg.addColorStop(0.15, 'rgba(255,250,220,.6)'); sg.addColorStop(1, 'rgba(255,250,220,0)'); x.fillStyle = sg; x.fillRect(0, 0, W, HZ); }
     if (A.cave) {   // a rock ceiling hanging down
-      for (let i = 0; i < W; i++) { const h = 6 + ridge(i * 0.05, seed + 3) * 26 + (hash(i >> 2, seed) < 0.12 ? 10 * hash(i, 9) : 0); const cg = x.createLinearGradient(0, 0, 0, h); cg.addColorStop(0, A.far[1]); cg.addColorStop(1, A.far[0]); x.fillStyle = cg; x.fillRect(i, 0, 1, h); }
+      for (let j = 0; j < W * BGR; j++) { const i = j / BGR, h = 6 + ridge(i * 0.05, seed + 3) * 26 + (hash(Math.floor(i) >> 2, seed) < 0.12 ? 10 * hash(Math.floor(i), 9) : 0); const cg = x.createLinearGradient(0, 0, 0, h); cg.addColorStop(0, A.far[1]); cg.addColorStop(1, A.far[0]); x.fillStyle = cg; x.fillRect(i, 0, 1 / BGR + 0.01, h); }
     }
     // far ranges: two silhouettes, the further one lost in haze
-    const haze = rgb(A.haze);
+    const haze = rgb(A.haze), sky = x.getImageData(0, 0, W * R, (HZ + 2) * R), sd = sky.data;
     [[0.55, 20, 0.018, A.far[0], 0.55], [0.85, 14, 0.03, A.far[1], 0.2]].forEach(function (L, li) {
       const base = HZ - 2, col = rgb(L[3]);
-      for (let i = 0; i < W; i++) {
-        const h = L[1] * (0.35 + ridge(i * L[2], seed + li * 50, 5)) * (A.mid === 'ocean' || A.mid === 'cloudsea' ? 0.35 : 1);
-        for (let y = Math.floor(base - h); y < base + 2; y++) {
-          const k = (y - (base - h)) / (h + 2), cc = mix(col, haze, L[4] * (1 - k * 0.3));
-          let sh = 1; if (A.snowcap && y < base - h + 4) sh = 1.4;
-          x.fillStyle = css([Math.min(255, cc[0] * sh), Math.min(255, cc[1] * sh), Math.min(255, cc[2] * sh)]); x.fillRect(i, y, 1, 1);
+      for (let j = 0; j < W * R; j++) {
+        const i = j / R, h = L[1] * (0.35 + ridge(i * L[2], seed + li * 50, 5)) * (A.mid === 'ocean' || A.mid === 'cloudsea' ? 0.35 : 1);
+        for (let yy = Math.floor((base - h) * R); yy < (base + 2) * R; yy++) {
+          const y = yy / R, k = (y - (base - h)) / (h + 2), cc = mix(col, haze, L[4] * (1 - k * 0.3));
+          const sh = A.snowcap && y < base - h + 4 ? 1.4 : 1, top = Math.min(1, ((yy + 1) / R - (base - h)) * R), o = (yy * W * R + j) * 4;
+          for (let q = 0; q < 3; q++) sd[o + q] = sd[o + q] + (Math.min(255, cc[q] * sh) - sd[o + q]) * top;   // anti-aliased ridge line
         }
       }
     });
+    x.putImageData(sky, 0, 0);
     // the floor in perspective, from the area's ground tile
-    const T = texData(D), tint = A.tint || [1, 1, 1], img = x.getImageData(0, HZ, W, BH - HZ), d = img.data, fh = rgb(A.haze);
-    for (let y = 0; y < BH - HZ; y++) {
-      const z = 900 / (y + 6), fog = Math.max(0, Math.min(1, (z - 30) / 110)), lum = 0.55 + 0.45 * Math.min(1, y / 50);
-      for (let i = 0; i < W; i++) {
-        const u = (((i - W / 2) * z / 120 + 1000) | 0) & 15, v = ((z * 1.2) | 0) & 15, o = (v * 16 + u) * 4, p = (y * W + i) * 4;
-        const jit = 0.92 + hash(i >> 1, (z | 0)) * 0.16;
-        for (let k = 0; k < 3; k++) { let val = T[o + k] * tint[k] * lum * jit; val = val + (fh[k] - val) * fog * 0.85; d[p + k] = Math.max(0, Math.min(255, val)); }
+    const T = texData(D), tint = A.tint || [1, 1, 1], img = x.getImageData(0, HZ * R, W * R, (BH - HZ) * R), d = img.data, fh = rgb(A.haze);
+    const tex = function (u, v, k) {   // bilinear, wrapping
+      const u0 = Math.floor(u), v0 = Math.floor(v), fu = u - u0, fv = v - v0, a = u0 & 15, b2 = (u0 + 1) & 15, c2 = v0 & 15, e = (v0 + 1) & 15;
+      const p = function (uu, vv) { return T[(vv * 16 + uu) * 4 + k]; };
+      return (p(a, c2) * (1 - fu) + p(b2, c2) * fu) * (1 - fv) + (p(a, e) * (1 - fu) + p(b2, e) * fu) * fv;
+    };
+    for (let yy = 0; yy < (BH - HZ) * R; yy++) {
+      const y = yy / R, z = 900 / (y + 6), fog = Math.max(0, Math.min(1, (z - 30) / 110)), lum = 0.55 + 0.45 * Math.min(1, y / 50);
+      for (let j = 0; j < W * R; j++) {
+        const i = j / R, u = (i - W / 2) * z / 120 + 1000, v = z * 1.2, p = (yy * W * R + j) * 4;
+        const jit = 0.92 + hash(Math.floor(i) >> 1, (z | 0)) * 0.16;
+        for (let k = 0; k < 3; k++) { let val = tex(u, v, k) * tint[k] * lum * jit; val = val + (fh[k] - val) * fog * 0.85; d[p + k] = Math.max(0, Math.min(255, val)); }
         d[p + 3] = 255;
       }
     }
-    x.putImageData(img, 0, HZ);
+    x.putImageData(img, 0, HZ * R);
     // the middle layer: what makes this place this place
     mid(x, A, seed, HZ);
     // floor clutter in perspective (stones, tufts) and a soft vignette
@@ -138,7 +144,7 @@
   // light shafts, glow, moving weather: drawn every frame on top of the painted backdrop
   AE.drawBattleBg = function (ctx, kind, t) {
     if (!AE.BGCACHE[kind]) AE.BGCACHE[kind] = paint(kind);
-    ctx.drawImage(AE.BGCACHE[kind], 0, 0);
+    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(AE.BGCACHE[kind], 0, 0, W, BH); ctx.restore();
     const A = P[kind] || P.grass;
     if (A.shafts) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < 4; i++) { const x0 = 30 + i * 60 + Math.sin(t * 0.01 + i) * 8, a = 0.05 + 0.03 * Math.sin(t * 0.02 + i * 2); ctx.fillStyle = 'rgba(255,250,200,' + a + ')'; ctx.beginPath(); ctx.moveTo(x0, 0); ctx.lineTo(x0 + 16, 0); ctx.lineTo(x0 + 50, BH); ctx.lineTo(x0 + 20, BH); ctx.fill(); } ctx.restore(); }
     if (A.glow) { ctx.globalAlpha = 0.1 + Math.sin(t * 0.05) * 0.05; ctx.fillStyle = A.glow; ctx.fillRect(0, 0, W, BH); ctx.globalAlpha = 1; }

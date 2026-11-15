@@ -11,16 +11,16 @@
   K('void_ray', { name: 'Void Ray', kind: 'mag', power: 16, elem: 'dark', fx: 'dark' });
   K('holy_lance', { name: 'Holy Lance', kind: 'mag', power: 16, elem: 'holy', fx: 'holy' });
   K('thunderhead', { name: 'Thunderhead', kind: 'mag', power: 15, elem: 'bolt', all: 1, fx: 'bolt' });
-  K('sky_fall', { name: 'Skyfall', kind: 'mag', power: 22, all: 1, fx: 'boom' });
-  K('warden_crush', { name: 'Warden Crush', kind: 'phys', power: 2.6, fx: 'boom' });
-  K('v_count', { name: 'Counting', kind: 'mag', power: 4, status: ['sleep', 'stop'], hit: 30, all: 1, fx: 'time' });
-  K('v_cradle', { name: 'Cradle Light', kind: 'mag', power: 20, elem: 'holy', all: 1, fx: 'holy' });
-  K('v_shards', { name: 'Four Shards', kind: 'mag', power: 26, all: 1, fx: 'spark' });
+  K('sky_fall', { name: 'Skyfall', kind: 'mag', power: 18, all: 1, fx: 'boom' });
+  K('warden_crush', { name: 'Warden Crush', kind: 'phys', power: 1.9, fx: 'boom' });
+  K('v_count', { name: 'Counting', kind: 'mag', power: 4, status: ['sleep', 'stop'], hit: 22, all: 1, fx: 'time' });
+  K('v_cradle', { name: 'Cradle Light', kind: 'mag', power: 17, elem: 'holy', all: 1, fx: 'holy' });
+  K('v_shards', { name: 'Four Shards', kind: 'mag', power: 21, all: 1, fx: 'spark' });
   K('v_mend', { name: 'Remember Me', kind: 'heal', power: 60, target: 'self', fx: 'heal' });
-  K('nx_forget', { name: 'Forget', kind: 'mag', power: 8, status: ['silence', 'confuse', 'slow'], hit: 40, all: 1, fx: 'dark' });
+  K('nx_forget', { name: 'Forget', kind: 'mag', power: 8, status: ['silence', 'confuse', 'slow'], hit: 28, all: 1, fx: 'dark' });
   K('nx_hollow', { name: 'Hollow', kind: 'gravity', power: 0.5, fx: 'dark' });
-  K('nx_end', { name: 'The Last Memory', kind: 'mag', power: 34, elem: 'dark', all: 1, fx: 'dark' });
-  K('nx_grasp', { name: 'Grasp of Nothing', kind: 'phys', power: 2.8, drain: 1, fx: 'claw' });
+  K('nx_end', { name: 'The Last Memory', kind: 'mag', power: 28, elem: 'dark', all: 1, fx: 'dark' });
+  K('nx_grasp', { name: 'Grasp of Nothing', kind: 'phys', power: 2.0, drain: 1, fx: 'claw' });
   // ---------- enemies (Nordheim) ----------
   E('snowwolf', 'Rime Wolf', 38, 2800, 120, 60, 30, 40, 44, 640, 40, 300, { mon: 'Beast', hue: 180, bright: 1.3 }, { weak: ['fire'], absorb: ['ice'], ai: [[3, 'attack'], [1, 'ice_fang']] });
   E('yeti', 'Snow Brute', 40, 3600, 130, 70, 20, 40, 24, 700, 44, 340, { mon: 'Panda', k: 2.6, bright: 1.3 }, { weak: ['fire'], ai: [[3, 'attack'], [1, 'maul']] });
@@ -38,7 +38,7 @@
   E('hollowed', 'The Hollowed', 52, 6200, 150, 70, 120, 90, 34, 1100, 64, 600, { mon: 'Spirit2', hue: 260, bright: 0.6 }, { undead: 1, weak: ['holy'], absorb: ['dark'], ai: [[1, 'attack'], [2, 'void_ray'], [1, 'nx_forget']] });
   E('choirguard', 'Choir Guardian', 58, 9000, 190, 110, 120, 110, 36, 1400, 80, 900, { mon: 'Cyclope2', k: 2.8, hue: 180, bright: 1.4 }, { weak: ['dark'], ai: [[2, 'attack'], [1, 'holy_lance'], [1, 'reflect_self']] });
   E('citadelangel', 'Citadel Seraph', 60, 8000, 170, 90, 150, 120, 44, 1500, 84, 1000, { mon: 'Butterfly', k: 2.6, hue: 200, bright: 1.5 }, { float: 1, weak: ['dark'], ai: [[1, 'attack'], [2, 'holy_lance'], [1, 'cure_spell', 'ally_hurt']] });
-  E('voidknight', 'Hollow Knight', 62, 11000, 210, 120, 80, 90, 38, 1700, 90, 1200, { cast: 'officer', k: 1.5, hue: 260, bright: 0.6 }, { ai: [[3, 'attack'], [1, 'nx_grasp']] });
+  E('voidknight', 'Hollow Knight', 62, 11000, 180, 120, 80, 90, 38, 1700, 90, 1200, { cast: 'officer', k: 1.5, hue: 260, bright: 0.6 }, { ai: [[3, 'attack'], [1, 'nx_grasp']] });
   // the Sky Wardens (they roam the world after the Sundering)
   const W = function (id, name, hp, art, el) { E(id, name, 62, hp, 210, 100, 150, 100, 36, 30000, 600, 20000, art, { boss: 1, weak: el[0], absorb: el[1], ai: [[2, 'warden_crush'], [2, 'sky_fall'], [1, el[2]], [1, 'attack']] }); };
   W('w_ashen', 'Ashen Warden', 110000, { boss: 'TenguRed', anim: 'Idle', fw: 82, fh: 82, k: 1.8, sat: 0.2 }, [['water'], ['fire'], 'ic_inferno']);
@@ -54,11 +54,11 @@
   E('ruinwyrm', 'Ruin Wyrm', 80, 300000, 260, 140, 220, 140, 54, 80000, 1500, 60000, { boss: 'DragonGreen', anim: 'Head', fw: 44, fh: 46, k: 3, hue: 300 }, { boss: 1, ai: [[2, 'sky_fall'], [2, 'warden_crush'], [1, 'blizzard'], [1, 'ic_inferno']], drop: [['omega_core', 1]] });
   E('hermit', 'The Hermit', 75, 240000, 240, 130, 240, 160, 60, 70000, 1400, 50000, { cast: 'orin', k: 1.6, hue: 180 }, { boss: 1, ai: [[2, 'thunderhead'], [2, 'blizzard'], [2, 'ic_inferno'], [1, 'v_count']], drop: [['genesis_rod', 1]] });
   // the end
-  E('vesper1', 'Vesper Lune', 64, 90000, 180, 100, 180, 120, 44, 0, 0, 0, { cast: 'vesper', k: 1.5 }, { boss: 1, ai: [[2, 'v_cradle'], [1, 'v_count'], [1, 'holy_lance']] });
-  E('vesper2', 'Vesper, Crowned', 66, 120000, 200, 110, 200, 130, 46, 0, 0, 0, { boss: 'GiantSpirit', anim: 'Idle', fw: 50, fh: 50, k: 2.6, hue: 180, bright: 1.4 }, { boss: 1, ai: [[2, 'v_shards'], [1, 'v_count'], [1, 'v_mend', 'hurt'], [1, 'holy_lance']] });
+  E('vesper1', 'Vesper Lune', 64, 80000, 180, 100, 180, 120, 44, 0, 0, 0, { cast: 'vesper', k: 1.5 }, { boss: 1, ai: [[2, 'v_cradle'], [1, 'v_count'], [1, 'holy_lance']] });
+  E('vesper2', 'Vesper, Crowned', 66, 108000, 200, 110, 200, 130, 46, 0, 0, 0, { boss: 'GiantSpirit', anim: 'Idle', fw: 50, fh: 50, k: 2.6, hue: 180, bright: 1.4 }, { boss: 1, ai: [[2, 'v_shards'], [1, 'v_count'], [1, 'v_mend', 'hurt'], [1, 'holy_lance']] });
   E('vesper3', 'Vesper, Hollowed', 68, 140000, 220, 120, 220, 140, 48, 0, 0, 0, { boss: 'TenguBlue', anim: 'Idle', fw: 68, fh: 68, k: 2.3, hue: 200, bright: 0.7 }, { boss: 1, ai: [[2, 'v_shards'], [2, 'void_ray'], [1, 'nx_forget']] });
-  E('nyxar1', 'Nyxar, the Hollow Echo', 72, 150000, 220, 130, 240, 150, 50, 0, 0, 0, { boss: 'DragonBlue', anim: 'Head', fw: 44, fh: 46, k: 3.4, hue: 240, bright: 0.5 }, { boss: 1, ai: [[2, 'nx_grasp'], [2, 'void_ray'], [1, 'nx_forget'], [1, 'nx_hollow']] });
-  E('nyxar2', 'Nyxar, Last Memory', 75, 180000, 220, 140, 260, 160, 54, 0, 0, 0, { boss: 'SquidRed', anim: 'Idle', fw: 76, fh: 79, k: 2.3, hue: 240, bright: 0.4 }, { boss: 1, ai: 'nyxar' });
+  E('nyxar1', 'Nyxar, the Hollow Echo', 72, 130000, 220, 130, 240, 150, 50, 0, 0, 0, { boss: 'DragonBlue', anim: 'Head', fw: 44, fh: 46, k: 3.4, hue: 240, bright: 0.5 }, { boss: 1, ai: [[2, 'nx_grasp'], [2, 'void_ray'], [1, 'nx_forget'], [1, 'nx_hollow']] });
+  E('nyxar2', 'Nyxar, Last Memory', 75, 160000, 220, 140, 260, 160, 54, 0, 0, 0, { boss: 'SquidRed', anim: 'Idle', fw: 76, fh: 79, k: 2.3, hue: 240, bright: 0.4 }, { boss: 1, ai: 'nyxar' });
   AE.AI.nyxar = function (f, B) { const v = f.ai.vars; v.t = (v.t || 0) + 1; if (v.t % 5 === 0) return AE.mkAct(f, B, 'nx_end'); if (v.t % 3 === 0) return AE.mkAct(f, B, 'nx_hollow'); return AE.mkAct(f, B, ['nx_grasp', 'void_ray', 'nx_forget'][AE.rand(3)]); };
   // ---------- encounter tables ----------
   const T = function (bg, sets) { return { bg: bg, sets: sets.map(function (x) { return { enemies: x[0], w: x[1] || 1, unless: x[2] }; }) }; };

@@ -167,3 +167,24 @@
     return play0.apply(this, arguments);
   };
 })();
+// saves made while money was broken (it became "NaN" after battles): give back a fair amount
+(function () {
+  const ld = AE.loadSlot;
+  AE.loadSlot = function (n) {
+    const r = ld.apply(this, arguments), S = AE.S_;
+    if (r && S && (typeof S.gold !== 'number' || !isFinite(S.gold))) { S.gold = 500 + 2500 * Math.max(0, (S.chapter || 1) - 1) * (S.chapter || 1); }
+    if (S) delete S.Gil;
+    return r;
+  };
+})();
+// fairness: no single enemy blow takes more than three-quarters of a full-health member's HP (gravity aside)
+(function () {
+  const pf = AE.Battle.prototype.perform;
+  AE.Battle.prototype.perform = function (act) { this._act = act; return pf.apply(this, arguments); };
+  const h0 = AE.Battle.prototype.hurt;
+  AE.Battle.prototype.hurt = function (f, d, o) {
+    const A = this._act, K = A && A.id && (AE.SKILLS[A.id] || AE.SPELLS[A.id]);
+    if (f.side === 'party' && d > 0 && A && A.user && A.user.side === 'enemy' && !(K && K.kind === 'gravity')) d = Math.min(d, Math.ceil(f.maxhp * 0.75));
+    return h0.call(this, f, d, o);
+  };
+})();

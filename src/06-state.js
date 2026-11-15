@@ -3,7 +3,7 @@
    Stats at a level come from each character's base and growth; gear and Prisms add to them. */
 AE.newState = function () {
   return {
-    v: 1, playing: false, time: 0, steps: 0, chapter: 1, Gil: 300,
+    v: 1, playing: false, time: 0, steps: 0, chapter: 1, gold: 300,
     party: ['kael'], reserve: [], m: {}, inv: {}, prisms: [], flags: {}, chests: {}, cards: {},
     map: 'start', x: 0, y: 0, dir: 2, world: null, vehicles: {}, talon: { owned: [] },
     cfg: { atb: 'wait', speed: 3, text: 2, win: null, autorun: false, music: 1, cursor: 'reset' },

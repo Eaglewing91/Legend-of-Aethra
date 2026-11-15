@@ -46,7 +46,7 @@
   K('gorr_quake', { name: 'Stomp', kind: 'mag', power: 6.5, elem: 'earth', all: 1, fx: 'quake' });
   K('brute_girder', { name: 'Girder Swing', kind: 'phys', power: 1.25, fx: 'boom', all: 1 });
   K('brute_slam', { name: 'Slam', kind: 'phys', power: 2.2, fx: 'boom' });
-  K('h0_scream', { name: 'Hollow Scream', kind: 'mag', power: 6, elem: 'dark', status: ['confuse'], hit: 25, all: 1, fx: 'dark' });
+  K('h0_scream', { name: 'Hollow Scream', kind: 'mag', power: 6, elem: 'dark', status: ['confuse'], hit: 15, all: 1, fx: 'dark' });
   K('h0_grasp', { name: 'Grasp', kind: 'phys', power: 1.6, drain: 1, fx: 'claw' });
   K('h0_flow', { name: 'Aether Surge', kind: 'mag', power: 10, fx: 'spark' });
   K('h0_mend', { name: 'Regrowth', kind: 'heal', power: 30, target: 'self', fx: 'heal' });

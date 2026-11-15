@@ -76,6 +76,12 @@
     await sayAs('MARLO', 'You look rough. Here, field kit. Patch yourselves up.');
     AE.healAll(); AE.Sfx.play('heal'); await AE.notice('The party is fully healed.');
   };
+  // the first floor inside: the valve puzzle, explained
+  EV['enter:r4_1'] = async function () {
+    if (F().r4_1_hint || F().r4_valves1) return; cs.flag('r4_1_hint');
+    await s('sable', 'Intake level. The stairs down are on the east side, behind a pressure seal.');
+    await s('sable', 'Three valve wheels in the side rooms hold it shut. Turn all three and it opens. Look for the gold arrows.');
+  };
   // the shutter in the Pressure Hall: Lyra's voice on the intercom
   EV.a1_r4_door = async function () {
     await AE.say('A security shutter blocks the stairs. A speaker grille crackles beside it.');

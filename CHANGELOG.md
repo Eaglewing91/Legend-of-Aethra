@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.4 — 2026-11-15
+
+- Switch puzzles (valves, levers, terminals, runes, crystals, orbs) in every dungeon: each switch you still need to use has a gold arrow and a glow over it, so they are easy to find. The arrow goes once it is used.
+- Reactor 4, Intake: Sable explains the valve puzzle when you arrive.
+
 ## 1.0.3 — 2026-11-15
 
 - Examining things: facing an object (a console, a bed, a mural, a lock) now works when its examine spot is the floor beside it, everywhere in the game, not just at Reactor 4.

@@ -328,7 +328,7 @@ AE.World.prototype.draw = function (ctx) {
     const t = D.t[ty * D.w + tx];
     if ((t === 4 || t === 15) && ((tx * 7 + ty * 3) % 2 === 0)) { const p = proj(tx + 0.3 + ((tx * 13 + ty) % 5) * 0.1, ty + 0.5); if (p && p.y > hz && seen(p, 12 * p.k)) items.push({ p: p, kind: t === 15 ? 'jtree' : 'tree', tx: tx, ty: ty }); }
   }
-  for (const k in D.places) { const q = D.places[k]; if (q.hidden && !AE.S_.flags['found_' + k]) continue; const p = proj(q[0] + 0.5, q[1] + 0.5); if (p && seen(p, 30 * Math.min(2.2, p.k * 1.4))) items.push({ p: p, kind: 'place', place: k, q: q }); }
+  for (const k in D.places) { const q = D.places[k]; if (AE.placeVisible ? !AE.placeVisible(k) : (q.hidden && !AE.S_.flags['found_' + k])) continue; const p = proj(q[0] + 0.5, q[1] + 0.5); if (p && seen(p, 30 * Math.min(2.2, p.k * 1.4))) items.push({ p: p, kind: 'place', place: k, q: q }); }
   const V = AE.S_.vehicles;
   for (const k in V) { const q = V[k]; if (q && q.have && q.x > 0) { const p = proj(q.x + 0.5, q.y + 0.5); if (p && seen(p, 10)) items.push({ p: p, kind: 'veh', v: k }); } }
   this._pv = { PY: hz + (camH - pH) * focal / back, tile: S * focal / back };

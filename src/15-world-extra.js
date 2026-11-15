@@ -103,13 +103,13 @@
     ctx.strokeStyle = '#fff'; ctx.strokeRect(x0 - 0.5, y0 - 0.5, mw + 1, mh + 1);
     AE.text(ctx, 'World of Aethra', W / 2, 4, '#ffe080', { align: 'center' });
     const sx = mw / D.w, sy = mh / D.h, S = AE.S_;
-    for (const k in D.places) { const q = D.places[k]; if (q.hidden && !S.flags['found_' + k]) continue; ctx.fillStyle = '#fff'; ctx.fillRect(x0 + q[0] * sx - 1, y0 + q[1] * sy - 1, 2, 2); }
+    for (const k in D.places) { const q = D.places[k]; if (AE.placeVisible ? !AE.placeVisible(k) : (q.hidden && !S.flags['found_' + k])) continue; ctx.fillStyle = '#fff'; ctx.fillRect(x0 + q[0] * sx - 1, y0 + q[1] * sy - 1, 2, 2); }
     const V = S.vehicles || {};
     for (const k in V) { const q = V[k]; if (q && q.have && q.x > 0) { ctx.fillStyle = { airship: '#ffd060', boat: '#a0d0ff', sub: '#60a0ff', skimmer: '#ff8060', talon: '#ffe080', gtalon: '#fff0a0' }[k] || '#fff'; ctx.fillRect(x0 + q.x * sx - 1.5, y0 + q.y * sy - 1.5, 3, 3); } }
     const px = x0 + w.x * sx, py = y0 + w.y * sy, on = AE.game.frame % 30 < 18;
     ctx.fillStyle = on ? '#ff3030' : '#fff'; ctx.beginPath(); ctx.arc(px, py, 2.5, 0, 7); ctx.fill();
     ctx.strokeStyle = '#ff3030'; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.sin(w.ang) * 7, py - Math.cos(w.ang) * 7); ctx.stroke();
-    const near = Object.keys(D.places).map(function (k) { const q = D.places[k]; return [Math.hypot(q[0] - w.x, q[1] - w.y), q[6]]; }).sort(function (a, b) { return a[0] - b[0]; })[0];
+    const near = Object.keys(D.places).filter(function (k) { return AE.placeVisible ? AE.placeVisible(k) : true; }).map(function (k) { const q = D.places[k]; return [Math.hypot(q[0] - w.x, q[1] - w.y), q[6]]; }).sort(function (a, b) { return a[0] - b[0]; })[0];
     if (near) AE.text(ctx, 'Nearest: ' + near[1], W / 2, H - 14, '#fff', { align: 'center' });
   };
 })();

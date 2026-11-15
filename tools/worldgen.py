@@ -191,6 +191,26 @@ def gold_isle(cx, cy, r):
             put(x, y, T['forest'] if math.hypot(x - cx, (y - cy) * 0.8) < r - 2.2 else T['mount'])
     put(cx, cy, T['forest'])
 gold_isle(150, 88, 5); gold_isle(12, 170, 5)
+# ---------- secret places (hidden on every map until found) ----------
+def vault(cx, cy, r):
+    """A valley sealed by cliffs, on land: forest inside, mountains round it. Only the Gold Talonbird climbs in."""
+    for y in range(cy - r - 2, cy + r + 3):
+        for x in range(cx - r - 2, cx + r + 3):
+            d = math.hypot(x - cx, y - cy)
+            if d < r - 1.6: put(x, y, T['forest'])
+            elif d < r + 1.2: put(x, y, T['mount'])
+    put(cx, cy, T['forest'])
+vault(20, 118, 5)                                                            # the Gold Talonbird's hidden valley
+ring(224, 27, 2.5, 6, T['snowmount'], T['snow'], 7)                          # a peak only the airship can land on
+for y in range(176, 186):                                                     # a deep hole in the south-west sea
+    for x in range(56, 66):
+        if at(x, y) in (T['sea'], T['shallow'], T['deep']):
+            d = math.hypot(x - 61, y - 181); put(x, y, T['deep'] if d < 2.6 else T['sea'] if d < 4.6 else at(x, y))
+for (px, py, t) in [(58, 70, 'grass'), (46, 80, 'forest'), (230, 152, 'desert'), (170, 183, 'beach'), (158, 44, 'snow')]:
+    for yy in range(py - 1, py + 2):
+        for xx in range(px - 1, px + 2):
+            if at(xx, yy) in (T['sea'], T['shallow'], T['deep'], T['mount'], T['snowmount'], T['river']): put(xx, yy, T[t])
+    put(px, py, T[t])
 def path(a, b, cost):
     """Cheapest route a -> b; cost(tile) is None where it cannot go."""
     dist = {a: 0}; prev = {}; q = [(0, a)]
@@ -227,8 +247,8 @@ for (px, py) in PLACE_XY:
     if at(px, py) not in FOOT and (px, py) not in STAND: put(px, py, T['desert'] if at(px, py) == T['mesa'] else T['hills'] if at(px, py) == T['mount'] else T['grass'])
 for yy in (133, 134):                 # the foot of the Gilded Spire, where the Skimmer is left
     for xx in (35, 36, 37): put(xx, yy, T['desert'])
-for k in [(104, 84), (116, 70), (98, 120), (89, 76), (120, 54), (36, 132), (132, 110), (73, 144), (91, 104), (83, 91)]: walkable((70, 100), k)
-for k in [(195, 155), (178, 146), (225, 168), (212, 142), (222, 128), (150, 132), (200, 165)]: walkable((157, 120), k)
+for k in [(104, 84), (116, 70), (98, 120), (89, 76), (120, 54), (36, 132), (132, 110), (73, 144), (91, 104), (83, 91), (58, 70), (46, 80)]: walkable((70, 100), k)
+for k in [(195, 155), (178, 146), (225, 168), (212, 142), (222, 128), (150, 132), (200, 165), (230, 152), (170, 183)]: walkable((157, 120), k)
 def gold_cost(t): return None if t == T['lava'] else 4 if t == T['deep'] else 1
 for k in [(150, 88), (12, 170)]:                 # a run of shoals the Gold Talonbird can wade along from Plumage Isle
     for (x, y) in path((30, 82), k, gold_cost) or []:
@@ -282,7 +302,17 @@ PLACES = {
     'refinery': (200, 165, 'refinery_1', 0, 0, 'tower', 'Aurex Sand Refinery'),
     'outpost': (130, 30, 'outpost_1', 0, 0, 'tower', 'Northwatch Outpost'),
     'skyruins': (60, 30, 'skyruins_1', 0, 0, 'ruins', 'Fallen Isle'),
+    # secrets
+    'falls': (58, 70, 'sc_falls_1', 0, 0, 'cave', 'Veiled Falls'),
+    'vault': (20, 118, 'sc_vault_1', 0, 0, 'cave', 'Kingsrest Hollow'),
+    'deep_ruin': (61, 181, 'sc_deep_1', 0, 0, 'sea', 'Drowned Archive'),
+    'peak': (224, 27, 'sc_peak_1', 0, 0, 'shrine', 'Skyward Peak'),
+    'oasis': (230, 152, 'sc_oasis', 0, 0, 'village', 'Moonwell Oasis'),
+    'graveyard': (46, 80, 'sc_graves', 0, 0, 'ruins', 'Forgotten Graves'),
+    'hidden_cove': (170, 183, 'sc_cove', 0, 0, 'cave', 'Rumrunners\' Cove'),
+    'star_cabin': (158, 44, 'sc_cabin', 0, 0, 'hut', 'Stargazer\'s Cabin'),
 }
+SECRETS = ['falls', 'vault', 'deep_ruin', 'peak', 'oasis', 'graveyard', 'hidden_cove', 'star_cabin']
 # encounter regions: a coarse grid (16 x 16 tiles per cell) of encounter groups by area
 REG = {}
 def region(x0, y0, x1, y1, name):
@@ -296,7 +326,7 @@ VEHICLES = {'talon': None, 'skimmer': (190, 152), 'boat': dock((134, 112), {T['s
 def main():
     os.makedirs('build', exist_ok=True)
     flat = [g[y][x] for y in range(H) for x in range(W)]
-    json.dump({'w': W, 'h': H, 't': flat, 'T': T, 'places': PLACES, 'reg': REG, 'vehicles': VEHICLES}, open('build/world.json', 'w'), separators=(',', ':'))
+    json.dump({'w': W, 'h': H, 't': flat, 'T': T, 'places': PLACES, 'reg': REG, 'vehicles': VEHICLES, 'secrets': SECRETS}, open('build/world.json', 'w'), separators=(',', ':'))
     # preview
     try:
         from PIL import Image

@@ -40,10 +40,16 @@ for k in ('sunscar', 'sunruins', 'orin', 'dunewreck', 'cinder', 'refinery', 'smu
 if (P['coral'][0], P['coral'][1]) not in sub_sea: problems.append('coral trench not reachable by sub')
 for k in ('frostgate', 'deeproot', 'outpost', 'abyss', 'talon_isle', 'trial_gale', 'trial_frost', 'trial_storm', 'wreck_isle', 'skyruins', 'lumen'): need(k, air, 'by airship')
 for k in ('crater', 'skyruins', 'lumen'): deny(k, boat_land | talon_foot, 'by boat or Talonbird')
+for k in ('falls', 'graveyard'): need(k, home, 'on foot from Halcyon')
+for k in ('oasis', 'hidden_cove'): need(k, sol, 'on foot from Saltmere')
+for k in ('peak', 'star_cabin'): need(k, air, 'by airship')
+deny('peak', boat_land | talon_foot, 'by boat or Talonbird')
+if (P['deep_ruin'][0], P['deep_ruin'][1]) not in sub_sea or at(P['deep_ruin'][0], P['deep_ruin'][1]) != 22: problems.append('deep_ruin not a deep tile the sub can reach')
+deny('vault', air | boat_land | talon_foot, 'except by Gold Talonbird'); need('vault', gt, 'by Gold Talonbird')
 for k in ('chapel', 'hermit'): deny(k, air | boat_land, 'except by Gold Talonbird'); need(k, gt, 'by Gold Talonbird')
 for v, (x, y) in [(k, v) for k, v in D['vehicles'].items() if v]:
     if at(x, y) not in FOOT: problems.append('vehicle %s at %s is not on dry land' % (v, (x, y)))
     if v in ('boat', 'sub') and not any(at(*c) in WALK[v] for c in near((x, y))): problems.append('vehicle %s at %s has no water' % (v, (x, y)))
 for k, p in P.items():
-    if at(p[0], p[1]) not in FOOT and k not in ('coral', 'crater'): problems.append('%s sits on terrain %d' % (k, at(p[0], p[1])))
+    if at(p[0], p[1]) not in FOOT and k not in ('coral', 'crater', 'deep_ruin'): problems.append('%s sits on terrain %d' % (k, at(p[0], p[1])))
 print('\n'.join(problems) or 'world OK'); sys.exit(1 if problems else 0)

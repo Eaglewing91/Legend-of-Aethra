@@ -234,6 +234,11 @@
     const n = (e && e.n) || 1;
     const team = { 1: ['bram', 'sable'], 3: ['orin', 'rook'], 5: ['ember', 'vesna'] }[n].filter(function (p) { return AE.S_.m[p]; });
     if (team.length) await AE.say(team.map(function (p) { return AE.CHARS[p].name; }).join(' and ') + ' hold the gate guardians back while you throw the switch.');
+    const GATE = {
+      1: [['bram', 'BRAM', 'Go on, lad. I held a reactor door with my back once. I can hold this.'], ['sable', 'SABLE', 'And I\'ll pick the lock on the next one while he\'s busy being heroic.']],
+      3: [['orin', 'ORIN', 'Go. I have one lesson left to give, and I would rather give it to her than to these.'], ['rook', 'ROOK', 'Archive note: Rook held the west gate. Please make sure that sentence remains true.']],
+      5: [['ember', 'EMBER', 'The Echoes are with me. All of them. Go and find the throne. I\'ll be right behind you.'], ['vesna', 'VESNA', 'Seven years I ran from her. Not today. Move, Seven.']] }[n] || [];
+    for (const g of GATE) if (AE.S_.m[g[0]]) await sayAs(g[1], g[2]);
     await cs.battle(['voidknight', 'choirguard', 'voidknight'], { bg: 'citadel', noRun: 1 });
     AE.Sfx.play('door'); cs.flag('cit_gate' + n); await AE.notice('A gate on the Throne Stair opens.');
   };
@@ -244,6 +249,9 @@
     await s('kael', 'Everybody frozen. Nothing ever changing. That isn\'t remembering, Vesper. That\'s a museum.');
     if (inP('sable')) await s('sable', 'Vesp. Stop counting. Please. He\'s not coming back. The real one. He\'s not.');
     await sayAs('VESPER', 'Sable... little Sable. You always did say the cruellest true things.');
+    if (inP('orin')) { await sayAs('ORIN', 'Did you ask it, Vesper? A question only they would know?'); await sayAs('VESPER', '...It said I didn\'t need to ask. It said I already knew.'); }
+    if (inP('vesna')) await sayAs('VESNA', 'Vessel Two asked for its mother. You wrote down the time. You remember? Because I do. Every night.');
+    if (F().a5_drago_joins) await sayAs('DRAGO', 'You used Corvin. You used me. You used a boy you built in a tank. Is there anyone left you haven\'t used?');
     await sayAs('VESPER', 'No. NO. I can fix it. The voice promised me.');
     await cs.battle(['vesper1'], { bg: 'citadel', boss: 1, noRun: 1 });
     await sayAs('VESPER', 'The Shards... take them... make me MORE.');
@@ -253,6 +261,10 @@
     cs.flag('a5_vesper'); cs.remove('vesper');
     await AE.say('Vesper falls to her knees, the Shards dark and cracked around her. For a moment she is sixteen again, burned to the wrists.');
     await sayAs('VESPER', 'Kael... I counted you to sleep. Every night. One, two, three... I\'m sorry. I\'m so sorry. It isn\'t her voice. It never was her voice.');
+    await s('kael', 'You counted me to sleep. You also taught me to walk, in the tank room, holding both my hands. I remember that too. Both things are true.');
+    await sayAs('VESPER', 'Why... why would you remember that?');
+    await s('kael', 'Because it\'s mine. Not his. Mine. Get up, Vesper. Come and help us finish it.');
+    if (inP('orin')) await sayAs('ORIN', 'Take my hand, child. You are late for a lesson. The last one: what to do after you have been wrong.');
     await AE.say('The floor of the throne room opens like an eye. Below it, the Aetherflow, and something vast and hollow rising through it.');
     await cs.warp('aetherflow', 19, 35, 0);
   };
@@ -264,6 +276,11 @@
     await s('kael', 'Everyone who ever lived is in this river. You don\'t get to be the only one.');
     await cs.battle(['nyxar1'], { bg: 'underwater', boss: 1, noRun: 1 });
     await sayAs('NYXAR', 'THEN I WILL BE THE LAST.');
+    await AE.say('The river darkens. The party\'s strength drains into it like water into sand. And then, from somewhere above, a voice. Steady. Counting.');
+    await sayAs('VESPER', 'One. Two. Three. ...Not to sleep, Kael. Not this time. Wake up. All of you, wake up.');
+    await sayAs('VESPER', 'I gave it a door into the world. Let me be the one who holds it shut. Go.');
+    AE.healAll();
+    if (inP('lyra')) await s('lyra', 'She\'s singing. Kael, Vesper\'s singing with the Chorus!');
     await cs.battle(['nyxar2'], { bg: 'underwater', boss: 1, noRun: 1 });
     cs.flag('a5_end'); await EV.ending();
   };
@@ -272,10 +289,19 @@
     await cs.narrate(['Nyxar came apart like smoke.', 'And in the river of memory, Lyra Vale began to sing.', 'One by one, the voices of the Chorus joined her: every singer who had ever lived, rising out of the Aetherflow.',
       'The song held the sky, as it had held it once before. The cracks closed. The red light faded.', 'The Crystals did not come back. Their memory was in the song now, and the song was everywhere.',
       'Without them, the reactors of Aurex Dynamics went dark, one by one. Halcyon\'s plate came down in pieces. For the first time in forty years, the Sumps saw the sky.',
-      'The world had to learn to live without the Crystals\' light. It was hard. It was worth it.', 'Bram Hollis went back to Thornbrook and built a new mill, with a red roof.',
-      'Sable and Mother Ilse took in every child the Sundering had orphaned.', 'Orin Thale wrote the history of the Chorus, and put his student\'s name in it, with kindness.',
-      'Vesper Lune was never found. Sometimes, in Lumen, the bells ring at night in a careful rhythm. One, two, three.',
-      'And in Thornbrook, beside the memorial stone with a dead boy\'s name on it, a young man and a young woman planted a bed of crystal-moss.', 'He had chosen his own name by then. It was a good one.']);
+      'The world had to learn to live without the Crystals\' light. It was hard. It was worth it.']);
+    const ep = [];
+    ep.push('Corvin Aurex resigned on the morning the last reactor died. Nobody stopped him leaving. Nobody much noticed.');
+    if (inP('bram')) ep.push('Bram Hollis went back to Thornbrook and built a new mill, with a red roof. Then he built Mother Ilse a new roof. Then everybody else\'s.');
+    if (inP('sable')) ep.push('Sable and Mother Ilse took in every child the Sundering had orphaned. Sable taught them cards. Mother Ilse taught them to lose gracefully.');
+    if (inP('orin')) ep.push('Orin Thale wrote the history of the Chorus, and put his student\'s name in it, with kindness. The last chapter is called "What To Do After You Have Been Wrong".');
+    if (inP('ember')) ep.push('Ember went home to Lumen. The Elders made a fuss. She let them. On the first night, she slept without hearing any voice at all.');
+    if (inP('rook')) ep.push('Rook opened an archive in the Academy library. Anyone may visit. The first shelf is labelled "The ones who went back".');
+    if (inP('vesna')) ep.push('Vesna hung up her rifle over the Sunscar inn\'s bar and never took it down. She still drinks. Less.');
+    if (F().a5_drago_joins) ep.push('Drago Venn turned down command of what was left of the Aurex army. He runs a ferry now, between Port Lark and Saltmere. The fish came back.');
+    ep.push('Vesper Lune was never found. Sometimes, in Lumen, the bells ring at night in a careful rhythm. One, two, three. Never to sleep. Always to wake.');
+    ep.push('And in Thornbrook, beside the memorial stone with a dead boy\'s name on it, a young man and a young woman planted a bed of crystal-moss.', 'He had chosen his own name by then. It was a good one.');
+    await cs.narrate(ep);
     await cs.title('LEGEND OF AETHRA', 'THE END', 300);
     await cs.narrate(['Created for Torn Arcade.', 'Art: Seliel the Shaper (Mana Seed characters), Pixel-boy and AAA (Ninja Adventure).', 'Thank you for playing.']);
     AE.S_.flags.cleared = 1; AE.S_.cleared = (AE.S_.cleared || 0) + 1;

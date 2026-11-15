@@ -209,11 +209,27 @@
     await sayAs('VESPER', '...No? Oh, bright boy. You saw the memory, didn\'t you. The fire. You think you understand me now.');
     await sayAs('VESPER', 'I don\'t need you to carry this one. I only needed you to break the guardian.');
     await AE.say('The shard lifts from the dead crystal and floats to her hand.');
-    await sayAs('VESPER', 'Three. One more, in the north, under the roots of the world. Come to the Deeproot when you\'re ready, Kael. You always come.');
-    cs.remove('vesper');
-    if (inP('orin')) await sayAs('ORIN', 'Vesper! VESPER! ...She didn\'t even look at me.');
+    if (inP('orin')) {
+      await sayAs('ORIN', 'Vesper.');
+      await sayAs('VESPER', '...Professor. You got old.');
+      await sayAs('ORIN', 'I did. You did not get to. I am sorry for that. I am sorry I gave you the key to the Lumen archive and never asked what door you meant to open.');
+      await sayAs('VESPER', 'Don\'t. Don\'t you dare be kind to me. You don\'t know what it\'s like, hearing them every night. My mother. My sister. Calling from the river.');
+      await sayAs('ORIN', 'Is it them? Truly? Have you ever once asked it a question only they would know?');
+      await AE.say('For a heartbeat, Vesper says nothing. The shard trembles in her hand.');
+      await sayAs('VESPER', '...Three. One more, in the north, under the roots of the world. Come to the Deeproot when you\'re ready, Kael. You always come.');
+      cs.remove('vesper');
+      await sayAs('ORIN', 'She heard me. Whatever she tells herself, she heard me.');
+    } else {
+      await sayAs('VESPER', 'Three. One more, in the north, under the roots of the world. Come to the Deeproot when you\'re ready, Kael. You always come.');
+      cs.remove('vesper');
+    }
     await AE.game.fadeOut(0.04);
-    await cs.narrate(['At the foot of Mount Cinder, in an abandoned Aurex hangar, the party found the Skylark.', 'Rook fitted the Engine Core into her heart. She shook, coughed smoke, and flew.']);
+    await cs.narrate(['At the foot of Mount Cinder, in an abandoned Aurex hangar, the party found the Skylark.', 'Rook fitted the Engine Core into her heart. She shook, coughed smoke, and flew.',
+      'That night she hung above the clouds, engines ticking as they cooled, and the party sat on her deck with their legs over the side.']);
+    if (inP('sable')) await s('sable', 'A real airship. Kestra\'s going to die of jealousy. I\'m going to fly over the Grotto very slowly. Twice.');
+    if (inP('rook')) await sayAs('ROOK', 'The Skylark was built to carry Cradle researchers between the Crystal sites. Now it carries the people stopping them. I find that... satisfying. Is that the word?');
+    if (inP('lyra')) await s('lyra', 'Look. You can see the whole coast from up here. Every town we walked through. They look so small.');
+    await s('kael', 'They\'re not small. They\'re just far away. That\'s why we have to keep moving.');
     await cs.title('END OF ACT III', 'SOLMARA', 180);
     cs.flag('a3_done'); cs.chapter(4);
     const q = (AE.WORLD.vehicles && AE.WORLD.vehicles.airship) || AE.landNear(212, 146); AE.S_.vehicles.airship = { x: q[0], y: q[1], have: 1 };

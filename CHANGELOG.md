@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.9 — 2026-11-15
+
+- Stairs and doors you could not walk to are fixed, everywhere: the stairs in the Sumps house (a bed blocked the way into the back room), the cellar stairs in the Thorn & Kettle and the Anchor inns (a prop stood in the doorway), and five more that the 1.0.5 prop clean-up had cut off: the Spire Exchange cellar, the Gale Inn upstairs, Old Mine (down to the Deep Vein), Orin's Tower (up to Floor 3) and the Sky Citadel gate.
+- New check (tools/check_warps.py): every door and stairs in the game can be walked onto from where you arrive.
+
 ## 1.0.8 — 2026-11-15
 
 - Townspeople repeat what they have to say: talking to someone again plays their whole conversation again (before, each talk moved on one line and then only the last line repeated).

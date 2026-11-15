@@ -20,10 +20,10 @@ def main():
         if hasattr(mod, 'patch'): mod.patch(maps)
     # shaped rooms: make sure every spot something stands on or arrives at is floor
     import re, _gen
-    arr = {}
+    arr = {}; arrsrc = {}
     for m in maps.values():
         for w in m.warps:
-            if w['to'] in maps: arr.setdefault(w['to'], []).append((w['tx'], w['ty']))
+            if w['to'] in maps: arr.setdefault(w['to'], []).append((w['tx'], w['ty'])); arrsrc.setdefault(w['to'], []).append((m.id, w['tx'], w['ty']))
     for f in glob.glob(os.path.join(os.path.dirname(__file__), '..', 'src', '**', '*.js'), recursive=True):
         for mid, x, y in re.findall(r"warp\('(\w+)',\s*(\d+),\s*(\d+)", open(f).read()): arr.setdefault(mid, []).append((int(x), int(y)))
     for m in maps.values():
@@ -70,9 +70,9 @@ def main():
         cand = [i for i in range(W * H) if col[i] == 0 and L['over'][i] >= 0 and i + W < W * H and col[i + W] == 1 and L['deco'][i + W] >= 0
                 and i - W >= 0 and col[i - W] == 1 and L['deco'][i - W] < 0 and (i % W, i // W) not in keep]
         if not cand: continue
-        def reach():
+        def reach(st=None):
             seen = set(); q = deque()
-            for (x, y) in starts:
+            for (x, y) in (st if st is not None else starts):
                 if 0 <= x < W and 0 <= y < H and col[y * W + x] in (0, 6, 8): seen.add((x, y)); q.append((x, y))
             while q:
                 x, y = q.popleft()
@@ -80,7 +80,19 @@ def main():
                     X, Y = x + dx, y + dy
                     if 0 <= X < W and 0 <= Y < H and (X, Y) not in seen and col[Y * W + X] in (0, 6, 8): seen.add((X, Y)); q.append((X, Y))
             return seen
-        def score(seen): return sum(1 for (x, y) in keep if (x, y) in seen or any((x + dx, y + dy) in seen for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))))
+        wset = {(w['x'], w['y']) for w in d['warps']}
+        tset = {(e['x'] + i, e['y'] + j) for e in d['events'] if e['touch'] for i in range(e['w']) for j in range(e['h'])}
+        # doors, stairs and step-on events must be stood on; everything else only needs a tile beside it
+        def score0(seen): return sum(1 for (x, y) in keep if (x, y) not in wset and ((x, y) in seen or ((x, y) not in tset and any((x + dx, y + dy) in seen for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))))))
+        # a door or stairs counts only if you can walk onto it without arriving through it (from the map it leads to)
+        scripted = [p for p in arr.get(k, []) if p not in [(a[1], a[2]) for a in arrsrc.get(k, [])]]
+        dests = sorted({w['to'] for w in d['warps']})
+        def score(seen):
+            n = score0(seen)
+            for T in dests:
+                st = [tuple(d['entry'])] + scripted + [(a[1], a[2]) for a in arrsrc.get(k, []) if a[0] != T]
+                sT = reach(st); n += sum(1 for w in d['warps'] if w['to'] == T and (w['x'], w['y']) in sT)
+            return n
         base = score(reach())
         for i in cand:
             col[i] = 1
@@ -140,6 +152,40 @@ def main():
                 if Y + j >= H or col[t] != 1 or L['deco'][t] < 0: break
                 L['deco'][t] = -1; L['over'][t] = -1; col[t] = 0
             cleared += 1
+    # doors and stairs you could never walk to (a prop stands in the only doorway): take that prop away
+    opened = 0
+    for k, d in out.items():
+        W, H, col, L = d['w'], d['h'], d['col'], d['layers']
+        scripted = [p for p in arr.get(k, []) if p not in [(a[1], a[2]) for a in arrsrc.get(k, [])]]
+        def reach2(st):
+            seen = set(); q = deque()
+            for (x, y) in st:
+                if 0 <= x < W and 0 <= y < H and col[y * W + x] in (0, 6, 8): seen.add((x, y)); q.append((x, y))
+            while q:
+                x, y = q.popleft()
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    X, Y = x + dx, y + dy
+                    if 0 <= X < W and 0 <= Y < H and (X, Y) not in seen and col[Y * W + X] in (0, 6, 8): seen.add((X, Y)); q.append((X, Y))
+            return seen
+        for w in d['warps']:
+            st = [tuple(d['entry'])] + scripted + [(a[1], a[2]) for a in arrsrc.get(k, []) if a[0] != w['to']]
+            if (w['x'], w['y']) in reach2(st): continue
+            def lone(i): return not any(0 <= i + o < W * H and col[i + o] == 1 and L['deco'][i + o] >= 0 and L['wall'][i + o] < 0 for o in (-1, 1))
+            cands = sorted([i for i in range(W * H) if col[i] == 1 and L['wall'][i] < 0], key=lambda i: (not lone(i), i))
+            for i in cands:
+                col[i] = 0
+                if (w['x'], w['y']) in reach2(st):
+                    L['deco'][i] = -1; L['over'][i] = -1; opened += 1
+                    for dy in (-1, 1):   # the rest of a tall prop (a bed, a shelf) in the same column
+                        for j in range(1, 4):
+                            t = i + dy * j * W
+                            if not (0 <= t < W * H) or L['wall'][t] >= 0 or (L['deco'][t] < 0 and L['over'][t] < 0) or col[t] not in (0, 1): break
+                            if col[t] == 0 and L['over'][t] >= 0: L['over'][t] = -1; break
+                            if col[t] != 1: break
+                            L['deco'][t] = -1; L['over'][t] = -1; col[t] = 0
+                    break
+                col[i] = 1
+    print('props taken out of doorways: %d' % opened)
     # fewer chests (FF7 hands out far less): at most one chest of consumables or gold per map (the most valuable is
     # kept), and only a few of the rarest items in the whole game (the latest ones are kept)
     COMMON = {'potion', 'hi_potion', 'ether', 'antidote', 'eye_drops', 'echo_screen', 'grenade', 'phoenix_down', 'remedy', 'glowcap', 'soft',

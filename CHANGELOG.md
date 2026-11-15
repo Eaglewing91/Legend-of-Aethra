@@ -1,5 +1,12 @@
 # Legend of Aethra changelog
 
+## 1.0.6 — 2026-11-15
+
+- After the first boss (Bulwark), the escape no longer starts with the camera stuck on empty space: the camera now always comes back to you when a cutscene ends or you change map. Saves made on the stuck screen load normally.
+- Reactor 4, Pressure Hall: the chest above the stairs down (you could only reach it by stepping on the stairs) has moved to free floor beside the other chests.
+- Reactor 4, Condenser Deck: the way to the core is now proper stairs down in the cross-shaped room, not an invisible trigger across a corridor.
+- Any chest that could only be reached from stairs or a door has been moved to free floor.
+
 ## 1.0.5 — 2026-11-15
 
 - **FF7-style numbers.** HP and MP now grow by Final Fantasy VII's own tables (Kael grows like Cloud, Bram like Barret, Lyra like Aeris, Sable like Yuffie, and so on): about 200 HP at Lv 1, 300 at Lv 6, 760 at Lv 20, 3,650 at Lv 50 and 9,400 at Lv 99. Strength, Vitality, Magic and Spirit follow FF7's curve too. Enemy HP and damage are scaled to match, so battles take about as long and hit about as hard as before (checked with a full simulated playthrough: every story battle won).

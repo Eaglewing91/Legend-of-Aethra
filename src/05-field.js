@@ -35,6 +35,7 @@ AE.Field = function (mapId, x, y, dir) {
   this.load(mapId, x, y, dir);
 };
 AE.Field.prototype.load = function (mapId, x, y, dir) {
+  this.camLock = false;   // a new map: the camera follows the player again (a cutscene may have panned it away)
   const S = AE.S_;
   this.map = new AE.Map(mapId); this.mapId = mapId;
   S.map = mapId; S.x = x; S.y = y; S.dir = dir === undefined ? 2 : dir;
@@ -74,7 +75,10 @@ AE.Field.prototype.blocked = function (x, y, who) {
 AE.Field.prototype.run = function (id, arg) {
   const fn = AE.EV[id]; if (!fn) return Promise.resolve();
   const self = this; this.locked++;
-  return Promise.resolve().then(function () { return fn(arg || {}); }).catch(function (e) { console.error('event ' + id, e); }).then(function () { self.locked = Math.max(0, self.locked - 1); });
+  return Promise.resolve().then(function () { return fn(arg || {}); }).catch(function (e) { console.error('event ' + id, e); }).then(function () {
+    self.locked = Math.max(0, self.locked - 1);
+    if (!self.locked) self.camLock = false;   // a finished cutscene gives the camera back to the player
+  });
 };
 AE.Field.prototype.update = function (g) {
   const I = g.input, p = this.player;

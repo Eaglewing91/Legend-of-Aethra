@@ -168,11 +168,11 @@ def build():
     f2.gate('r4_door', sx - 1, sy + 1, 3, 1, tile=('dungeon', 5, 1))
     f2.event(sx - 1, sy + 2, 'a1_r4_door', 3, 1, unless='r4_door')
     savepoint(f2, q.x + 1, q.y + q.h - 2)
-    # condenser deck -> core (a door in the top wall of the last room)
-    q = i3['rooms'][-1]; cx = q.x + q.w // 2 - 1
-    door_up(f3, cx, q.y - 1, 'r4_core', 16, 26)
+    # condenser deck -> core: stairs down near the bottom of the last room (a corridor comes in at its top)
+    q = i3['rooms'][-1]; cx, cy = q.x + q.w // 2, q.y + q.h - 3
+    stairs(f3, cx, cy, 'r4_core', 16, 26, True)
     for w in core.warps:
-        if w['to'] == 'r4_3': w['tx'] = cx + (w['x'] - 16); w['ty'] = q.y + 1
+        if w['to'] == 'r4_3': w['tx'] = cx; w['ty'] = cy + 1
     savepoint(f3, q.x + 1, q.y + 1)
     # Undercurrent rebels posted on the floors (they chat, heal, and give tips)
     r = i1['rooms'][1]; f1.npc(r.x + 1, r.y + 1, 'pip', id='pip1', say=['PIP: Biggest job we ever pulled, and the doors just... open for us.', 'PIP: Someone on the inside likes us.'], still=1, if_='r4_in&!r4_boss')

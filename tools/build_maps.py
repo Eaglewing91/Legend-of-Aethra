@@ -100,7 +100,47 @@ def main():
                     if y + j >= H or L['deco'][t] < 0 or col[t] != 1: break
                     L['deco'][t] = -1; col[t] = 0
             removed += 1
-    print('prop tops made solid: %d, props removed from paths: %d' % (fixed, removed))
+    # a chest, a person or something to examine whose only way to it has a prop drawn on it (it looks blocked):
+    # take that prop away so the way in is plain floor
+    cleared = 0; moved = 0
+    for k, d in out.items():
+        W, H, col, L = d['w'], d['h'], d['col'], d['layers']
+        chests = d['chests'] if isinstance(d['chests'], dict) else {}
+        npcs = d['npcs'].values() if isinstance(d['npcs'], dict) else d['npcs']
+        tg = [tuple(map(int, c.split(','))) for c in chests] + [(n['x'], n['y']) for n in npcs if not n.get('walk')]
+        tg += [(e['x'], e['y']) for e in d['events'] if not e['touch'] and e['w'] == 1 and e['h'] == 1 and col[e['y'] * W + e['x']] not in (0, 6, 8)]
+        warps = {(w['x'], w['y']) for w in d['warps']}
+        # a chest you could only open by standing on stairs or a door: move it to the nearest free floor
+        for ck in list(chests):
+            x, y = map(int, ck.split(','))
+            nb = [(x + dx, y + dy) for dx, dy in ((0, 1), (1, 0), (-1, 0), (0, -1)) if 0 <= x + dx < W and 0 <= y + dy < H and col[(y + dy) * W + x + dx] in (0, 6, 8)]
+            if not nb or any(p not in warps for p in nb): continue
+            taken = set(tg) | warps | {(e['x'], e['y']) for e in d['events']}
+            from collections import deque as _dq
+            seen = {nb[0]}; q = _dq([nb[0]]); spot = None
+            while q and not spot:
+                cx_, cy_ = q.popleft()
+                for dx, dy in ((0, 1), (1, 0), (-1, 0), (0, -1)):
+                    X, Y = cx_ + dx, cy_ + dy
+                    if not (0 <= X < W and 0 <= Y < H) or (X, Y) in seen or col[Y * W + X] not in (0, 6, 8): continue
+                    seen.add((X, Y)); q.append((X, Y))
+                    if (X, Y) in taken or L['deco'][Y * W + X] >= 0 or L['over'][Y * W + X] >= 0: continue
+                    # against a wall, with open floor in front, and not in a 1-wide way through
+                    if Y > 0 and col[(Y - 1) * W + X] == 1 and Y + 1 < H and col[(Y + 1) * W + X] in (0, 6, 8) and (Y + 1, X) and (X - 1 >= 0 and col[Y * W + X - 1] in (0, 6, 8) or X + 1 < W and col[Y * W + X + 1] in (0, 6, 8)):
+                        spot = (X, Y); break
+            if spot:
+                v = chests.pop(ck); chests['%d,%d' % spot] = v; col[spot[1] * W + spot[0]] = 1; col[y * W + x] = 0; moved += 1
+                tg = [t for t in tg if t != (x, y)] + [spot]
+        for (x, y) in tg:
+            nb = [(x + dx, y + dy) for dx, dy in ((0, 1), (1, 0), (-1, 0), (0, -1)) if 0 <= x + dx < W and 0 <= y + dy < H and col[(y + dy) * W + x + dx] in (0, 6, 8) and (x + dx, y + dy) not in warps]
+            if not nb or any(L['deco'][Y * W + X] < 0 and L['over'][Y * W + X] < 0 for X, Y in nb): continue
+            X, Y = nb[0]; L['deco'][Y * W + X] = -1; L['over'][Y * W + X] = -1
+            for j in range(1, 4):   # the rest of a tall prop below it
+                t = (Y + j) * W + X
+                if Y + j >= H or col[t] != 1 or L['deco'][t] < 0: break
+                L['deco'][t] = -1; L['over'][t] = -1; col[t] = 0
+            cleared += 1
+    print('prop tops made solid: %d, props removed from paths: %d, props cleared from the way to chests/people: %d, chests moved off stairs: %d' % (fixed, removed, cleared, moved))
     os.makedirs('build', exist_ok=True)
     json.dump(out, open('build/maps.json', 'w'), separators=(',', ':'))
     if '--fast' not in sys.argv or not os.path.exists(os.path.join(MK.GEN, 'walls.png')):

@@ -136,7 +136,15 @@ AE.Field.prototype.interact = function () {
   if (ev.length) { this.run(ev[0].id, ev[0]); return; }
   // standing on a check spot (not a step trigger) works too, whichever way you face
   const here = this.map.eventsAt(p.x, p.y).filter(function (e) { return !e.touch && (!e.if || AE.cond(e.if)) && (!e.unless || !AE.cond(e.unless)); });
-  if (here.length) this.run(here[0].id, here[0]);
+  if (here.length) { this.run(here[0].id, here[0]); return; }
+  // facing a solid object (a console, a bed, a mural) whose examine spot is the floor beside it
+  const fx = p.x + D.x, fy = p.y + D.y, map = this.map, C = AE.C;
+  if (map.c(fx, fy) === C.OPEN || map.c(fx, fy) === C.STAIR || map.c(fx, fy) === C.SHALLOW) return;
+  const near = [[0, -1], [1, 0], [0, 1], [-1, 0]].map(function (d) { return [fx + d[0], fy + d[1]]; }).filter(function (q) { return q[0] !== p.x || q[1] !== p.y; });
+  for (let i = 0; i < near.length; i++) {
+    const es = map.eventsAt(near[i][0], near[i][1]).filter(function (e) { return !e.touch && (!e.if || AE.cond(e.if)) && (!e.unless || !AE.cond(e.unless)); });
+    if (es.length) { this.run(es[0].id, es[0]); return; }
+  }
 };
 AE.Field.prototype.talk = function (n) {
   const self = this, p = this.player, d = n.def;

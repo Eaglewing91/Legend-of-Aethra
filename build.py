@@ -7,7 +7,7 @@ Maps come from tools/maps/*.py through tools/build_maps.py. Mana Seed art (priva
 import base64, glob, json, os, subprocess, sys, io, gzip
 from PIL import Image
 
-VERSION = '1.0.2'
+VERSION = '1.0.3'
 FAST = '--fast' in sys.argv
 os.makedirs('build', exist_ok=True)
 env = dict(os.environ, PYTHONHASHSEED='0')

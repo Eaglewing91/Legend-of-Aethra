@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.3 — 2026-11-15
+
+- Examining things: facing an object (a console, a bed, a mural, a lock) now works when its examine spot is the floor beside it, everywhere in the game, not just at Reactor 4.
+- Checked every map: every examine spot, switch puzzle, sealed gate and story flag can be reached and triggered.
+
 ## 1.0.2 — 2026-11-15
 
 - The opening: the Reactor 4 gate console now works when you face it (it only answered from the floor in front of it), and Sable says where it is: the east end of the platform.

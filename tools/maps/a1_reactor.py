@@ -116,7 +116,6 @@ def build_core():
     m.warp(16, 27, 'r4_3', 0, 0, 0, 2)                 # back up (fixed below)
     m.entry = [16, 25]
     m.event(15, 9, 'a1_bulwark', 4, 1, unless='r4_boss')
-    m.event(15, 12, 'a1_core_after', 4, 1, if_='r4_boss&!r4_charge')
     m.chest(3, 12, 'hi_potion'); m.chest(31, 16, 'prism:scan')
     savepoint(m, 8, 24)
     return m

@@ -6,3 +6,4 @@ build/dev.html
 build/maps.json
 node_modules/
 __pycache__/
+*.pyc

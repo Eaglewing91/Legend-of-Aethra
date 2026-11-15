@@ -10,10 +10,10 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const here = await p.evaluate(() => new Promise(r => { document.addEventListener('aethra:here', e => r(e.detail)); document.dispatchEvent(new CustomEvent('aethra:ping')); }));
   console.log('here', here);
   await p.evaluate(() => document.dispatchEvent(new CustomEvent('aethra:open', { detail: JSON.stringify({ host: 'phone', volume: 50 }) })));
-  await p.waitForTimeout(2500); await p.screenshot({ path: process.argv[2] + '/us1.png' });
+  await p.waitForTimeout(2500); await p.screenshot({ path: (process.argv[2] || '/tmp') + '/us1.png' });
   await p.keyboard.press('KeyZ'); await p.waitForTimeout(2500);
   for (let i = 0; i < 30; i++) { await p.keyboard.press('KeyZ'); await p.waitForTimeout(150); }
-  await p.screenshot({ path: process.argv[2] + '/us2.png' });
+  await p.screenshot({ path: (process.argv[2] || '/tmp') + '/us2.png' });
   await p.evaluate(() => document.dispatchEvent(new CustomEvent('aethra:close')));
   await p.waitForTimeout(300);
   console.log('saved keys', await p.evaluate(() => Object.keys(window.ST)));

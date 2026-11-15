@@ -48,7 +48,7 @@
     await cs.together([['t1', 'U3', 2], ['t2', 'U3', 2]]);
     await sayAs('AUREX TROOPER', 'Hold it! This platform is closed to the public!');
     await s('bram', 'We\'re not the public, son.');
-    await AE.say('Battle tip: when a fighter\'s gauge fills, choose a command. Attack with your weapon, or open Magic to use a Prism\'s spells. Items heal.', { name: 'TIP' });
+    await AE.say('Battle tip: battles are turn based. The strip at the top shows whose turn is next. On your turn, choose a command. Attack with your weapon, or open Magic to use a Prism\'s spells. Items heal.', { name: 'TIP' });
     AE.setParty(['kael', 'bram', 'sable'], 1);
     AE.slotPrism('kael', 'restore'); AE.slotPrism('bram', 'bolt'); AE.slotPrism('sable', 'steal');
     const r = await cs.battle(['a_trooper', 'a_trooper'], { bg: 'reactor', noRun: 1 });

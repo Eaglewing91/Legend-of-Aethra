@@ -28,7 +28,7 @@ stolen memories, four Crystals that hold up the sky, and the woman who wants all
 - **300 maps**: towns that each have their own shape and streets, 157 interiors (many with upstairs rooms and cellars)
   and big multi-floor dungeons: Reactor 4, Aurex Tower, Mistwood, the Wind Shrine, the Coral Sanctum, Orin's Tower,
   Mount Cinder, the Deeproot, the Sky Citadel and more.
-- **Active-time battles** with Wait or Active mode, front and back rows, elements, status effects, back attacks,
+- **Turn-based battles** in Speed order, with a turn-order strip, front and back rows, elements, status effects, back attacks,
   stealing, Mimic, Surge Arts and Echo summons. 154 monsters and 52 bosses, with a Bestiary.
 - **Prisms**: slot them in weapons and armour for spells, commands and support; link them in pairs; they level up.
 - **An open 3D world map** you can cross on foot, by talonbird, skimmer, boat, submersible and the airship Skylark. Some

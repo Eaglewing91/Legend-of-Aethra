@@ -126,6 +126,7 @@ AE.Battle.prototype.draw = function (ctx) {
     const y = p.y - 6 - b, a = t > 45 ? (60 - t) / 15 : 1;
     ctx.globalAlpha = a; AE.text(ctx, p.text, p.x, y, p.col, { align: 'center' }); ctx.globalAlpha = 1;
   });
+  if (!this.banner && this.phase === 'fight') this.drawTurns(ctx);
   if (this.banner) { const w = AE.textWidth(this.banner.text) + 20; AE.window(ctx, (AE.W - w) / 2, 4, w, 18); AE.text(ctx, this.banner.text, AE.W / 2, 9, '#fff', { align: 'center' }); }
   this.drawHud(ctx);
   if (this.phase === 'win' && this.endT > 30) {
@@ -160,8 +161,7 @@ AE.Battle.prototype.drawHud = function (ctx) {
     AE.text(ctx, f.name, 100, y, active ? '#ffe080' : col);
     AE.text(ctx, f.hp + '/' + f.maxhp, 192, y, col, { align: 'right' });
     AE.text(ctx, String(f.mp), 214, y, '#9cf', { align: 'right' });
-    AE.bar(ctx, 218, y + 1, 32, 3, f.atb, ready || f.waiting ? '#ffe060' : '#e0e0e0');
-    AE.bar(ctx, 218, y + 6, 32, 2, f.surge || 0, (f.surge || 0) >= 1 ? (AE.game.frame % 20 < 10 ? '#ff60c0' : '#ffa0e0') : '#c04090');
+    AE.bar(ctx, 218, y + 3, 32, 3, f.surge || 0, (f.surge || 0) >= 1 ? (AE.game.frame % 20 < 10 ? '#ff60c0' : '#ffa0e0') : '#c04090');
     // status pips
     let px = 100; Object.keys(f.status).slice(0, 6).forEach(function (s) { const I = AE.STATUS_INFO[s]; if (!I) return; ctx.fillStyle = I.col; ctx.fillRect(px, y + 10, 4, 2); px += 5; });
   });
@@ -191,5 +191,23 @@ AE.Battle.prototype.drawMenu = function (ctx) {
       if (it.n !== undefined) AE.text(ctx, ':' + it.n, X + 100, Y, '#fff', { align: 'right' });
       if (i === L.sel && !M.target) AE.cursor(ctx, X - 14, Y);
     }
+  }
+};
+
+// the turn-order strip: who acts now, then the next turns
+AE.Battle.prototype.drawTurns = function (ctx) {
+  const list = this.order(6), cur = this.menu ? this.menu.f : this.cur; if (!list.length) return;
+  const items = list.map(function (f, i) {
+    let n = f.name; if (n.length > 8) n = n.slice(0, 7) + '.';
+    return { f: f, n: n, w: AE.textWidth(n), now: i === 0 && f === cur };
+  });
+  let w = AE.textWidth('Next') + 14, k = 0;
+  for (; k < items.length; k++) { if (w + items[k].w + 10 > AE.W - 8) break; w += items[k].w + 10; }
+  ctx.globalAlpha = 0.85; AE.window(ctx, 2, 2, w, 15); ctx.globalAlpha = 1;
+  let x = 9; AE.text(ctx, items[0].now ? 'Now' : 'Next', x, 6, '#aab'); x += AE.textWidth('Next') + 6;
+  for (let i = 0; i < k; i++) {
+    const it = items[i], col = it.f.side === 'party' ? (it.now ? '#ffe080' : '#cfe0ff') : (it.now ? '#ff9a7a' : '#e0a0a0');
+    if (i) AE.text(ctx, '>', x - 8, 6, '#667');
+    AE.text(ctx, it.n, x, 6, col); x += it.w + 10;
   }
 };

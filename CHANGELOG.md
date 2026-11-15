@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.1 — 2026-11-15
+
+- Battles are now turn based: one fighter acts at a time, in Speed order, and nothing moves while you choose. A strip at the top of the screen shows whose turn is next. Haste and Slow change how often a turn comes round.
+- The Battle mode option (Active / Wait) is gone; Battle speed now sets the pause between turns.
+
 ## 1.0.0 — 2026-11-15
 - First release: all five acts, with night talks at inns, arrival scenes, a rival's fourth stand, a last night before
   the Citadel and epilogues for every character who joined you.

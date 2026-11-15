@@ -177,7 +177,7 @@ AE.OrderScreen.prototype.draw = function (ctx) {
 // ---------- Config ----------
 AE.ConfigScreen = function () { this.sel = 0; };
 AE.CONFIG = [
-  ['Battle mode', 'atb', ['active', 'wait'], ['Active', 'Wait']], ['Battle speed', 'speed', [1, 2, 3, 4, 5], ['1', '2', '3', '4', '5']],
+  ['Battle speed', 'speed', [1, 2, 3, 4, 5], ['1', '2', '3', '4', '5']],
   ['Text speed', 'text', [1, 2, 4, 99], ['Slow', 'Normal', 'Fast', 'Instant']], ['Always run', 'autorun', [false, true], ['Off', 'On']],
   ['Cursor', 'cursor', ['reset', 'memory'], ['Reset', 'Memory']], ['Music', 'music', [0, 0.5, 1], ['Off', 'Low', 'Full']],
   ['Window colour', 'winSel', [0, 1, 2, 3, 4], ['Blue', 'Midnight', 'Crimson', 'Forest', 'Steel']]
@@ -203,7 +203,7 @@ AE.ConfigScreen.prototype.draw = function (ctx) {
     let v = r[2].indexOf(C[r[1]]); if (v < 0) v = 0; AE.text(ctx, '< ' + r[3][v] + ' >', 200, y, '#ffe080', { align: 'center' });
     if (i === self.sel) AE.cursor(ctx, 8, y);
   });
-  AE.text(ctx, 'Wait mode pauses battle time while you choose a spell, item or target.', 10, 150, '#888');
+  AE.text(ctx, 'Battles are turn based. Battle speed sets the pause between turns.', 10, 150, '#888');
   AE.text(ctx, 'Keys: arrows move, Z/Enter OK, X/Esc back, C menu,', 10, 170, '#888');
   AE.text(ctx, 'Shift run, Q/E switch, hold Q+E in battle to flee.', 10, 182, '#888');
 };

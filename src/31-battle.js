@@ -1,7 +1,7 @@
-/* ================= The battle scene (ATB) =================
-   Party of up to 3 on the right, enemies on the left. ATB gauges fill with Speed; a full gauge opens the command
-   window (Q/E switch between ready characters). Actions play one at a time. Wait mode pauses the gauges while you
-   are choosing a spell, item or target. */
+/* ================= The battle scene (turn based) =================
+   Party of up to 3 on the right, enemies on the left. One fighter acts at a time, in Speed order (Haste and Slow
+   change how often a fighter's turn comes round). Nothing moves while you choose: when one action is over, battle
+   time jumps straight to the next fighter's turn. The strip at the top shows the coming turns. */
 AE.startBattle = function (form, o) {
   o = o || {}; const g = AE.game;
   return new Promise(function (res) {
@@ -16,7 +16,7 @@ AE.Battle = function (form, o) {
   this.party = S.party.slice(0, 3).map(function (id, i) { return AE.mkParty(id, i); });
   this.enemies = form.enemies.map(function (e, i) { return AE.mkEnemy(typeof e === 'string' ? e : e.id, i, typeof e === 'string' ? {} : e); });
   this.layout();
-  this.queue = []; this.ready = []; this.busy = false; this.menu = null; this.phase = 'intro'; this.t = 0; this.pops = []; this.fx = []; this.banner = null;
+  this.queue = []; this.ready = []; this.busy = false; this.gap = 0; this.stuck = 0; this.cur = null; this.menu = null; this.phase = 'intro'; this.t = 0; this.pops = []; this.fx = []; this.banner = null;
   this.allUses = {}; this.runHold = 0; this.result = null; this.spoils = { exp: 0, ap: 0, gold: 0, items: [] };
   // ambush / first strike
   const pre = Math.max(0, ...this.party.map(function (f) { return f.abil.indep.pre || 0; }));
@@ -45,10 +45,32 @@ AE.Battle.prototype.all = function () { return this.party.concat(this.enemies); 
 AE.Battle.prototype.foes = function (f) { return (f.side === 'party' ? this.enemies : this.party).filter(AE.alive); };
 AE.Battle.prototype.friends = function (f, ko) { return (f.side === 'party' ? this.party : this.enemies).filter(function (x) { return ko ? !x.gone : AE.alive(x); }); };
 AE.Battle.prototype.speedK = function () { return [0, 0.55, 0.75, 1, 1.25, 1.5][AE.S_.cfg.speed || 3]; };
-AE.Battle.prototype.paused = function () {
-  if (this.phase !== 'fight') return true;
-  if (AE.S_.cfg.atb === 'wait' && this.menu && (this.menu.depth > 0)) return true;
-  return false;
+AE.Battle.prototype.paused = function () { return this.phase !== 'fight'; };
+// turn based: battle time only moves when nobody is acting, choosing or waiting to act
+AE.Battle.prototype.idle = function () {
+  return !this.busy && !this.menu && !this.queue.length && !this.ready.length && !this.echo &&
+    !this.all().some(function (f) { return f.waiting && AE.alive(f); });
+};
+AE.Battle.prototype.rate = function (f) {
+  let r = (f.spd + 25) / 1500 * (f.status.haste ? 1.5 : 1) * (f.status.slow ? 0.5 : 1);
+  if (f.side === 'enemy' && f.d.atbK) r *= f.d.atbK;
+  return r;
+};
+// the next n turns, for the turn-order strip (the fighter acting now comes first)
+AE.Battle.prototype.order = function (n) {
+  const self = this, out = [], cur = this.menu ? this.menu.f : this.cur;
+  if (cur && AE.alive(cur)) out.push(cur);
+  const sim = this.all().filter(function (f) { return AE.alive(f) && AE.canAct(f); }).map(function (f) {
+    return { f: f, a: f === cur ? 0 : f.waiting ? 1 : f.atb, r: self.rate(f) };
+  });
+  if (!sim.length) return out;
+  while (out.length < n) {
+    let best = null, bt = 1e9;
+    sim.forEach(function (x) { const t = (1 - x.a) / x.r; if (t < bt - 1e-9) { bt = t; best = x; } });
+    sim.forEach(function (x) { x.a = Math.min(1, x.a + x.r * bt); });
+    out.push(best.f); best.a = 0;
+  }
+  return out;
 };
 AE.Battle.prototype.update = function (g) {
   const I = g.input, self = this; this.t++;
@@ -58,9 +80,14 @@ AE.Battle.prototype.update = function (g) {
   if (this.banner && --this.banner.t <= 0) this.banner = null;
   if (this.phase === 'intro') { if (this.t > 30) { this.phase = 'fight'; if (this.pre) this.say(this.pre > 0 ? 'First strike!' : 'Ambushed!'); } return; }
   if (this.phase === 'win' || this.phase === 'lose' || this.phase === 'end') { if (this.endUpdate) this.endUpdate(g); return; }
-  // ATB and timed status
-  if (!this.paused() && !this.busy) this.tick(1 / 60);
-  else if (!this.paused()) this.tick(1 / 60);
+  // turns: when nobody is acting, a short pause, then battle time runs on (instantly) to the next fighter's turn
+  if (this.idle()) {
+    if (++this.gap > [0, 30, 22, 14, 8, 2][AE.S_.cfg.speed || 3]) { for (let i = 0; i < 6000 && this.idle() && this.phase === 'fight'; i++) this.tick(1 / 60); this.gap = 0; }
+  } else {
+    this.gap = 0;
+    // safety: someone marked as waiting but nothing queued for them
+    if (!this.busy && !this.menu && !this.queue.length && !this.ready.length) { if (++this.stuck > 90) { this.all().forEach(function (f) { f.waiting = false; }); this.stuck = 0; } } else this.stuck = 0;
+  }
   // run away: hold Q and E together (or the Run command)
   if (((I.held.prev && I.held.next) || I.held.flee) && !this.form.noRun) { if (++this.runHold > 70) { this.tryRun(); this.runHold = 0; } } else this.runHold = 0;
   // menus
@@ -73,12 +100,12 @@ AE.Battle.prototype.update = function (g) {
   if (!this.busy && this.queue.length) {
     const act = this.queue.shift();
     if (!AE.alive(act.user) || (act.user.side === 'enemy' && this.over())) return;
-    this.busy = true;
-    this.perform(act).catch(function (e) { console.error(e); }).then(function () { self.busy = false; self.afterAction(); });
+    this.busy = true; this.cur = act.user;
+    this.perform(act).catch(function (e) { console.error(e); }).then(function () { self.busy = false; self.cur = null; self.afterAction(); });
   }
 };
 AE.Battle.prototype.tick = function (dt) {
-  const k = this.speedK(), self = this;
+  const self = this;
   this.all().forEach(function (f) {
     if (!AE.alive(f)) return;
     // timed statuses
@@ -94,9 +121,8 @@ AE.Battle.prototype.tick = function (dt) {
       if (f.status.regen) { const h = Math.max(1, Math.floor(f.maxhp / 24)); self.healHp(f, h); }
     }
     if (!AE.canAct(f) || f.waiting) return;
-    let r = (f.spd + 25) / 1500 * k * (f.status.haste ? 1.5 : 1) * (f.status.slow ? 0.5 : 1);
-    if (f.side === 'enemy' && f.d.atbK) r *= f.d.atbK;
-    f.atb = Math.min(1, f.atb + r);
+    if (self.ready.length || self.queue.length || self.all().some(function (x) { return x.waiting; })) return;   // one turn at a time
+    f.atb = Math.min(1, f.atb + self.rate(f));
     if (f.atb >= 1) {
       f.waiting = true; f.defending = false;
       if (f.side === 'enemy') self.enemyTurn(f);

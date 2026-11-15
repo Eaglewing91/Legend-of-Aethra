@@ -133,7 +133,10 @@ AE.Field.prototype.interact = function () {
   const sg = this.map.signAt(p.x + D.x, p.y + D.y);
   if (sg) { this.locked++; const self = this; AE.say(sg).then(function () { self.locked--; }); return; }
   const ev = this.map.eventsAt(p.x + D.x, p.y + D.y).concat(this.map.eventsAt(tx, ty)).filter(function (e) { return !e.touch && (!e.if || AE.cond(e.if)) && (!e.unless || !AE.cond(e.unless)); });
-  if (ev.length) this.run(ev[0].id, ev[0]);
+  if (ev.length) { this.run(ev[0].id, ev[0]); return; }
+  // standing on a check spot (not a step trigger) works too, whichever way you face
+  const here = this.map.eventsAt(p.x, p.y).filter(function (e) { return !e.touch && (!e.if || AE.cond(e.if)) && (!e.unless || !AE.cond(e.unless)); });
+  if (here.length) this.run(here[0].id, here[0]);
 };
 AE.Field.prototype.talk = function (n) {
   const self = this, p = this.player, d = n.def;

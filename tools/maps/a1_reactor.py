@@ -66,6 +66,7 @@ def build_gate():
     m.warp(39, 20, 'r4_gate', 38, 20, 3)               # (east alley is a dead end: Sable's lookout)
     # the console that opens the gate (Sable hacks it), the platform and the start
     m.event(29, 6, 'a1_gate_console', touch=False)
+    m.event(29, 5, 'a1_gate_console', touch=False)   # the console itself, so facing it works
     m.event(18, 29, 'a1_gate_locked', 4, 1)
     m.entry = [5, 6]
     m.chest(37, 16, 'potion', 2); m.chest(2, 23, 'antidote', 2); m.chest(38, 7, 'gold', 100)

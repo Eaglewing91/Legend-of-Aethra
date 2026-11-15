@@ -1,5 +1,10 @@
 # Legend of Aethra changelog
 
+## 1.0.2 — 2026-11-15
+
+- The opening: the Reactor 4 gate console now works when you face it (it only answered from the floor in front of it), and Sable says where it is: the east end of the platform.
+- Pressing OK while standing on a spot you can examine now works whichever way you face.
+
 ## 1.0.1 — 2026-11-15
 
 - Battles are now turn based: one fighter acts at a time, in Speed order, and nothing moves while you choose. A strip at the top of the screen shows whose turn is next. Haste and Slow change how often a turn comes round.

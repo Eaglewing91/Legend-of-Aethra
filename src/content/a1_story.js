@@ -55,7 +55,7 @@
     cs.remove('t1'); cs.remove('t2'); cs.remove('bram'); cs.remove('sable');
     await s('bram', 'Not bad, kid. Not bad at all.');
     await AE.say('Kael equipped a Restore Prism (Cure). Bram has Bolt, Sable has Steal. Open the menu (C) and choose Prisms to slot more as you find them.', { name: 'TIP' });
-    await s('sable', 'Gate console\'s by the crates. Give me ten seconds and an Academy sword to hold.');
+    await s('sable', 'Gate console\'s at the east end of the platform, past the lamp. Give me ten seconds and an Academy sword to hold.');
     await s('kael', 'You can have the ten seconds.');
     cs.flag('a1_open_done');
   };

@@ -303,7 +303,7 @@
     ep.push('And in Thornbrook, beside the memorial stone with a dead boy\'s name on it, a young man and a young woman planted a bed of crystal-moss.', 'He had chosen his own name by then. It was a good one.');
     await cs.narrate(ep);
     await cs.title('LEGEND OF AETHRA', 'THE END', 300);
-    await cs.narrate(['Created for Torn Arcade.', 'Art: Seliel the Shaper (Mana Seed characters), Pixel-boy and AAA (Ninja Adventure).', 'Thank you for playing.']);
+    await cs.narrate(['Created for Torn Arcade.', 'Art: Seliel the Shaper (Mana Seed characters), Pixel-boy and AAA (Ninja Adventure).', 'Music: an original score, composed for Legend of Aethra.', 'Thank you for playing.']);
     AE.S_.flags.cleared = 1; AE.S_.cleared = (AE.S_.cleared || 0) + 1;
     await AE.say('A clear save lets you keep exploring: the Abyssal Spire, the trials and the super-bosses still wait.', { name: 'TIP' });
     await cs.warp('academy', 21, 20, 2);

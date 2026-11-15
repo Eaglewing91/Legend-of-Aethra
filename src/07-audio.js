@@ -39,14 +39,14 @@ AE.Sfx = {
     o.connect(g); g.connect(AE.Audio.master); o.start(); o.stop(c.currentTime + len + 0.01);
   }
 };
-// logical names -> soundtrack keys
+// logical names -> soundtrack tracks (maps and scripts may also name a track directly). Jingles (#) play once.
 AE.TRACKS = {
-  title: 'intro', story: 'story', town: 'village', village: 'calm_village', city: 'manor', slums: 'lost_village', world: 'adventure', road: 'road',
-  battle: 'fight', boss: 'fight2', dungeon: 'dungeon', cave: 'cave', reactor: 'tension', factory: 'tension', sad: 'sad', temple: 'temple',
-  mystic: 'mystical', forest: 'dark_forest', clearing: 'clearing', boat: 'boat', sea: 'boat', water: 'aquatic', desert: 'sunny', final: 'final_area',
-  castle: 'dark_castle', ruins: 'ruins', crypt: 'crypt', curse: 'curse', dream: 'dream', airship: 'ascension', spire: 'good_time', revelation: 'revelation',
-  lament: 'lament', ending: 'end_theme', credits: 'credit', melancholy: 'melancholia', chill: 'chill', peaceful: 'peaceful', quiet: 'quiet', snow: 'quiet',
-  victory: '#victory', gameover: '#gameover', levelup: '#levelup'
+  title: 'prelude', story: 'story', town: 'town', village: 'town', city: 'halcyon', slums: 'sumps', world: 'world', road: 'quiet',
+  battle: 'battle', boss: 'boss', dungeon: 'dungeon', cave: 'cave', reactor: 'reactor', factory: 'tower', sad: 'sorrow', temple: 'temple',
+  mystic: 'mystic', mystical: 'lumen', forest: 'forest', clearing: 'peaceful', boat: 'sea', water: 'water', desert: 'desert',
+  final: 'citadel', castle: 'castle', ruins: 'ruins', crypt: 'crypt', curse: 'memory', dream: 'memory', airship: 'airship', spire: 'gilded',
+  revelation: 'vesper', lament: 'sorrow', ending: 'ending', credits: 'ending', melancholy: 'lyra', chill: 'tavern', peaceful: 'peaceful',
+  quiet: 'quiet', snow: 'frost', tension: 'tension', victory: '#victory', gameover: '#gameover', levelup: '#levelup'
 };
 AE.Music = {
   cur: null, src: null, gain: null, want: null, jingle: false,
@@ -56,14 +56,14 @@ AE.Music = {
     const key = AE.TRACKS[name] || name, self = this;
     this.cur = name; this.want = key;
     const c = AE.ac(); if (!c) return;
-    const isJ = key[0] === '#', data = isJ ? (AE.SFX || {})[key.slice(1)] : (AE.MUSIC || {})[key];
+    const isJ = key[0] === '#', data = isJ ? ((AE.MUSIC || {})[key.slice(1)] || (AE.SFX || {})[key.slice(1)]) : (AE.MUSIC || {})[key];
     this.stop(0.25);
     if (!data) return;
     this.jingle = isJ;
     AE.decode('mus:' + key, data).then(function (buf) {
       if (!buf || self.want !== key) return;
       const s = c.createBufferSource(), g = c.createGain(); s.buffer = buf; s.loop = !isJ;
-      const v = (AE.S_ && AE.S_.cfg ? AE.S_.cfg.music : 1) * 0.6;
+      const v = (AE.S_ && AE.S_.cfg ? AE.S_.cfg.music : 1) * 0.85;
       g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(Math.max(0.001, v), c.currentTime + 0.4);
       s.connect(g); g.connect(AE.Audio.master); s.start(); self.src = s; self.gain = g;
     });

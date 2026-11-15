@@ -5,3 +5,4 @@ build/data.js
 build/dev.html
 build/maps.json
 node_modules/
+__pycache__/

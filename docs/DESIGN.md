@@ -20,7 +20,10 @@ names, characters, logos, music or signature terms.
 - **World map in pseudo-3D**: a tilted perspective view (like the SNES Mode 7 world maps) that you can rotate.
   Towns, mountains, trees and vehicles stand up as sprites.
 - Battles side-view, party of **3** on the right, enemies on the left, ATB bars, Surge gauges.
-- Music: Ninja Adventure tracks (CC0) in a separate Soundtrack script; jingles for victory, level up, game over.
+- Music: an original score in a Final Fantasy style (tools/music: a synthesised orchestra and a score notation), 45 tracks
+  in a separate Soundtrack script. Leitmotifs: the main theme (world map, airship, ending), Lyra's Chorus song, Vesper's
+  "One, Two, Three" waltz and Nyxar's tritone. Every town has its own theme; Vesper, Nyxar, Drago and the Weapons have
+  their own battle music; victory fanfare, inn and game-over jingles.
 
 ## World: Aethra
 A world of three continents where Aether, the life-current of the planet, wells up as crystal. The four great

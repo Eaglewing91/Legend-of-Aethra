@@ -90,17 +90,15 @@ sfx = {}
 if os.path.isdir(NA):
     for k, f in SFX.items(): sfx[k] = ogg(NA + 'Sounds/' + f + '.wav', 's_' + k)
     for k, f in JINGLES.items(): sfx[k] = ogg(NA + 'Jingles/' + f + '.wav', 'j_' + k, '28k')
-# music (the dev page carries it; the userscript gets it from the Soundtrack scripts)
-MUSIC = {'intro': '38 - Intro', 'story': '6 - Story', 'village': '36 - Village', 'calm_village': '33 - Calm Village', 'manor': '32 - Manor', 'lost_village': '26 - Lost Village',
-         'adventure': '35 - Adventure', 'road': '23 - Road', 'fight': '17 - Fight', 'fight2': '34  - Fight', 'dungeon': '21 - Dungeon', 'cave': '2 - The Cave',
-         'tension': '28 - Tension', 'sad': '7 - Sad Theme', 'temple': '12 - Temple', 'mystical': '13 - Mystical', 'dark_forest': '37 - Dark Forest', 'clearing': '11 - Clearing',
-         'boat': '39 - Boat', 'aquatic': '18 - Aquatic', 'sunny': '31 - Sunny', 'final_area': '24 - Final Area', 'dark_castle': '10 - Dark Castle', 'ruins': '30 - Ruins',
-         'crypt': '40 - Crypt', 'curse': '14 - Curse', 'dream': '22 - Dream', 'ascension': '19 - Ascension', 'good_time': '20 - Good Time', 'revelation': '3 - Revelation',
-         'lament': '29 - Lament', 'end_theme': '8 - End Theme', 'credit': '15 - Credit Theme', 'melancholia': '16 - Melancholia', 'chill': '27 - Chill',
-         'peaceful': '5 - Peaceful', 'quiet': '9 - Quiet'}
+# music: the original Legend of Aethra score, rendered by tools/music (the dev page carries it with --music; the
+# userscript gets it from the Soundtrack script)
+FF = 'build/.snd/ff/'
+if '--music' in sys.argv or '--soundtrack' in sys.argv: subprocess.run([sys.executable, 'tools/music/render.py'], check=True)
+MUSIC = {os.path.basename(f)[:-5]: f for f in sorted(glob.glob(FF + '*.opus'))}
+TITLES = json.load(open(FF + 'titles.json')) if os.path.exists(FF + 'titles.json') else {}
 music = {}
-if os.path.isdir(NA) and '--music' in sys.argv:
-    for k, f in MUSIC.items(): music[k] = ogg(NA + 'Musics/' + f + '.ogg', 'm_' + k, '40k')
+if '--music' in sys.argv:
+    for k, f in MUSIC.items(): music[k] = base64.b64encode(open(f, 'rb').read()).decode()
 
 maps = json.load(open('build/maps.json'))
 bossfw = {}
@@ -119,31 +117,16 @@ dev = """<!doctype html><html><head><meta charset="utf-8"><title>Legend of Aethr
 window.AE = AE; AE.boot(document.getElementById('host'), window.AE_DATA).then(function (g) { window.ready = true; });
 </script></body></html>"""
 open('build/dev.html', 'w').write(dev)
-# ---------- the soundtrack: one optional script with every track (Opus, 18 kbps mono; larger than 2 MB by choice) ----------
-SPARTS = [(1, ['intro', 'adventure', 'fight', 'fight2', 'village', 'calm_village', 'manor', 'road', 'lost_village', 'peaceful'], 'the title, the world map, battles and towns'),
-          (2, ['dungeon', 'cave', 'tension', 'temple', 'dark_forest', 'clearing', 'boat', 'aquatic', 'sunny'], 'dungeons, caves, reactors, temples, forests, the sea and the desert'),
-          (3, ['story', 'sad', 'mystical', 'revelation', 'lament', 'melancholia', 'chill', 'quiet', 'dream'], 'story scenes and quiet places'),
-          (4, ['final_area', 'dark_castle', 'ruins', 'crypt', 'curse', 'ascension', 'good_time', 'end_theme', 'credit'], 'the Citadel, ruins, crypts, the airship, the Gilded Spire and the ending')]
-NPARTS = 1
-if os.path.isdir(NA) and '--soundtrack' in sys.argv:
-    order = [k for _, keys, _ in SPARTS for k in keys if k in MUSIC]
-    enc = {}
-    for k in order:
-        out = 'build/.snd/o_' + k + '.ogg'
-        if not os.path.exists(out): subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', NA + 'Musics/' + MUSIC[k] + '.ogg', '-ac', '1', '-c:a', 'libopus', '-b:a', '18k', out], check=True)
-        enc[k] = base64.b64encode(open(out, 'rb').read()).decode()
-    total = sum(len(v) for v in enc.values()); per = total / NPARTS; groups = [[]]; acc = 0
-    for k in order:
-        if acc + len(enc[k]) > per * 1.08 and len(groups) < NPARTS and groups[-1]: groups.append([]); acc = 0
-        groups[-1].append(k); acc += len(enc[k])
-    for part, keys in enumerate(groups, 1):
-        tracks = {k: enc[k] for k in keys}; what = ', '.join(keys).replace('_', ' ')
-        fname = 'Legend-of-Aethra-Soundtrack.user.js'; url = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/' + fname
-        txt = """// ==UserScript==
-// @name         Legend of Aethra - Soundtrack%s
+# ---------- the soundtrack: one optional script with every track (Opus; larger than 2 MB by choice) ----------
+if '--soundtrack' in sys.argv and MUSIC:
+    tracks = {k: base64.b64encode(open(f, 'rb').read()).decode() for k, f in MUSIC.items()}
+    fname = 'Legend-of-Aethra-Soundtrack.user.js'; url = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/' + fname
+    names = '\n'.join('   - %s' % TITLES.get(k, k) for k in MUSIC)
+    txt = """// ==UserScript==
+// @name         Legend of Aethra - Soundtrack
 // @namespace    eaglewing.legend-of-aethra
 // @version      %s
-// @description  Optional music for Legend of Aethra, every track: %s. Hands the tracks to the game when it starts; makes no requests and stores nothing.
+// @description  Optional music for Legend of Aethra: the full original score (%d tracks). Hands the tracks to the game when it starts; makes no requests and stores nothing.
 // @author       Eaglewing [571041]
 // @match        https://www.torn.com/*
 // @updateURL    %s
@@ -152,9 +135,12 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
 // @run-at       document-idle
 // @noframes
 // ==/UserScript==
-/* Music from "Ninja Adventure" by Pixel-boy and AAA (CC0). Packaging (c) Eaglewing [571041], all rights reserved; for use on
-   Torn only. This script makes no requests and needs no API key. It only answers the game's 'aethra-music:request' page
-   event with one 'aethra-music' event carrying its tracks.
+/* The Legend of Aethra soundtrack: an original score in the spirit of the classic Final Fantasy soundtracks, composed
+   and synthesised for this game (no samples, no borrowed melodies). (c) Eaglewing [571041], all rights reserved; for
+   use on Torn only. This script makes no requests and needs no API key. It only answers the game's
+   'aethra-music:request' page event with one 'aethra-music' event carrying its tracks.
+   Tracks:
+%s
    TERMS OF SERVICE
    | Data Storage          | No                       |
    | Data Sharing          | Nobody                   |
@@ -164,16 +150,16 @@ if os.path.isdir(NA) and '--soundtrack' in sys.argv:
 */
 (function () {
   const T = %s;
-  const send = function () { document.dispatchEvent(new CustomEvent('aethra-music', { detail: JSON.stringify({ part: %d, tracks: T }) })); };
+  const send = function () { document.dispatchEvent(new CustomEvent('aethra-music', { detail: JSON.stringify({ part: 1, tracks: T }) })); };
   document.addEventListener('aethra-music:request', send);
-  document.documentElement.dataset['aethraMusic%d'] = '%s';
+  document.documentElement.dataset['aethraMusic1'] = '%s';
 })();
-""" % ('', VERSION, what, url, url, json.dumps(tracks), part, part, VERSION)
-        open('build/' + fname, 'w').write(txt)
-        print('soundtrack part %d: %d tracks, %.2f MB' % (part, len(tracks), len(txt) / 1e6))
+""" % (VERSION, len(tracks), url, url, names, json.dumps(tracks), VERSION)
+    open('build/' + fname, 'w').write(txt)
+    print('soundtrack: %d tracks, %.2f MB' % (len(tracks), len(txt) / 1e6))
 
 # ---------- the Art & Effects script: every picture and sound effect (the main script carries code, maps and story) ----------
-main_blob = json.dumps({k: v for k, v in data.items() if k not in ('art', 'sfx')})
+main_blob = json.dumps({k: (v if k != 'music' else {}) for k, v in data.items() if k not in ('art', 'sfx')})
 art_blob = json.dumps({'art': data['art'], 'sfx': data['sfx']})
 ART_URL = 'https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Art.user.js'
 art_js = '''// ==UserScript==
@@ -191,7 +177,7 @@ art_js = '''// ==UserScript==
 // @run-at       document-idle
 // @noframes
 // ==/UserScript==
-/* Art, sound and music: "Ninja Adventure" by Pixel-boy and AAA (CC0). Characters and townspeople: "Mana Seed" by Seliel the
+/* Art and sound effects: "Ninja Adventure" by Pixel-boy and AAA (CC0). Characters and townspeople: "Mana Seed" by Seliel the
    Shaper, used under licence with permission (not CC0; don't extract or reuse it). Packaging (c) Eaglewing [571041].
    This script makes no requests and needs no API key. It only answers the game's 'aethra-art:request' page event with one
    'aethra-art' event carrying its pictures and sounds.
@@ -233,7 +219,7 @@ header = '''// ==UserScript==
 /*
  * LEGEND OF AETHRA by Eaglewing [571041]
  * Licence: all rights reserved, for use on Torn only (full text: LICENCE in the GitHub repo). Third-party art and sound:
- * "Ninja Adventure" by Pixel-boy and AAA (CC0). Characters and townspeople: "Mana Seed" by Seliel the Shaper, used under
+ * "Ninja Adventure" by Pixel-boy and AAA (CC0); the music is an original score. Characters and townspeople: "Mana Seed" by Seliel the Shaper, used under
  * licence with permission (not CC0; don't extract or reuse it). Unofficial fan project, not affiliated with Torn.
  *
  * HOW IT WORKS
@@ -244,7 +230,7 @@ header = '''// ==UserScript==
  * - Save files (three slots and a resume point) are kept in Tampermonkey storage on your device.
  * - Torn Arcade link (page events only): 'aethra:ping' / 'aethra:here' (installed? version), 'aethra:open' (play inside
  *   the phone), 'aethra:close', 'aethra:closed', 'aethra:mute', 'aethra:volume', 'aethra:pad'. The Art & Effects script (needed) answers
- *   'aethra-art:request' with 'aethra-art'; the five optional Soundtrack scripts answer
+ *   'aethra-art:request' with 'aethra-art'; the optional Soundtrack script answers
  *   'aethra-music:request' with 'aethra-music'.
  *
  * TERMS OF SERVICE
@@ -258,7 +244,7 @@ header = '''// ==UserScript==
 launcher = '''
 AE.store = { get: function (k) { try { return GM_getValue(k, null); } catch (e) { return null; } }, set: function (k, v) { try { GM_setValue(k, v); } catch (e) {} } };
 let readying = null;
-const DATA = ''' + blob + ''';
+const DATA = ''' + json.dumps(dict(data, music={})) + ''';
 const ensure = function () { return readying || (readying = Promise.resolve(AE)); };
 // music arrives from the optional Soundtrack scripts
 document.addEventListener('aethra-music', function (e) { try { const d = JSON.parse(e.detail); AE.MUSIC = Object.assign(AE.MUSIC || {}, d.tracks || {}); DATA.music = Object.assign(DATA.music || {}, d.tracks || {}); if (AE.Music && AE.Music.cur && !AE.Music.src) { const n = AE.Music.cur; AE.Music.cur = null; AE.Music.play(n); } } catch (x) {} });

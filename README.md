@@ -4,7 +4,7 @@ A 16-bit style role-playing game for [Torn](https://www.torn.com), in the spirit
 It plays inside the **Torn Arcade** phone (Legends folder) or in its own window from the Tampermonkey menu.
 
 **Install:** [Legend-of-Aethra.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra.user.js)
-(about 1.8 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (every track, about 9 MB). Without it you still hear the sound effects, but no background music.
+(about 1.8 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (the full original score, 45 tracks, about 9 MB). Without it you still hear the sound effects, but no background music.
 
 ## The game
 A newly sworn Warden of the Vanguard Academy takes his first contract: get the rebel cell Undercurrent into Aurex
@@ -36,6 +36,6 @@ through page events only (`aethra:ping`, `aethra:here`, `aethra:open`, `aethra:c
 | Only locally (save files in Tampermonkey storage) | Nobody | Public amusement | Not stored / Not shared (no key used) | None (no API key needed) |
 
 ## Credits
-By Eaglewing [571041]. Art, music and sound: "Ninja Adventure" by Pixel-boy and AAA (CC0). Characters and townspeople:
+By Eaglewing [571041]. Art and sound effects: "Ninja Adventure" by Pixel-boy and AAA (CC0). Music: an original score in the style of the classic Final Fantasy soundtracks, composed and synthesised for this game (tools/music). Characters and townspeople:
 "Mana Seed" by Seliel the Shaper, used under licence with permission (not CC0; don't extract or reuse it).
 All rights reserved, for use on Torn only: see [LICENCE](LICENCE).

@@ -46,6 +46,8 @@ for k in ('peak', 'star_cabin'): need(k, air, 'by airship')
 deny('peak', boat_land | talon_foot, 'by boat or Talonbird')
 if (P['deep_ruin'][0], P['deep_ruin'][1]) not in sub_sea or at(P['deep_ruin'][0], P['deep_ruin'][1]) != 22: problems.append('deep_ruin not a deep tile the sub can reach')
 deny('vault', air | boat_land | talon_foot, 'except by Gold Talonbird'); need('vault', gt, 'by Gold Talonbird')
+if not any(at(x, y) in LAND['airship'] for x in range(114, 127) for y in range(140, 153)): problems.append('Needle Atoll: nowhere for the airship to land')
+if not any(at(x, y) in LAND['boat'] for x in range(112, 129) for y in range(138, 155)): problems.append('Needle Atoll: no beach for the boat')
 for k in ('chapel', 'hermit'): deny(k, air | boat_land, 'except by Gold Talonbird'); need(k, gt, 'by Gold Talonbird')
 for v, (x, y) in [(k, v) for k, v in D['vehicles'].items() if v]:
     if at(x, y) not in FOOT: problems.append('vehicle %s at %s is not on dry land' % (v, (x, y)))

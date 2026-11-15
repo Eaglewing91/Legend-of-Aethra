@@ -135,6 +135,7 @@
     ['peak', 'The tallest summit in the far north-east of Nordheim has a flat top. As if something lands there.'],
     ['deep_ruin', 'Fishermen off the south-west coast talk of a hole in the sea floor, and books floating up from it.'],
     ['vault', 'Thirteen kings sleep in a valley in the far west of Meridia, walled in by cliffs. Not even an airship can land there.'],
+    ['atoll', 'South of Port Lark there\'s a ring of sand in the sea. Prickly things live there, and they pay better than any job. If you can hit them.'],
     ['ghost', 'A ship with green lanterns sails the southern sea at night. Row out to her, if you have a boat and no sense.'],
   ];
   EV.sc_rumours = async function () {

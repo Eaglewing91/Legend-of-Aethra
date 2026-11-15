@@ -200,6 +200,14 @@ def vault(cx, cy, r):
             if d < r - 1.6: put(x, y, T['forest'])
             elif d < r + 1.2: put(x, y, T['mount'])
     put(cx, cy, T['forest'])
+# Needle Atoll: a ring of sand in the open sea south of Port Lark (the levelling island, FF7's Cactus Island)
+for y in range(136, 157):
+    for x in range(110, 131):
+        d = math.hypot(x - 120, (y - 146) * 1.15) + (fbm(x * 0.3 + 9, y * 0.3) - 0.5) * 2.2
+        if d < 4.2: put(x, y, T['desert'])
+        elif d < 5.6: put(x, y, T['beach'])
+        elif d < 7.5 and at(x, y) in (T['sea'], T['deep']): put(x, y, T['shallow'])
+for (x, y) in ((118, 144), (123, 148), (121, 143)): put(x, y, T['jungle'])      # a few palms
 vault(20, 118, 5)                                                            # the Gold Talonbird's hidden valley
 ring(224, 27, 2.5, 6, T['snowmount'], T['snow'], 7)                          # a peak only the airship can land on
 for y in range(176, 186):                                                     # a deep hole in the south-west sea

@@ -4,10 +4,10 @@ A 16-bit style role-playing game for [Torn](https://www.torn.com), in the spirit
 It plays inside the **Torn Arcade** phone (Legends folder) or in its own window from the Tampermonkey menu.
 
 **Install:** [Legend-of-Aethra.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra.user.js)
-(about 2.2 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (the full original score, 45 tracks, about 9 MB). Without it you still hear the sound effects, but no background music.
+(about 2.2 MB). Optional music: [Legend-of-Aethra-Soundtrack.user.js](https://github.com/Eaglewing91/Legend-of-Aethra/raw/main/build/Legend-of-Aethra-Soundtrack.user.js) (the full original score, 45 tracks, about 16 MB). Without it you still hear the sound effects, but no background music.
 In the Torn Arcade phone, the game and its Soundtrack sit side by side in the **Legends** folder.
 
-> ⚠️ **Large scripts.** The game (about 2.2 MB) and the Soundtrack (about 9 MB) are much bigger than a usual userscript.
+> ⚠️ **Large scripts.** The game (about 2.2 MB) and the Soundtrack (about 16 MB) are much bigger than a usual userscript.
 > They can take a moment to install and to load, and **some mobile browsers and userscript managers may not be able to
 > install or run scripts this size**. If the Soundtrack won't install or slows your phone down, leave it out: the game
 > still plays, with sound effects but no music. A PC or laptop is the most reliable way to play.

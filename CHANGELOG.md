@@ -11,7 +11,10 @@
 - Secrets: hidden places and guardians, a ghost ship, Needle Atoll, legendary Prisms and rumours to follow.
 - Side content: the Arcana card game, talonbird races and breeding, the Gilded Spire minigames, snowboarding, a submarine
   duel, the Battle Square, side quests, trials, roaming Weapons, super-bosses and the Abyssal Spire.
-- The Soundtrack: an optional script with an original 45-track score.
+- The Soundtrack: an optional script with an original 45-track score, encoded at 32 kbps stereo so it stays clean (no crackle).
+- Sound that holds up: a limiter and soft clipper stop music and effects clipping together; only the last few decoded
+  tracks are kept in memory (long sessions on phones stay light); the audio sleeps while the game is closed; the music
+  arrives whichever script loads first; the phone's mute, volume and the in-game Music option apply at once.
 - A touch pad for phones and tablets, with a Flee button in battles you can run from.
 - Sharper battles: the game draws at a resolution matched to your screen, sprites scale by whole pixels, the battle
   backdrops are painted at three times the detail, and every boss faces your party.

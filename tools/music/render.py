@@ -8,7 +8,7 @@ OUT = os.path.join(HERE, '..', '..', 'build', '.snd', 'ff')
 REG = {}
 
 
-def track(key, title, kbps=20):
+def track(key, title, kbps=32):
     def deco(fn):
         REG[key] = (fn, title, kbps, fn.__module__); return fn
     return deco

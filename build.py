@@ -152,8 +152,10 @@ if '--soundtrack' in sys.argv and MUSIC:
 */
 (function () {
   const T = %s;
-  const send = function () { document.dispatchEvent(new CustomEvent('aethra-music', { detail: JSON.stringify({ part: 1, tracks: T }) })); };
+  let msg = null;
+  const send = function () { if (!msg) msg = JSON.stringify({ part: 1, tracks: T }); document.dispatchEvent(new CustomEvent('aethra-music', { detail: msg })); };
   document.addEventListener('aethra-music:request', send);
+  document.dispatchEvent(new CustomEvent('aethra-music:ready'));   // tiny: lets an already-open game ask again
   document.documentElement.dataset['aethraMusic1'] = '%s';
 })();
 """ % (VERSION, len(tracks), url, url, names, json.dumps(tracks), VERSION)
@@ -249,6 +251,7 @@ let readying = null;
 const DATA = ''' + json.dumps(dict(data, music={})) + ''';
 const ensure = function () { return readying || (readying = Promise.resolve(AE)); };
 // music arrives from the optional Soundtrack scripts
+document.addEventListener('aethra-music:ready', function () { if (AE.host && AE.host.root && AE.host.root.style.display !== 'none' && !Object.keys(AE.MUSIC || {}).length) document.dispatchEvent(new CustomEvent('aethra-music:request')); });
 document.addEventListener('aethra-music', function (e) { try { const d = JSON.parse(e.detail); AE.MUSIC = Object.assign(AE.MUSIC || {}, d.tracks || {}); DATA.music = Object.assign(DATA.music || {}, d.tracks || {}); if (AE.Music && AE.Music.cur && !AE.Music.src) { const n = AE.Music.cur; AE.Music.cur = null; AE.Music.play(n); } } catch (x) {} });
 // pictures and sounds come from the Art & Effects script (asked for once, when you first press Play)
 let gotArt = !!DATA.art;

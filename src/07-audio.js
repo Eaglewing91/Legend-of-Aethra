@@ -6,7 +6,17 @@ AE.ac = function () {
   const A = AE.Audio;
   if (!A.ctx) {
     const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
-    A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = A.muted ? 0 : A.vol; A.master.connect(A.ctx.destination);
+    A.ctx = new C(); A.master = A.ctx.createGain(); A.master.gain.value = A.muted ? 0 : A.vol;
+    // a brick-wall limiter before the speakers: music and effects together never clip (clipping is heard as crackle)
+    try {
+      const L = A.ctx.createDynamicsCompressor(); L.threshold.value = -6; L.knee.value = 3; L.ratio.value = 12; L.attack.value = 0.002; L.release.value = 0.2;
+      // then a soft clipper: untouched below 0.8, rounded off above, so the output can never pass full scale
+      const W = A.ctx.createWaveShaper(), n = 2049, cv = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1, ax = Math.abs(x); cv[i] = ax <= 0.8 ? x : Math.sign(x) * (0.8 + 0.19 * Math.tanh((ax - 0.8) / 0.19)); }
+      W.curve = cv; W.oversample = '2x';
+      const pre = A.ctx.createGain(); pre.gain.value = 0.9;   // a little headroom for the compressor's make-up gain
+      A.master.connect(pre); pre.connect(L); L.connect(W); W.connect(A.ctx.destination); A.limiter = W;
+    } catch (e) { A.master.connect(A.ctx.destination); }
   }
   if (A.ctx.state === 'suspended') A.ctx.resume();
   return A.ctx;
@@ -14,8 +24,13 @@ AE.ac = function () {
 AE.setVolume = function (v) { const A = AE.Audio; A.vol = AE.clamp(v, 0, 1); if (A.master) A.master.gain.value = A.muted ? 0 : A.vol; };
 AE.setMuted = function (m) { const A = AE.Audio; A.muted = !!m; if (A.master) A.master.gain.value = A.muted ? 0 : A.vol; };
 AE.b64buf = function (b64) { const s = atob(b64), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u.buffer; };
+AE.MUSIC_KEEP = 3;   // decoded music tracks kept in memory (the one playing and the last few)
 AE.decode = function (key, b64) {
   const A = AE.Audio, c = AE.ac(); if (!c || !b64) return Promise.resolve(null);
+  if (key.indexOf('mus:') === 0) {
+    A.lru = (A.lru || []).filter(function (k) { return k !== key; }); A.lru.push(key);
+    while (A.lru.length > AE.MUSIC_KEEP) delete A.buf[A.lru.shift()];
+  }
   if (A.buf[key]) return A.buf[key];
   A.buf[key] = new Promise(function (res) { try { c.decodeAudioData(AE.b64buf(b64), res, function () { res(null); }); } catch (e) { res(null); } });
   return A.buf[key];
@@ -50,6 +65,8 @@ AE.TRACKS = {
 };
 AE.Music = {
   cur: null, src: null, gain: null, want: null, jingle: false,
+  level: function () { const m = AE.S_ && AE.S_.cfg && AE.S_.cfg.music !== undefined ? AE.S_.cfg.music : 1; return m * 0.85; },
+  setLevel: function () { const c = AE.Audio.ctx; if (this.gain && c) { try { this.gain.gain.cancelScheduledValues(c.currentTime); this.gain.gain.setTargetAtTime(Math.max(0.0001, this.level()), c.currentTime, 0.05); } catch (e) {} } },
   play: function (name) {
     if (!name) return;
     if (name === this.cur && !this.jingle) return;
@@ -63,7 +80,7 @@ AE.Music = {
     AE.decode('mus:' + key, data).then(function (buf) {
       if (!buf || self.want !== key) return;
       const s = c.createBufferSource(), g = c.createGain(); s.buffer = buf; s.loop = !isJ;
-      const v = (AE.S_ && AE.S_.cfg ? AE.S_.cfg.music : 1) * 0.85;
+      const v = AE.Music.level();
       g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(Math.max(0.001, v), c.currentTime + 0.4);
       s.connect(g); g.connect(AE.Audio.master); s.start(); self.src = s; self.gain = g;
     });

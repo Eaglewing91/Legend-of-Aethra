@@ -191,7 +191,7 @@ AE.ConfigScreen.prototype.update = function (I) {
   if (I.rep.left || I.rep.right) {
     i = AE.clamp(i + (I.rep.right ? 1 : -1), 0, vals.length - 1); C[k] = vals[i]; AE.Sfx.play('move');
     if (k === 'winSel') { C.win = AE.WINCOLS[C[k]]; AE.winGrad = {}; }
-    if (k === 'music' && AE.Music.gain) AE.Music.gain.gain.value = C.music * 0.6;
+    if (k === 'music' && AE.Music.setLevel) AE.Music.setLevel();
   }
   if (I.pressed.back || I.pressed.ok) return 'close';
 };

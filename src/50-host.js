@@ -20,13 +20,15 @@ AE.host = {
     const touch = (function () { try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
     AE.setPad(o.pad !== undefined ? o.pad : (AE.pad.want !== undefined ? AE.pad.want : touch));
     r.style.display = 'flex'; this.game.input.clear(); this.game.start();
+    try { if (AE.Audio.ctx && AE.Audio.ctx.state === 'suspended') AE.Audio.ctx.resume(); } catch (e) {}
     const c = r.querySelector('canvas'); if (c) c.focus();
     if (AE.Music && AE.S_ && AE.S_.playing) { const f = AE.field(); AE.Music.cur = null; AE.Music.play(f ? f.map.d.music : 'world'); }
   },
   close: function () {
     if (!this.root || this.root.style.display === 'none') return;
     AE.suspend();
-    this.root.style.display = 'none'; this.game.stop(); if (AE.Music) AE.Music.stop(0.1); this.game.input.clear();
+    this.root.style.display = 'none'; this.game.stop(); if (AE.Music) { AE.Music.stop(0.1); AE.Music.cur = null; } this.game.input.clear();
+    setTimeout(function () { try { if (AE.Audio.ctx && AE.host.root.style.display === 'none') AE.Audio.ctx.suspend(); } catch (e) {} }, 300);
     try { document.dispatchEvent(new CustomEvent('aethra:closed')); } catch (e) {}
   }
 };

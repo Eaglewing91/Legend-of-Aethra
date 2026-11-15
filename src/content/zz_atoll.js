@@ -35,16 +35,16 @@
   K('beg', { name: 'Begs', kind: 'special' });
   AE.SPECIALS.beg = async function (B, u) { B.say(u.fed ? 'The urn looks very content.' : '"Gimme an Elixir! An Elixir!"', 70); await AE.wait(40); };
   // ---------- the monsters ----------
-  E('needleback', 'Needleback', 40, 6000, 120, 200, 40, 160, 60, 3200, 140, 1500, { mon: 'Bamboo', k: 2.6, hue: 40, sat: 1.3 },
+  E('needleback', 'Needleback', 40, 6000, 130, 200, 40, 160, 60, 2400, 110, 1200, { mon: 'Bamboo', k: 2.6, hue: 40, sat: 1.3 },
     { eva: 85, morph: 'tetra_bloom', ai: 'needleback', immune: ['poison'] });
-  E('jumbo_needle', 'Jumbo Needleback', 64, 60000, 200, 220, 120, 200, 40, 30000, 1600, 15000, { mon: 'BambooYellow', k: 5.5, hue: 30, sat: 1.4 },
+  E('jumbo_needle', 'Jumbo Needleback', 64, 60000, 210, 220, 120, 200, 40, 20000, 1200, 12000, { mon: 'BambooYellow', k: 5.5, hue: 30, sat: 1.4 },
     { boss: 0, eva: 40, ai: [[2, 'jneedles'], [3, 'attack']], drop: [['megalixir', 0.5]] });
-  E('greedy_urn', 'Greedy Urn', 41, 4096, 10, 255, 10, 255, 30, 8000, 1200, 8000, { mon: 'LanternRed', k: 2.8, hue: 300 },
+  E('greedy_urn', 'Greedy Urn', 41, 4096, 10, 255, 10, 255, 30, 6000, 900, 6000, { mon: 'LanternRed', k: 2.8, hue: 300 },
     { urn: 1, ai: 'greedy_urn' });
   AE.AI.needleback = function (f, B) {
     f.turns = (f.turns || 0) + 1;
     if (f.turns >= 4 && Math.random() < 0.45) return { kind: 'skill', id: 'bolt_away', targets: [f] };
-    return Math.random() < 0.55 ? { kind: 'skill', id: 'needles', targets: [AE.pick(B.foes(f))] } : { kind: 'attack', targets: [AE.pick(B.foes(f))] };
+    return Math.random() < 0.65 ? { kind: 'skill', id: 'needles', targets: [AE.pick(B.foes(f))] } : { kind: 'attack', targets: [AE.pick(B.foes(f))] };
   };
   AE.AI.greedy_urn = function (f, B) {
     f.turns = (f.turns || 0) + 1;

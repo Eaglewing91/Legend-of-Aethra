@@ -10,7 +10,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const b = await chromium.launch(); const p = await b.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.text().startsWith('SIM')) console.log(m.text()); });
   await p.goto('file://' + process.cwd() + '/build/dev.html'); await p.waitForFunction(() => window.ready, null, { timeout: 30000 });
-  const res = await p.evaluate(async ({ seq, K }) => {
+  const res = await p.evaluate(async ({ seq, K, ATOLL }) => {
     const G = AE.game; G.stop(); AE.Music = null;
     AE.say = function (t, o) { return Promise.resolve(o && o.choices ? 0 : undefined); }; AE.notice = function () { return Promise.resolve(); };
     AE.tutorial = function () { return Promise.resolve(); };
@@ -147,8 +147,14 @@ const { chromium } = require('playwright'); const fs = require('fs');
     AE.newGame(); await runUntil(() => true, 5); G.scenes = []; const S = AE.S_; S.cfg.speed = 5; S.cfg.atb = 'active'; S.cfg.diff = 1;
     const log = [], enc = { won: 0, lost: 0, frames: 0, n: 0 };
     let lastEnc = 'r4';
+    const atoll = (ATOLL || '').split(':'); const atollAt = +atoll[0], atollN = +(atoll[1] || 0);
     for (let i = 0; i < seq.length; i++) {
-      const rec = seq[i]; if (rec.en.some(e => !AE.ENEMIES[e])) continue;
+      const rec = seq[i];
+      if (atollN && i === atollAt) {   // an optional trip to Needle Atoll
+        const lv0 = S.party.map(id => S.m[id].lv);
+        for (let k = 0; k < atollN; k++) { AE.healAll(); await battle(AE.rollFormation('w_needle')); }
+        console.log('SIM atoll trip: ' + atollN + ' battles, levels ' + lv0 + ' -> ' + S.party.map(id => S.m[id].lv));
+      } if (rec.en.some(e => !AE.ENEMIES[e])) continue;
       const avgLv = S.party.length ? S.party.reduce((a, id) => a + S.m[id].lv, 0) / S.party.length : 1;
       sync(rec, avgLv); if (rec.enc && AE.ENC[rec.enc]) lastEnc = rec.enc;
       const encN = rec.boss ? K : Math.floor(K / 2);
@@ -168,7 +174,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
       log.push(row); console.log('SIM ' + JSON.stringify(row));
     }
     return { log, enc: { n: enc.n, won: enc.won, lost: enc.lost, avgSecs: Math.round(enc.frames / Math.max(1, enc.n) / 60) }, usedItems, playMinutes: Math.round(frames / 3600) };
-  }, { seq, K });
+  }, { seq, K, ATOLL: process.argv[5] || '' });
   fs.writeFileSync(out, JSON.stringify(res, null, 1));
   console.log('ENC', JSON.stringify(res.enc), 'ITEMS', JSON.stringify(res.usedItems), 'battle minutes', res.playMinutes, errs.length ? 'ERRORS ' + errs.slice(0, 5).join(' | ') : 'no errors');
   await b.close();

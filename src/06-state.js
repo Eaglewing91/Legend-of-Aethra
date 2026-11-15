@@ -11,7 +11,8 @@ AE.newState = function () {
   };
 };
 // ---------- levels ----------
-AE.expFor = function (lv) { return lv <= 1 ? 0 : Math.floor(4 * Math.pow(lv - 1, 2.75) + 18 * (lv - 1)); };   // total EXP to reach lv (Lv 99 ~ 1.4M)
+AE.EXP_K = 1.25;   // levelling pace: each level needs 25% more EXP than the original curve
+AE.expFor = function (lv) { return lv <= 1 ? 0 : Math.floor(AE.EXP_K * (4 * Math.pow(lv - 1, 2.75) + 18 * (lv - 1))); };   // total EXP to reach lv (Lv 99 ~ 2M)
 AE.growStat = function (b, g, lv, k) { return Math.floor(b + g * (lv - 1) + (k || 0) * Math.pow(lv - 1, 2)); };
 // make a member: id, level
 AE.joinMember = function (id, lv) {

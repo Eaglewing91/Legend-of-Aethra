@@ -157,7 +157,7 @@ AE.Field.prototype.talk = function (n) {
   if (d.shop) { this.locked++; AE.openShop(d.shop, d).then(function () { self.locked--; }); return; }
   const lines = d.say || '...';
   this.locked++;
-  const pick = Array.isArray(lines) ? lines[(n.talks = (n.talks || 0) + 1, Math.min(lines.length - 1, n.talks - 1))] : lines;
+  const pick = Array.isArray(lines) ? lines.join('|') : lines;   // the whole conversation, every time you talk
   AE.say(pick, { name: d.name }).then(function () { self.locked--; });
 };
 AE.Field.prototype.openChest = function (ch) {

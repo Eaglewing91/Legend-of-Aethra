@@ -1,5 +1,9 @@
 # Legend of Aethra changelog
 
+## 1.0.8 — 2026-11-15
+
+- Townspeople repeat what they have to say: talking to someone again plays their whole conversation again (before, each talk moved on one line and then only the last line repeated).
+
 ## 1.0.7 — 2026-11-15
 
 - Fewer chests: 286 down to 208. Each area now has at most one chest of potions, ethers or gold (the best one is kept), and the rarest items are much scarcer in the whole game: 4 Megalixirs, 8 Elixirs, 8 X-Potions, 5 Turbo Ethers and 1 Ribbon. Gear, Prisms and key items are all still there. Act 1 alone has 32 fewer chests.

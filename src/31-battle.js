@@ -62,7 +62,7 @@ AE.Battle.prototype.update = function (g) {
   if (!this.paused() && !this.busy) this.tick(1 / 60);
   else if (!this.paused()) this.tick(1 / 60);
   // run away: hold Q and E together (or the Run command)
-  if (I.held.prev && I.held.next && !this.form.noRun) { if (++this.runHold > 70) { this.tryRun(); this.runHold = 0; } } else this.runHold = 0;
+  if (((I.held.prev && I.held.next) || I.held.flee) && !this.form.noRun) { if (++this.runHold > 70) { this.tryRun(); this.runHold = 0; } } else this.runHold = 0;
   // menus
   if (this.menu) this.menu.update(I, this);
   else if (this.ready.length) {

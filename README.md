@@ -42,7 +42,8 @@ stolen memories, four Crystals that hold up the sky, and the woman who wants all
 - Three save files plus a resume point when you close it.
 
 **Controls:** arrows/WASD move · Z, Enter or Space OK · X or Esc back · C menu · Shift run · M world map ·
-hold Q+E to flee a battle.
+hold Q+E to flee a battle. On a touch screen, the touch pad has a D-pad, OK, back, MENU, RUN and MAP, plus a FLEE button
+(hold it) that appears in battles you can run from.
 
 ## Rules and privacy
 The game never reads, clicks or changes Torn's page, makes no network requests, uses no API key and no websockets.

@@ -74,12 +74,25 @@ AE.pad = {
     btn('OK', 'ok', 'right:14px;bottom:60px;width:56px;height:56px;border-radius:28px'); btn('✕', 'back', 'right:76px;bottom:16px;width:46px;height:46px;border-radius:23px');
     btn('MENU', 'menu', 'right:14px;bottom:126px;width:56px;height:30px;font-size:11px'); btn('RUN', 'run', 'right:76px;bottom:126px;width:46px;height:30px;font-size:11px');
     btn('MAP', 'map', 'left:6px;top:8px;width:46px;height:28px;font-size:11px');
+    // FLEE: hold it to run from a battle (like holding Q and E); shown only in battles you can run from
+    btn('FLEE', 'flee', 'right:128px;bottom:126px;width:52px;height:30px;font-size:11px;background:rgba(220,90,70,.3)');
+    this.fleeBtn = p.lastChild; this.fleeBtn.style.display = 'none';
     root.appendChild(p);
   },
   set: function (on) {
     const r = AE.host.root; if (!r) { AE.pad.want = on; return; }
     if (!this.el) this.make(r);
     this.el.style.display = on ? 'block' : 'none';
+    clearInterval(this.fleeT); this.fleeT = 0;
+    if (on) {
+      const self = this;
+      this.fleeT = setInterval(function () {
+        if (!self.el || !self.el.isConnected) { clearInterval(self.fleeT); self.fleeT = 0; return; }
+        const t = AE.game && AE.game.top(), show = !!(t && t.kind === 'battle' && t.form && !t.form.noRun && !t.result);
+        self.fleeBtn.style.display = show ? 'flex' : 'none';
+        if (!show && AE.game && AE.game.input.held.flee) AE.game.input.press('flee', false);
+      }, 200);
+    }
   }
 };
 AE.setPad = function (on) { AE.pad.set(!!on); };

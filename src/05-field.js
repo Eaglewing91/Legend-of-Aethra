@@ -187,6 +187,20 @@ AE.Field.prototype.draw = function (ctx) {
   const all = this.npcs.concat([this.player]).sort(function (a, b) { return a.py - b.py; });
   all.forEach(function (a) { a.draw(ctx, cx, cy); });
   m.drawLayer(ctx, 'over', cx, cy);
+  // where to go next: a bouncing gold arrow over marked events (mark is a condition, like if)
+  (m.d.events || []).forEach(function (e) {
+    if (!e.mark || !AE.cond(e.mark)) return;
+    const X = Math.round((e.x + e.w / 2) * 16 - cx), Y = Math.round(e.y * 16 - cy - 6 - Math.abs(Math.sin(AE.game.frame / 12)) * 5);
+    if (X < -16 || Y < -16 || X > AE.W + 16 || Y > AE.H + 16) return;
+    // a soft pulsing glow on the spot itself
+    const gx = e.x * 16 - cx, gy = e.y * 16 - cy, pul = 0.25 + 0.2 * Math.sin(AE.game.frame / 9);
+    ctx.fillStyle = 'rgba(255,214,80,' + pul.toFixed(3) + ')'; ctx.fillRect(gx, gy, e.w * 16, e.h * 16);
+    ctx.strokeStyle = 'rgba(255,230,140,' + (pul + 0.3).toFixed(3) + ')'; ctx.lineWidth = 1; ctx.strokeRect(gx + 0.5, gy + 0.5, e.w * 16 - 1, e.h * 16 - 1);
+    // the arrow
+    ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.beginPath(); ctx.moveTo(X - 8, Y - 11); ctx.lineTo(X + 8, Y - 11); ctx.lineTo(X, Y + 1); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffd040'; ctx.beginPath(); ctx.moveTo(X - 7, Y - 12); ctx.lineTo(X + 7, Y - 12); ctx.lineTo(X, Y - 1); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff6c0'; ctx.fillRect(X - 5, Y - 11, 6, 1);
+  });
   if (AE.fieldAmbient) AE.fieldAmbient(ctx, this, cx, cy);
   if (AE.fieldLight) AE.fieldLight(ctx, this, cx, cy);
   if (m.d.tint) { ctx.fillStyle = m.d.tint; ctx.fillRect(0, 0, AE.W, AE.H); }

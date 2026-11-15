@@ -3,6 +3,7 @@
 ## 1.0.3 — 2026-11-15
 
 - Examining things: facing an object (a console, a bed, a mural, a lock) now works when its examine spot is the floor beside it, everywhere in the game, not just at Reactor 4.
+- A gold arrow and a glow show where to go at the start: the gate console, then the reactor doors. The first tip explains how to examine things.
 - Checked every map: every examine spot, switch puzzle, sealed gate and story flag can be reached and triggered.
 
 ## 1.0.2 — 2026-11-15

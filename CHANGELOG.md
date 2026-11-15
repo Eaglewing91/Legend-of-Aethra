@@ -1,5 +1,12 @@
 # Legend of Aethra changelog
 
+## 1.0.5 — 2026-11-15
+
+- **FF7-style numbers.** HP and MP now grow by Final Fantasy VII's own tables (Kael grows like Cloud, Bram like Barret, Lyra like Aeris, Sable like Yuffie, and so on): about 200 HP at Lv 1, 300 at Lv 6, 760 at Lv 20, 3,650 at Lv 50 and 9,400 at Lv 99. Strength, Vitality, Magic and Spirit follow FF7's curve too. Enemy HP and damage are scaled to match, so battles take about as long and hit about as hard as before (checked with a full simulated playthrough: every story battle won).
+- Sources (Power Source, Guard Source...) now really raise the stat.
+- Indoors and in dungeons: you can no longer walk onto the tops of tall props (pipes, shelves, cabinets) standing against a wall. Where a prop stood in the only way through, it has been taken out.
+- Checked the whole game for places you could get stuck: every gate's switch or story trigger is reachable before the gate opens, no standing person blocks a way through, every key item has a source, and every map without a door has a scripted way out.
+
 ## 1.0.4 — 2026-11-15
 
 - Switch puzzles (valves, levers, terminals, runes, crystals, orbs) in every dungeon: each switch you still need to use has a gold arrow and a glow over it, so they are easy to find. The arrow goes once it is used.

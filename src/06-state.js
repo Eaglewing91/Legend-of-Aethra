@@ -14,6 +14,75 @@ AE.newState = function () {
 AE.EXP_K = 1.25;   // levelling pace: each level needs 25% more EXP than the original curve
 AE.expFor = function (lv) { return lv <= 1 ? 0 : Math.floor(AE.EXP_K * (4 * Math.pow(lv - 1, 2.75) + 18 * (lv - 1))); };   // total EXP to reach lv (Lv 99 ~ 2M)
 AE.growStat = function (b, g, lv, k) { return Math.floor(b + g * (lv - 1) + (k || 0) * Math.pow(lv - 1, 2)); };
+// ---------- FF7 growth ----------
+// HP and MP: FF7's own tables, [gradient, base] for the level brackets 2-11, 12-21, 22-31, 32-41, 42-51, 52-61,
+// 62-81, 82-99. HP = base + (lv - 1) * gradient; MP = base + (lv - 1) * gradient / 10 (the averages FF7 levels to).
+AE.FF7 = {
+  hp: {
+    cloud: [[19, 200], [42, -40], [72, -640], [100, -1440], [121, -2280], [137, -3080], [120, -2040], [98, -200]],
+    barret: [[22, 200], [45, 0], [82, -760], [118, -1840], [143, -2840], [143, -2840], [115, -1160], [95, 600]],
+    tifa: [[19, 200], [38, 0], [64, -520], [96, -1520], [121, -2520], [131, -3000], [117, -2160], [92, -80]],
+    aeris: [[17, 160], [36, 0], [65, -560], [93, -1400], [114, -2240], [126, -2880], [113, -2080], [93, -400]],
+    red: [[21, 200], [45, -40], [75, -640], [105, -1520], [126, -2360], [134, -2760], [119, -1840], [97, -80]],
+    yuffie: [[18, 200], [37, 0], [64, -560], [89, -1320], [111, -2160], [127, -2960], [120, -2560], [96, -520]],
+    cait: [[24, 200], [51, -80], [80, -640], [111, -1560], [141, -2760], [138, -2600], [99, -240], [72, 2000]],
+    vincent: [[18, 160], [41, -80], [67, -600], [86, -1160], [110, -2120], [123, -2800], [120, -2640], [92, -400]]
+  },
+  mp: {
+    cloud: [[64, 12], [78, 0], [90, -26], [101, -58], [112, -102], [112, -102], [96, -4], [73, 180]],
+    barret: [[57, 10], [67, 0], [77, -20], [90, -60], [102, -108], [100, -96], [84, 0], [63, 170]],
+    tifa: [[60, 10], [70, 0], [84, -28], [94, -58], [104, -98], [104, -98], [92, -26], [72, 136]],
+    aeris: [[70, 16], [84, 0], [99, -30], [112, -68], [124, -116], [120, -96], [105, -6], [82, 188]],
+    red: [[58, 12], [75, -6], [86, -28], [97, -60], [108, -104], [112, -126], [94, -16], [66, 210]],
+    yuffie: [[58, 10], [72, -2], [80, -20], [93, -58], [106, -110], [110, -130], [85, 20], [72, 126]],
+    vincent: [[63, 12], [80, -6], [90, -26], [96, -44], [100, -60], [105, -86], [97, 38], [84, 74]]
+  },
+  // who grows like whom: [HP table, MP table]
+  who: { kael: ['cloud', 'cloud'], bram: ['barret', 'barret'], lyra: ['aeris', 'aeris'], sable: ['yuffie', 'yuffie'],
+    orin: ['vincent', 'aeris'], ember: ['aeris', 'aeris'], rook: ['cait', 'barret'], vesna: ['vincent', 'vincent'] },
+  // Cloud's average Strength / Vitality / Magic / Spirit at Lv 1, 6, 10, 20, 30, 50, 99
+  curve: { lv: [1, 6, 10, 20, 30, 50, 99], str: [17, 20, 25, 37.5, 49.5, 76.5, 99], vit: [14, 16, 21, 33.5, 47.5, 68.5, 92.5],
+    mag: [16, 19, 25, 36.5, 50.5, 75.5, 99], spr: [15, 17, 22, 33.5, 46.5, 69.5, 96.5] }
+};
+AE.ff7Table = function (t, lv, mp) {
+  const i = lv <= 11 ? 0 : lv <= 21 ? 1 : lv <= 31 ? 2 : lv <= 41 ? 3 : lv <= 51 ? 4 : lv <= 61 ? 5 : lv <= 81 ? 6 : 7;
+  return mp ? t[i][1] + Math.floor((lv - 1) * t[i][0] / 10) : t[i][1] + (lv - 1) * t[i][0];
+};
+// the four main stats: each character keeps their own strengths, scaled so the cast averages FF7's curve
+AE.ff7Ratio = function (k, lv) {
+  const F = AE.FF7; F.R = F.R || {};
+  if (!F.R[k]) {
+    const ids = Object.keys(F.who), c = F.curve, out = [0];
+    for (let L = 1; L <= 99; L++) {
+      let j = 0; while (j < c.lv.length - 2 && L > c.lv[j + 1]) j++;
+      const t = (L - c.lv[j]) / (c.lv[j + 1] - c.lv[j]), want = c[k][j] + (c[k][j + 1] - c[k][j]) * t;
+      const avg = ids.reduce(function (s, id) { const C = AE.CHARS[id]; return s + AE.growStat(C.base[k], C.grow[k], L); }, 0) / ids.length;
+      out[L] = want / avg;
+    }
+    F.R[k] = out;
+  }
+  return F.R[k][AE.clamp(lv, 1, 99)];
+};
+AE.ff7Stats = function (id, lv, st) {
+  const w = AE.FF7.who[id]; if (!w) return;
+  st.maxhp = Math.max(1, AE.ff7Table(AE.FF7.hp[w[0]], lv)); st.maxmp = Math.max(0, AE.ff7Table(AE.FF7.mp[w[1]], lv, true));
+  ['str', 'vit', 'mag', 'spr'].forEach(function (k) { st[k] = Math.max(1, Math.round(st[k] * AE.ff7Ratio(k, lv))); });
+};
+// enemies: party hits are smaller with FF7 stats, so enemy HP shrinks by the same share at that level
+AE.ff7EnemyHp = function (lv) {
+  const F = AE.FF7; if (F.EH) return F.EH[AE.clamp(lv || 1, 1, 99)];
+  const ids = Object.keys(F.who), base = function (atk, L) { return atk + ((atk + L) / 32) * ((atk * L) / 32); }; F.EH = [1];
+  for (let L = 1; L <= 99; L++) {
+    const W = Math.min(120, 18 + 0.95 * (L - 1)); let ph = 0, mg = 0;
+    ids.forEach(function (id) {
+      const C = AE.CHARS[id], s0 = AE.growStat(C.base.str, C.grow.str, L), m0 = AE.growStat(C.base.mag, C.grow.mag, L);
+      const s1 = Math.round(s0 * AE.ff7Ratio('str', L)), m1 = Math.round(m0 * AE.ff7Ratio('mag', L));
+      ph += base(s1 + W, L) / base(s0 + W, L); mg += (m1 + L) / (m0 + L);
+    });
+    F.EH[L] = (0.7 * ph + 0.3 * mg) / ids.length;
+  }
+  return F.EH[AE.clamp(lv || 1, 1, 99)];
+};
 // make a member: id, level
 AE.joinMember = function (id, lv) {
   const S = AE.S_, C = AE.CHARS[id];
@@ -31,6 +100,12 @@ AE.calc = function (id) {
     str: AE.growStat(b.str, g.str, lv), vit: AE.growStat(b.vit, g.vit, lv), mag: AE.growStat(b.mag, g.mag, lv),
     spr: AE.growStat(b.spr, g.spr, lv), spd: AE.growStat(b.spd, g.spd, lv), lck: AE.growStat(b.lck, g.lck, lv)
   };
+  // FF7 numbers: HP and MP follow the FF7 growth tables, Strength/Vitality/Magic/Spirit follow FF7's curve
+  // (see AE.FF7). The old values are kept so battles stay balanced (see AE.ff7In).
+  const old = { hp: st.maxhp, vit: st.vit, spr: st.spr };
+  AE.ff7Stats(id, lv, st);
+  const bo = m.boost || {}, bn = m.bonus || {};   // Sources (Power Source...) used from the menu or in battle
+  ['str', 'vit', 'mag', 'spr', 'spd', 'lck'].forEach(function (k) { st[k] += (bo[k] || 0) + (bn[k] || 0); });
   const w = AE.WEAPONS[m.equip.weapon] || { atk: 0, hit: 95 }, a = AE.ARMORS[m.equip.armor] || { def: 0, mdef: 0, eva: 0 }, ac = AE.ACCS[m.equip.acc] || {};
   st.atk = 0; st.def = 0; st.mdef = 0; st.hit = w.hit || 95; st.eva = (a.eva || 0); st.meva = (a.meva || 0);
   const add = function (o) { if (!o) return; for (const k in o) if (typeof o[k] === 'number' && k in st) st[k] += o[k]; };
@@ -61,6 +136,10 @@ AE.calc = function (id) {
   st.maxhp = AE.clamp(st.maxhp, 1, 9999); st.maxmp = AE.clamp(st.maxmp, 0, 999);
   ['str', 'vit', 'mag', 'spr', 'spd', 'lck'].forEach(function (k) { st[k] = AE.clamp(st[k], 1, 255); });
   st.atk += st.str + st.wpn; st.def += st.vit + st.arm; st.mdef += st.spr + st.marm;
+  // how hard enemy hits land compared with the old numbers: the same share of HP as before
+  const hpOld = Math.min(9999, Math.floor(old.hp * (1 + (ind.hp || 0) / 100))), defOld = st.def - st.vit + old.vit, mdefOld = st.mdef - st.spr + old.spr;
+  st.kPhys = (st.maxhp / hpOld) * (512 - Math.min(511, defOld)) / (512 - Math.min(511, st.def));
+  st.kMag = (st.maxhp / hpOld) * (512 - Math.min(511, mdefOld)) / (512 - Math.min(511, st.mdef));
   st.elemAtk = w.elem || null; st.armElem = a.elem || null; st.armHalf = a.half || null; st.statusGuard = (a.guard || []).concat(ac.guard || []);
   m.st = st; m.maxhp = st.maxhp; m.maxmp = st.maxmp;
   m.hp = Math.min(m.hp, m.maxhp); m.mp = Math.min(m.mp, m.maxmp);

@@ -6,7 +6,7 @@ AE.mkParty = function (id, slot) {
   const S = AE.S_, m = S.m[id], C = AE.CHARS[id]; AE.calc(id); const st = m.st;
   const f = new AE.Fighter({ side: 'party', id: id, name: C.name, m: m, lv: m.lv, hp: m.hp, maxhp: m.maxhp, mp: m.mp, maxmp: m.maxmp,
     atk: st.atk, def: st.def, mag: st.mag, mdef: st.mdef, spd: st.spd, lck: st.lck, str: st.str, hit: st.hit, eva: st.eva, meva: st.meva,
-    elemAtk: st.elemAtk, half: st.armHalf, guard: st.statusGuard, row: m.row, long: !!(AE.WEAPONS[m.equip.weapon] || {}).long || !!st.abil.indep.long,
+    elemAtk: st.elemAtk, kPhys: st.kPhys || 1, kMag: st.kMag || 1, half: st.armHalf, guard: st.statusGuard, row: m.row, long: !!(AE.WEAPONS[m.equip.weapon] || {}).long || !!st.abil.indep.long,
     abil: st.abil, status: {}, atb: Math.random() * 0.5, slot: slot, surge: m.surge || 0, anim: 'ready', t: 0 });
   (m.status || []).forEach(function (s) { f.status[s] = 999; });
   if (st.acc === 'haste') f.status.haste = 9999; if (st.acc === 'protect') { f.status.protect = 9999; f.status.shell = 9999; }
@@ -15,7 +15,8 @@ AE.mkParty = function (id, slot) {
 };
 AE.mkEnemy = function (id, slot, o) {
   const D = AE.ENEMIES[id]; if (!D) throw new Error('no enemy ' + id);
-  return new AE.Fighter(Object.assign({ side: 'enemy', id: id, d: D, name: D.name, lv: D.lv, hp: D.hp, maxhp: D.hp, mp: D.mp || 99, maxmp: D.mp || 99,
+  const hp = Math.max(1, Math.round(D.hp * AE.ff7EnemyHp(D.lv)));   // FF7-scale HP (see AE.ff7EnemyHp)
+  return new AE.Fighter(Object.assign({ side: 'enemy', id: id, d: D, name: D.name, lv: D.lv, hp: hp, maxhp: hp, mp: D.mp || 99, maxmp: D.mp || 99,
     atk: D.atk, def: D.def, mag: D.mag, mdef: D.mdef, spd: D.spd, lck: D.lck || 10, hit: D.hit || 95, eva: D.eva || 0, meva: D.meva || 0,
     status: {}, atb: Math.random() * 0.7, slot: slot, anim: 'idle', t: Math.random() * 10, ai: { n: 0, vars: {} } }, o || {}));
 };
@@ -35,6 +36,7 @@ AE.physDamage = function (a, t, power, o) {
   if (a.side === 'party' && a.row === 'back' && !a.long && !o.ranged) dmg /= 2;
   if (t.side === 'party' && t.row === 'back' && !o.ranged) dmg /= 2;
   if (a.status.frog) dmg /= 4;
+  if (a.side === 'enemy' && t.side === 'party') dmg *= t.kPhys || 1;   // FF7-scale party HP (see AE.calc)
   return AE.variance(dmg);
 };
 AE.magDamage = function (a, t, power, o) {
@@ -43,6 +45,7 @@ AE.magDamage = function (a, t, power, o) {
   let dmg = power * (512 - Math.min(511, t.mdef)) * base / (16 * 512);
   if (t.status.shell) dmg /= 2;
   if (o.split) dmg /= 2;   // spells on all targets lose a little
+  if (a.side === 'enemy' && t.side === 'party') dmg *= t.kMag || 1;
   return AE.variance(dmg);
 };
 AE.healAmount = function (a, power) { return AE.variance((power * 22 + 6 * (a.mag + a.lv) * power / 10)); };
